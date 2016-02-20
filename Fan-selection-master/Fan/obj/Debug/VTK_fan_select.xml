@@ -22,10 +22,5 @@ VTK_fan_select
   resource lookups using this strongly typed resource class.
 </summary>
 </member>
-<member name="P:VTK_fan_select.My.Resources.Resources.Lager_opstelling">
-<summary>
-  Looks up a localized resource of type System.Drawing.Bitmap.
-</summary>
-</member>
 </members>
 </doc>

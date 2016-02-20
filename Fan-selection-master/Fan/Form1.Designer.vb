@@ -22,7 +22,6 @@ Partial Class Form1
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
         Dim Legend1 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
         Dim Series1 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
@@ -31,6 +30,7 @@ Partial Class Form1
         Dim ChartArea2 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
         Dim Legend2 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
         Dim Series4 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPage1 = New System.Windows.Forms.TabPage()
         Me.Button7 = New System.Windows.Forms.Button()
@@ -306,8 +306,6 @@ Partial Class Form1
         Me.Label110 = New System.Windows.Forms.Label()
         Me.Label109 = New System.Windows.Forms.Label()
         Me.Label108 = New System.Windows.Forms.Label()
-        Me.GroupBox18 = New System.Windows.Forms.GroupBox()
-        Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.TabPage6 = New System.Windows.Forms.TabPage()
         Me.TextBox142 = New System.Windows.Forms.TextBox()
         Me.TextBox141 = New System.Windows.Forms.TextBox()
@@ -541,6 +539,7 @@ Partial Class Form1
         Me.TextBox4 = New System.Windows.Forms.TextBox()
         Me.TextBox6 = New System.Windows.Forms.TextBox()
         Me.TextBox5 = New System.Windows.Forms.TextBox()
+        Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.GroupBox16.SuspendLayout()
@@ -595,8 +594,6 @@ Partial Class Form1
         CType(Me.NumericUpDown24, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.NumericUpDown23, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.NumericUpDown22, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.GroupBox18.SuspendLayout()
-        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage6.SuspendLayout()
         Me.TabPage3.SuspendLayout()
         Me.GroupBox39.SuspendLayout()
@@ -649,6 +646,7 @@ Partial Class Form1
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox11.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
+        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'TabControl1
@@ -3094,12 +3092,12 @@ Partial Class Form1
         '
         'TabPage5
         '
+        Me.TabPage5.Controls.Add(Me.PictureBox1)
         Me.TabPage5.Controls.Add(Me.GroupBox22)
         Me.TabPage5.Controls.Add(Me.GroupBox21)
         Me.TabPage5.Controls.Add(Me.GroupBox5)
         Me.TabPage5.Controls.Add(Me.Button6)
         Me.TabPage5.Controls.Add(Me.GroupBox19)
-        Me.TabPage5.Controls.Add(Me.GroupBox18)
         Me.TabPage5.Location = New System.Drawing.Point(4, 22)
         Me.TabPage5.Name = "TabPage5"
         Me.TabPage5.Padding = New System.Windows.Forms.Padding(3)
@@ -3799,26 +3797,6 @@ Partial Class Form1
         Me.Label108.Size = New System.Drawing.Size(154, 16)
         Me.Label108.TabIndex = 0
         Me.Label108.Text = "Overhang waaier a [mm]"
-        '
-        'GroupBox18
-        '
-        Me.GroupBox18.Controls.Add(Me.PictureBox1)
-        Me.GroupBox18.Location = New System.Drawing.Point(503, 31)
-        Me.GroupBox18.Name = "GroupBox18"
-        Me.GroupBox18.Size = New System.Drawing.Size(411, 283)
-        Me.GroupBox18.TabIndex = 0
-        Me.GroupBox18.TabStop = False
-        Me.GroupBox18.Text = "Opstelling"
-        '
-        'PictureBox1
-        '
-        Me.PictureBox1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.PictureBox1.Image = Global.VTK_fan_select.My.Resources.Resources.Lager_opstelling
-        Me.PictureBox1.Location = New System.Drawing.Point(3, 16)
-        Me.PictureBox1.Name = "PictureBox1"
-        Me.PictureBox1.Size = New System.Drawing.Size(405, 264)
-        Me.PictureBox1.TabIndex = 0
-        Me.PictureBox1.TabStop = False
         '
         'TabPage6
         '
@@ -6376,6 +6354,15 @@ Partial Class Form1
         Me.TextBox5.TabIndex = 11
         Me.TextBox5.Text = "1"
         '
+        'PictureBox1
+        '
+        Me.PictureBox1.Image = CType(resources.GetObject("PictureBox1.Image"), System.Drawing.Image)
+        Me.PictureBox1.Location = New System.Drawing.Point(503, 51)
+        Me.PictureBox1.Name = "PictureBox1"
+        Me.PictureBox1.Size = New System.Drawing.Size(435, 251)
+        Me.PictureBox1.TabIndex = 90
+        Me.PictureBox1.TabStop = False
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -6459,8 +6446,6 @@ Partial Class Form1
         CType(Me.NumericUpDown24, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.NumericUpDown23, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.NumericUpDown22, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.GroupBox18.ResumeLayout(False)
-        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage6.ResumeLayout(False)
         Me.TabPage6.PerformLayout()
         Me.TabPage3.ResumeLayout(False)
@@ -6533,6 +6518,7 @@ Partial Class Form1
         Me.GroupBox11.PerformLayout()
         Me.GroupBox3.ResumeLayout(False)
         Me.GroupBox3.PerformLayout()
+        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -6701,8 +6687,6 @@ Partial Class Form1
     Friend WithEvents TextBox32 As TextBox
     Friend WithEvents Label43 As Label
     Friend WithEvents GroupBox19 As GroupBox
-    Friend WithEvents GroupBox18 As GroupBox
-    Friend WithEvents PictureBox1 As PictureBox
     Friend WithEvents NumericUpDown27 As NumericUpDown
     Friend WithEvents NumericUpDown26 As NumericUpDown
     Friend WithEvents NumericUpDown25 As NumericUpDown
@@ -7047,4 +7031,5 @@ Partial Class Form1
     Friend WithEvents GroupBox14 As GroupBox
     Friend WithEvents ComboBox7 As ComboBox
     Friend WithEvents Label221 As Label
+    Friend WithEvents PictureBox1 As PictureBox
 End Class
