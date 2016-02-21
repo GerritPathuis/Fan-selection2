@@ -1863,14 +1863,14 @@ Public Class Form1
     Private Sub Scale_rules_compressor()
         Dim ty As Integer
         Dim Pow0, Q0, dia0, n0 As Double                                                'From Tschets
-        Dim Ptot0, ro0_inlet, temp0 As Double                                           'Initial conditions
+        Dim Ptot0, Pstat0, ro0_inlet, temp0 As Double                                           'Initial conditions
         Dim Volume_debiet As Double                                                     '[m3/hr] is identiek per waaier (onafhankelijk van de density)
         Dim massa_debiet As Double
-        Dim Pow1, P1_in, P1_out, dia1, n1, ro_fan1_inlet, ro_fan1_outlet, temp1 As Double       'Impellar #1 
-        Dim Pow2, P2_in, P2_out, dia2, n2, ro_fan2_inlet, ro_fan2_outlet, temp2 As Double       'Impellar #2 
-        Dim Pow3, P3_in, P3_out, dia3, n3, ro_fan3_inlet, ro_fan3_outlet, temp3 As Double       'Impellar #3 
-        Dim dia_omloop1, dp_omloop_1, phi_1, velos_1, area_1 As Double                          'Omloop #1
-        Dim dia_omloop2, dp_omloop_2, phi_2, velos_2, area_2 As Double                          'Omloop #2
+        Dim Pow1, P1_in, P1_tot_out, P1_stat_out, dia1, n1, ro_fan1_inlet, ro_fan1_outlet, temp1 As Double      'Impellar #1 
+        Dim Pow2, P2_in, P2_tot_out, P2_stat_out, dia2, n2, ro_fan2_inlet, ro_fan2_outlet, temp2 As Double      'Impellar #2 
+        Dim Pow3, P3_in, P3_tot_out, P3_stat_out, dia3, n3, ro_fan3_inlet, ro_fan3_outlet, temp3 As Double      'Impellar #3 
+        Dim dia_omloop1, dp_omloop_1, phi_1, velos_1, area_1 As Double                                          'Omloop #1
+        Dim dia_omloop2, dp_omloop_2, phi_2, velos_2, area_2 As Double                                          'Omloop #2
         Dim Power_total As Double
 
         Try
@@ -1881,6 +1881,7 @@ Public Class Form1
                 n0 = Tschets(ty).Tdata(1)           '[rpm]
                 ro0_inlet = Tschets(ty).Tdata(2)    '[kg/m3]
                 Ptot0 = Tschets(ty).werkp_opT(1)    'P_totaal [Pa]
+                Pstat0 = Tschets(ty).werkp_opT(2)   'P_static [Pa]
                 Pow0 = Tschets(ty).werkp_opT(3)     '[kW]
                 Q0 = Tschets(ty).werkp_opT(4)       '[Am3/s]
 
@@ -1907,20 +1908,22 @@ Public Class Form1
                 n2 = n1         'Impellar #1 and #2 have same speed
                 n3 = n1         'Impellar #1 and #3 have same speed
 
-                '=============================================== PROBLEM PSTAT and P_total seem to be mixed up=================
-                '================================= CHECK CHECK=========================================
+
+                '==========================================================================
 
                 Volume_debiet = Round(Scale_rule_cap(Q0, dia0, dia1, n0, n1), 2)                        '[Am3/s]
                 massa_debiet = Volume_debiet * ro_fan1_inlet                                            '[kg/s= m3/s* kg/m3]
 
                 '-------------------------- Waaier #1 ----------------------
-                P1_out = P1_in + Round(Scale_rule_Pressure(Ptot0, dia0, dia1, n0, n1, ro0_inlet, ro_fan1_inlet), 0)    '[Pa]
-                Pow1 = Round(Scale_rule_Power(Pow0, dia0, dia1, n0, n1, ro0_inlet, ro_fan1_inlet), 0)               '[kW] 
-                temp1 = temp0 + (Pow1 / (cp_air * massa_debiet))                                                    '[c]
+                P1_tot_out = P1_in + Round(Scale_rule_Pressure(Ptot0, dia0, dia1, n0, n1, ro0_inlet, ro_fan1_inlet), 0)     '[Pa] P_total
+                P1_stat_out = P1_in + Round(Scale_rule_Pressure(Pstat0, dia0, dia1, n0, n1, ro0_inlet, ro_fan1_inlet), 0)   '[Pa] P_static
+                Pow1 = Round(Scale_rule_Power(Pow0, dia0, dia1, n0, n1, ro0_inlet, ro_fan1_inlet), 0)                       '[kW] 
+                temp1 = temp0 + (Pow1 / (cp_air * massa_debiet))                                                            '[c]
 
                 '----------- present------------------------
                 TextBox136.Text = Round(P1_in / 100, 0).ToString                            '[mbarg] inlet (atmospheric)
-                TextBox12.Text = Round(P1_out / 100, 0).ToString                            '[mbar] outlet
+                TextBox12.Text = Round(P1_tot_out / 100, 0).ToString                        '[mbar] outlet P_total
+                TextBox153.Text = Round(P1_stat_out / 100, 0).ToString                      '[mbar] outlet P_static
                 TextBox129.Text = Round(temp1, 0).ToString                                  '[c]
                 TextBox132.Text = Round(Pow1, 0).ToString                                   '[kW]
                 TextBox135.Text = Round(massa_debiet * 3600, 0).ToString                    '[kg/hr]
@@ -1929,7 +1932,7 @@ Public Class Form1
                 '------------------- pressure loss omloop #1 -----------------------------
                 '--------------------- dp = phi* 1/2 ro*v^2 --------------
                 '------------------- calc ro2 @ omloop inlet ----------------
-                ro_fan1_outlet = calc_density(G_density_act_zuig, (Ptot0 + 101300), (P1_out + 101300), temp0, temp1)
+                ro_fan1_outlet = calc_density(G_density_act_zuig, (Ptot0 + 101300), (P1_tot_out + 101300), temp0, temp1)
                 NumericUpDown38.Value = Round(ro_fan1_outlet, 2).ToString       'Density outlet
 
                 '----------------- diameter omloop #1 --------------------
@@ -1939,7 +1942,7 @@ Public Class Form1
 
                 dp_omloop_1 = 0.5 * phi_1 * velos_1 ^ 2 * ro_fan1_outlet        '[Pa]
                 TextBox64.Text = Round(dp_omloop_1 / 100, 0).ToString           '[mbar]
-                P2_in = P1_out - dp_omloop_1                                    '[Pa]
+                P2_in = P1_tot_out - dp_omloop_1                                '[Pa]
 
                 ro_fan2_inlet = calc_density(G_density_act_zuig, (Ptot0 + 101300), (P2_in + 101300), temp0, temp1)
 
@@ -1947,20 +1950,22 @@ Public Class Form1
 
                 '-------------------------- Waaier #2 ----------------------
                 '---------------------------------------------------------------
-                P2_out = P2_in + Round(Scale_rule_Pressure(Ptot0, dia0, dia2, n0, n2, ro0_inlet, ro_fan2_inlet), 0)    '[Pa]
-                Pow2 = Round(Scale_rule_Power(Pow0, dia0, dia2, n0, n2, ro0_inlet, ro_fan2_inlet), 0)               '[kW] 
-                temp2 = temp0 + ((Pow1 + Pow2) / (cp_air * massa_debiet))                                           '[c]
+                P2_tot_out = P2_in + Round(Scale_rule_Pressure(Ptot0, dia0, dia2, n0, n2, ro0_inlet, ro_fan2_inlet), 0)     '[Pa] P_total
+                P2_stat_out = P2_in + Round(Scale_rule_Pressure(Pstat0, dia0, dia2, n0, n2, ro0_inlet, ro_fan2_inlet), 0)   '[Pa] P_static
+                Pow2 = Round(Scale_rule_Power(Pow0, dia0, dia2, n0, n2, ro0_inlet, ro_fan2_inlet), 0)                       '[kW] 
+                temp2 = temp0 + ((Pow1 + Pow2) / (cp_air * massa_debiet))                                                   '[c]
 
                 '----------- present------------------------
                 TextBox137.Text = Round(P2_in / 100, 0).ToString                '[mbar]
                 TextBox130.Text = Round(temp2, 0).ToString                      '[c]
-                TextBox80.Text = Round(P2_out / 100, 0).ToString                '[mbar] outlet
+                TextBox80.Text = Round(P2_tot_out / 100, 0).ToString            '[mbar] outlet P_total
+                TextBox154.Text = Round(P2_stat_out / 100, 0).ToString          '[mbar] outlet P_static
                 TextBox133.Text = Round(Pow2, 0).ToString                       '[kW]
 
                 '------------------- pressure loss omloop #2 -----------------------------
                 '--------------------- dp = phi* 1/2 ro*v^2 --------------
                 '------------------- calc ro2 @ omloop inlet ----------------
-                ro_fan2_outlet = calc_density(G_density_act_zuig, (Ptot0 + 101300), (P2_out + 101300), temp0, temp2)
+                ro_fan2_outlet = calc_density(G_density_act_zuig, (Ptot0 + 101300), (P2_tot_out + 101300), temp0, temp2)
                 NumericUpDown40.Value = Round(ro_fan2_outlet, 2).ToString       'Density outlet
 
 
@@ -1972,18 +1977,19 @@ Public Class Form1
                 dp_omloop_2 = 0.5 * phi_2 * velos_2 ^ 2 * ro_fan2_outlet        '[Pa]
                 TextBox128.Text = Round(dp_omloop_2 / 100, 0).ToString          '[mbar]
 
-                P3_in = P2_out - dp_omloop_2                                    '[Pa]
+                P3_in = P2_tot_out - dp_omloop_2                                '[Pa]
 
                 ro_fan3_inlet = calc_density(G_density_act_zuig, (Ptot0 + 101300), (P3_in + 101300), temp0, temp2)
                 NumericUpDown41.Value = Round(ro_fan3_inlet, 2).ToString        '[kg/m3] Density inlet
 
                 '-------------------------- Waaier #3 ----------------------
                 '---------------------------------------------------------------
-                P3_out = P3_in + Round(Scale_rule_Pressure(Ptot0, dia0, dia3, n0, n3, ro0_inlet, ro_fan3_inlet), 0) '[Pa]
-                Pow3 = Round(Scale_rule_Power(Pow0, dia0, dia3, n0, n3, ro0_inlet, ro_fan3_inlet), 0)   '[kW] 
-                temp3 = temp0 + ((Pow1 + Pow2 + Pow3) / (cp_air * massa_debiet))
+                P3_tot_out = P3_in + Round(Scale_rule_Pressure(Ptot0, dia0, dia3, n0, n3, ro0_inlet, ro_fan3_inlet), 0)     '[Pa] P_total
+                P3_stat_out = P3_in + Round(Scale_rule_Pressure(Pstat0, dia0, dia2, n0, n2, ro0_inlet, ro_fan2_inlet), 0)   '[Pa] P_static
+                Pow3 = Round(Scale_rule_Power(Pow0, dia0, dia3, n0, n3, ro0_inlet, ro_fan3_inlet), 0)                       '[kW] 
+                temp3 = temp0 + ((Pow1 + Pow2 + Pow3) / (cp_air * massa_debiet))                                            '[c]
 
-                ro_fan3_outlet = calc_density(G_density_act_zuig, (Ptot0 + 101300), (P3_out + 101300), temp0, temp3)
+                ro_fan3_outlet = calc_density(G_density_act_zuig, (Ptot0 + 101300), (P3_tot_out + 101300), temp0, temp3)
                 NumericUpDown46.Value = Round(ro_fan3_outlet, 2).ToString       'Density outlet
 
                 '-------------------------- Aantal trappen ----------------------
@@ -1994,7 +2000,7 @@ Public Class Form1
                     TextBox130.BackColor = Color.FromArgb(192, 255, 192)
                     TextBox133.BackColor = Color.FromArgb(192, 255, 192)
                     Power_total = Pow1 + Pow2                                           '[kW]
-                    TextBox147.Text = Round((P2_out - P1_in) / 100, 0).ToString         '[mbar] dP fan
+                    TextBox147.Text = Round((P2_tot_out - P1_in) / 100, 0).ToString     '[mbar] dP fan
                 Else
                     TextBox80.BackColor = SystemColors.Window
                     TextBox130.BackColor = SystemColors.Window
@@ -2002,13 +2008,14 @@ Public Class Form1
                     GroupBox28.Visible = True
                     GroupBox29.Visible = True
                     Power_total = Pow1 + Pow2 + Pow3                                    '[kW]
-                    TextBox147.Text = Round((P3_out - P1_in) / 100, 0).ToString         '[mbar] dP fan
+                    TextBox147.Text = Round((P3_tot_out - P1_in) / 100, 0).ToString     '[mbar] dP fan
                 End If
 
                 '----------- present------------------------
                 TextBox138.Text = Round(P3_in / 100, 0).ToString                    '[mbar]
                 TextBox131.Text = Round(temp3, 0).ToString                          '[c]
-                TextBox82.Text = Round(P3_out / 100, 0).ToString                    '[mbar] outlet
+                TextBox82.Text = Round(P3_tot_out / 100, 0).ToString                '[mbar] P_total outlet
+                TextBox155.Text = Round(P3_stat_out / 100, 0).ToString              '[mbar] outlet P_static
                 TextBox134.Text = Round(Pow3, 0).ToString                           '[kW]
                 TextBox139.Text = Round(Power_total, 0).ToString                    '[kW]
 
