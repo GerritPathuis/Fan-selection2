@@ -217,6 +217,10 @@ Public Class Form1
         If ComboBox2.Items.Count > 0 Then
             ComboBox2.SelectedIndex = 6                 'Select T17B
         End If
+
+        If ComboBox3.Items.Count > 0 Then
+            ComboBox3.SelectedIndex = 5                 'Select Domex
+        End If
         If ComboBox5.Items.Count > 0 Then
             ComboBox5.SelectedIndex = 6                 'Select T17B
         End If
@@ -1285,13 +1289,13 @@ Public Class Form1
                 Chart1.Series(2).Color = Color.Green
                 Chart1.Series(3).Color = Color.Blue
 
+                '----------- labels on-off ------------------
                 Chart1.Series(0).IsValueShownAsLabel = True
-                Chart1.Series(1).IsValueShownAsLabel = True
-
-                If CheckBox6.Checked Then
+                If CheckBox6.Checked Then   'Labels on
+                    Chart1.Series(1).IsValueShownAsLabel = True
                     Chart1.Series(2).IsValueShownAsLabel = True
                     Chart1.Series(3).IsValueShownAsLabel = True
-                    Chart1.Series(4).IsValueShownAsLabel = True
+                    'Chart1.Series(4).IsValueShownAsLabel = True
                     Chart1.Series(5).IsValueShownAsLabel = True
                 End If
 
@@ -1307,6 +1311,7 @@ Public Class Form1
                 '---------------- fan target ---------------------
                 TextBox149.Text = Round(G_Debiet_z_act_hr, 0).ToString  'Debiet [Am3/hr]
                 TextBox148.Text = NumericUpDown2.Value.ToString         'Ptotal [mbar]
+                TextBox156.Text = NumericUpDown12.Value.ToString        'Density [kg/m3]
 
                 If CheckBox2.Checked = False Then
                     Chart1.ChartAreas("ChartArea0").AxisX.Title = "Debiet [Am3/s]"
@@ -1330,11 +1335,10 @@ Public Class Form1
 
                 '------------------Weerstand coefficient ---------------------
                 If CheckBox2.Checked = True Then
-                    Weerstand_coefficient = P_target * 2 / (NumericUpDown11.Value * (G_Debiet_z_act_hr) ^ 2)
+                    Weerstand_coefficient = P_target * 2 / (NumericUpDown12.Value * (G_Debiet_z_act_hr) ^ 2)
                 Else
-                    Weerstand_coefficient = P_target * 2 / (NumericUpDown11.Value * (G_Debiet_z_act_hr / 3600) ^ 2)
+                    Weerstand_coefficient = P_target * 2 / (NumericUpDown12.Value * (G_Debiet_z_act_hr / 3600) ^ 2)
                 End If
-
 
                 '-------------------Target dot ---------------------
                 If CheckBox3.Checked = True Then
@@ -1360,7 +1364,7 @@ Public Class Form1
                         Chart1.Series(2).YAxisType = AxisType.Secondary
                         Chart1.Series(2).Points.AddXY(debiet, Tschets(Tschets_no).Tverm_scaled(hh))
                         If CheckBox3.Checked = True Then
-                            p_loss_line = 0.5 * Weerstand_coefficient * NumericUpDown11.Value * debiet ^ 2
+                            p_loss_line = 0.5 * Weerstand_coefficient * NumericUpDown12.Value * debiet ^ 2
                             Chart1.Series(4).Points.AddXY(debiet, p_loss_line)
                         End If
                         Chart1.Series(5).YAxisType = AxisType.Primary
@@ -1491,7 +1495,7 @@ Public Class Form1
     Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
         If ComboBox1.SelectedIndex < (ComboBox1.Items.Count - 1) Then
             ComboBox1.SelectedIndex += 1
-            Scale_rules_applied(ComboBox1.SelectedIndex, NumericUpDown9.Value, NumericUpDown10.Value, NumericUpDown11.Value)
+            Scale_rules_applied(ComboBox1.SelectedIndex, NumericUpDown9.Value, NumericUpDown10.Value, NumericUpDown12.Value)
             draw_chart1(ComboBox1.SelectedIndex)
         End If
     End Sub
@@ -1499,7 +1503,7 @@ Public Class Form1
     Private Sub Button5_Click(sender As Object, e As EventArgs) Handles Button5.Click
         If (ComboBox1.SelectedIndex > 0) Then
             ComboBox1.SelectedIndex -= 1
-            Scale_rules_applied(ComboBox1.SelectedIndex, NumericUpDown9.Value, NumericUpDown10.Value, NumericUpDown11.Value)
+            Scale_rules_applied(ComboBox1.SelectedIndex, NumericUpDown9.Value, NumericUpDown10.Value, NumericUpDown12.Value)
             draw_chart1(ComboBox1.SelectedIndex)
         End If
     End Sub
@@ -1563,37 +1567,36 @@ Public Class Form1
         Dim hh As Integer
         Dim Pow1, Q1, Pt1, Ps1, Dia1, n1, Ro1 As Double
 
-        'MessageBox.Show("ty= " & ty.ToString & " dia2= " & dia2.ToString & " n2= " & n2.ToString & " ro2= " & ro2.ToString)
+        If (ty >= 0) And (ty < (ComboBox1.Items.Count - 1)) Then    'Preventing exceptions
+            Try
+                Dia1 = Tschets(ty).Tdata(0)     'waaier [mm]
+                n1 = Tschets(ty).Tdata(1)       '[rpm]
+                Ro1 = Tschets(ty).Tdata(2)      '[kg/m3]
 
-        Try
-            Dia1 = Tschets(ty).Tdata(0)     'waaier [mm]
-            n1 = Tschets(ty).Tdata(1)       '[rpm]
-            Ro1 = Tschets(ty).Tdata(2)      '[kg/m3]
+                For hh = 0 To 11
+                    If Tschets(ty).TPtot(hh) > 0 Then           'Rest of the array is empty
+                        Q1 = Tschets(ty).TFlow(hh)              'Actual volume debiet [Am3/s]
+                        Pt1 = Tschets(ty).TPtot(hh)             'P_total [Pa]
+                        Ps1 = Tschets(ty).TPstat(hh)            'P_static [Pa]
+                        Pow1 = Tschets(ty).Tverm(hh)            'as power [kW]
 
+                        If n1 < 1 Or Ro1 < 0.01 Or Dia1 < 0.01 Then  'Prevent devision bij zero
+                            MessageBox.Show("Problem occured in line 1369")
+                        End If
 
-            For hh = 0 To 11
-                If Tschets(ty).TPtot(hh) > 0 Then           'Rest of the array is empty
-                    Q1 = Tschets(ty).TFlow(hh)              'Actual volume debiet [Am3/s]
-                    Pt1 = Tschets(ty).TPtot(hh)             'P_total [Pa]
-                    Ps1 = Tschets(ty).TPstat(hh)            'P_static [Pa]
-                    Pow1 = Tschets(ty).Tverm(hh)            'as power [kW]
-
-                    If n1 < 1 Or Ro1 < 0.01 Or Dia1 < 0.01 Then  'Prevent devision bij zero
-                        MessageBox.Show("Problem occured in line 1369")
+                        Tschets(ty).TFlow_scaled(hh) = Round(Scale_rule_cap(Q1, Dia1, dia2, n1, n2), 2)             '[m3/s]
+                        Tschets(ty).TPtot_scaled(hh) = Round(Scale_rule_Pressure(Pt1, Dia1, dia2, n1, n2, Ro1, ro2), 0)
+                        Tschets(ty).TPstat_scaled(hh) = Round(Scale_rule_Pressure(Ps1, Dia1, dia2, n1, n2, Ro1, ro2), 0)
+                        Tschets(ty).Tverm_scaled(hh) = Round(Scale_rule_Power(Pow1, Dia1, dia2, n1, n2, Ro1, ro2), 0)
+                        Tschets(ty).Teff_scaled(hh) = Tschets(ty).Teff(hh)
                     End If
+                Next hh
 
-                    Tschets(ty).TFlow_scaled(hh) = Round(Scale_rule_cap(Q1, Dia1, dia2, n1, n2), 2)             '[m3/s]
-                    Tschets(ty).TPtot_scaled(hh) = Round(Scale_rule_Pressure(Pt1, Dia1, dia2, n1, n2, Ro1, ro2), 0)
-                    Tschets(ty).TPstat_scaled(hh) = Round(Scale_rule_Pressure(Ps1, Dia1, dia2, n1, n2, Ro1, ro2), 0)
-                    Tschets(ty).Tverm_scaled(hh) = Round(Scale_rule_Power(Pow1, Dia1, dia2, n1, n2, Ro1, ro2), 0)
-                    Tschets(ty).Teff_scaled(hh) = Tschets(ty).Teff(hh)
-                End If
-            Next hh
-            'MessageBox.Show("1380")
-            draw_chart1(ty)     'This gives a problem
-        Catch ex As Exception
-            ' MessageBox.Show(ex.Message & " NumericUDown9_ValueChanged ")  ' Show the exception's message.
-        End Try
+                draw_chart1(ty)
+            Catch ex As Exception
+                MessageBox.Show(ex.Message & " Problem in Scale_rules_applied ")  ' Show the exception's message.
+            End Try
+        End If
     End Sub
 
     Private Sub do_Chart2()
@@ -1723,7 +1726,7 @@ Public Class Form1
         J_shaft_a = 0.5 * g_shaft_a * (dia_a / 2) ^ 2         'MassaTraagheid [kg.m2]
         J_shaft_b = 0.5 * g_shaft_b * (dia_b / 2) ^ 2         'MassaTraagheid [kg.m2]
         J_shaft_c = 0.5 * g_shaft_c * (dia_c / 2) ^ 2         'MassaTraagheid [kg.m2]
-        J_naaf = 0.5 * gewicht_naaf * (dia_naaf / 2) ^ 2            'MassaTraagheid [kg.m2]
+        J_naaf = 0.5 * gewicht_naaf * (dia_naaf / 2) ^ 2      'MassaTraagheid [kg.m2]
 
         '---------- Kritisch toerental formule 6.41 pagina 213--------------
         Elasticiteitsm = 210 * 1000 ^ 3                                 'in Pascal [N/m2]
@@ -1808,7 +1811,7 @@ Public Class Form1
 
     Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click, NumericUpDown8.ValueChanged, NumericUpDown7.ValueChanged, NumericUpDown6.ValueChanged, NumericUpDown5.ValueChanged, NumericUpDown4.ValueChanged, NumericUpDown3.ValueChanged, NumericUpDown2.ValueChanged, NumericUpDown13.ValueChanged, NumericUpDown12.ValueChanged, NumericUpDown1.ValueChanged, ComboBox1.SelectedIndexChanged, RadioButton4.CheckedChanged, RadioButton3.CheckedChanged, CheckBox4.CheckedChanged, CheckBox5.CheckedChanged, NumericUpDown33.ValueChanged, ComboBox7.SelectedIndexChanged, TabPage1.Enter
         If TabControl1.SelectedTab.Name = "TabPage1" Then
-            ComboBox7.SelectedIndex = ComboBox1.SelectedIndex
+            ComboBox7.SelectedIndex = ComboBox1.SelectedIndex       'type selectie
         End If
         Selectie_1()
     End Sub
@@ -1863,7 +1866,7 @@ Public Class Form1
     Private Sub Scale_rules_compressor()
         Dim ty As Integer
         Dim Pow0, Q0, dia0, n0 As Double                                                'From Tschets
-        Dim Ptot0, Pstat0, ro0_inlet, temp0 As Double                                           'Initial conditions
+        Dim Ptot0, Pstat0, ro0_inlet, temp0 As Double                                   'Initial conditions
         Dim Volume_debiet As Double                                                     '[m3/hr] is identiek per waaier (onafhankelijk van de density)
         Dim massa_debiet As Double
         Dim Pow1, P1_in, P1_tot_out, P1_stat_out, dia1, n1, ro_fan1_inlet, ro_fan1_outlet, temp1 As Double      'Impellar #1 
@@ -2063,8 +2066,9 @@ Public Class Form1
         TextBox145.Text = Round(spalt_loss, 1).ToString    '[kg/hr]
     End Sub
 
-    Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click, CheckBox6.CheckedChanged, CheckBox3.CheckedChanged, CheckBox2.CheckedChanged, CheckBox1.CheckedChanged, Chart1.Enter, TabPage3.Enter, NumericUpDown9.ValueChanged, NumericUpDown11.ValueChanged, NumericUpDown10.ValueChanged
-        Scale_rules_applied(ComboBox1.SelectedIndex, NumericUpDown9.Value, NumericUpDown10.Value, NumericUpDown11.Value)
+    Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click, CheckBox6.CheckedChanged, CheckBox3.CheckedChanged, CheckBox2.CheckedChanged, CheckBox1.CheckedChanged, Chart1.Enter, TabPage3.Enter, NumericUpDown9.ValueChanged, NumericUpDown10.ValueChanged
+
+        Scale_rules_applied(ComboBox1.SelectedIndex, NumericUpDown9.Value, NumericUpDown10.Value, NumericUpDown12.Value)
         draw_chart1(ComboBox1.SelectedIndex)
     End Sub
 

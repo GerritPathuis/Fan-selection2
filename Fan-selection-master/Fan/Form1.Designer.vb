@@ -325,8 +325,6 @@ Partial Class Form1
         Me.NumericUpDown9 = New System.Windows.Forms.NumericUpDown()
         Me.NumericUpDown10 = New System.Windows.Forms.NumericUpDown()
         Me.Label98 = New System.Windows.Forms.Label()
-        Me.NumericUpDown11 = New System.Windows.Forms.NumericUpDown()
-        Me.Label99 = New System.Windows.Forms.Label()
         Me.GroupBox38 = New System.Windows.Forms.GroupBox()
         Me.CheckBox6 = New System.Windows.Forms.CheckBox()
         Me.CheckBox3 = New System.Windows.Forms.CheckBox()
@@ -375,6 +373,8 @@ Partial Class Form1
         Me.Label177 = New System.Windows.Forms.Label()
         Me.Button9 = New System.Windows.Forms.Button()
         Me.GroupBox29 = New System.Windows.Forms.GroupBox()
+        Me.TextBox155 = New System.Windows.Forms.TextBox()
+        Me.Label225 = New System.Windows.Forms.Label()
         Me.NumericUpDown46 = New System.Windows.Forms.NumericUpDown()
         Me.Label182 = New System.Windows.Forms.Label()
         Me.Label176 = New System.Windows.Forms.Label()
@@ -397,6 +397,8 @@ Partial Class Form1
         Me.Label162 = New System.Windows.Forms.Label()
         Me.NumericUpDown42 = New System.Windows.Forms.NumericUpDown()
         Me.GroupBox27 = New System.Windows.Forms.GroupBox()
+        Me.TextBox154 = New System.Windows.Forms.TextBox()
+        Me.Label224 = New System.Windows.Forms.Label()
         Me.NumericUpDown40 = New System.Windows.Forms.NumericUpDown()
         Me.Label175 = New System.Windows.Forms.Label()
         Me.TextBox137 = New System.Windows.Forms.TextBox()
@@ -420,6 +422,8 @@ Partial Class Form1
         Me.NumericUpDown37 = New System.Windows.Forms.NumericUpDown()
         Me.NumericUpDown39 = New System.Windows.Forms.NumericUpDown()
         Me.GroupBox25 = New System.Windows.Forms.GroupBox()
+        Me.TextBox153 = New System.Windows.Forms.TextBox()
+        Me.Label223 = New System.Windows.Forms.Label()
         Me.Label174 = New System.Windows.Forms.Label()
         Me.TextBox136 = New System.Windows.Forms.TextBox()
         Me.Label168 = New System.Windows.Forms.Label()
@@ -544,12 +548,8 @@ Partial Class Form1
         Me.TextBox4 = New System.Windows.Forms.TextBox()
         Me.TextBox6 = New System.Windows.Forms.TextBox()
         Me.TextBox5 = New System.Windows.Forms.TextBox()
-        Me.Label223 = New System.Windows.Forms.Label()
-        Me.TextBox153 = New System.Windows.Forms.TextBox()
-        Me.Label224 = New System.Windows.Forms.Label()
-        Me.Label225 = New System.Windows.Forms.Label()
-        Me.TextBox154 = New System.Windows.Forms.TextBox()
-        Me.TextBox155 = New System.Windows.Forms.TextBox()
+        Me.TextBox156 = New System.Windows.Forms.TextBox()
+        Me.Label226 = New System.Windows.Forms.Label()
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.GroupBox16.SuspendLayout()
@@ -610,7 +610,6 @@ Partial Class Form1
         Me.GroupBox39.SuspendLayout()
         CType(Me.NumericUpDown9, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.NumericUpDown10, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.NumericUpDown11, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox38.SuspendLayout()
         Me.GroupBox37.SuspendLayout()
         Me.GroupBox36.SuspendLayout()
@@ -2364,7 +2363,6 @@ Partial Class Form1
         Me.Button2.TabIndex = 28
         Me.Button2.Text = "Reken"
         Me.Button2.UseVisualStyleBackColor = True
-        Me.Button2.Visible = False
         '
         'Label49
         '
@@ -4030,11 +4028,9 @@ Partial Class Form1
         Me.GroupBox39.Controls.Add(Me.NumericUpDown9)
         Me.GroupBox39.Controls.Add(Me.NumericUpDown10)
         Me.GroupBox39.Controls.Add(Me.Label98)
-        Me.GroupBox39.Controls.Add(Me.NumericUpDown11)
-        Me.GroupBox39.Controls.Add(Me.Label99)
-        Me.GroupBox39.Location = New System.Drawing.Point(884, 304)
+        Me.GroupBox39.Location = New System.Drawing.Point(884, 319)
         Me.GroupBox39.Name = "GroupBox39"
-        Me.GroupBox39.Size = New System.Drawing.Size(152, 112)
+        Me.GroupBox39.Size = New System.Drawing.Size(152, 84)
         Me.GroupBox39.TabIndex = 19
         Me.GroupBox39.TabStop = False
         Me.GroupBox39.Text = "Fan gegevens"
@@ -4082,36 +4078,13 @@ Partial Class Form1
         Me.Label98.TabIndex = 10
         Me.Label98.Text = "Rpm"
         '
-        'NumericUpDown11
-        '
-        Me.NumericUpDown11.BackColor = System.Drawing.Color.Yellow
-        Me.NumericUpDown11.DecimalPlaces = 3
-        Me.NumericUpDown11.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.NumericUpDown11.Increment = New Decimal(New Integer() {1, 0, 0, 196608})
-        Me.NumericUpDown11.Location = New System.Drawing.Point(71, 77)
-        Me.NumericUpDown11.Maximum = New Decimal(New Integer() {39, 0, 0, 65536})
-        Me.NumericUpDown11.Minimum = New Decimal(New Integer() {9, 0, 0, 65536})
-        Me.NumericUpDown11.Name = "NumericUpDown11"
-        Me.NumericUpDown11.Size = New System.Drawing.Size(59, 22)
-        Me.NumericUpDown11.TabIndex = 13
-        Me.NumericUpDown11.Value = New Decimal(New Integer() {1205, 0, 0, 196608})
-        '
-        'Label99
-        '
-        Me.Label99.AutoSize = True
-        Me.Label99.Location = New System.Drawing.Point(6, 79)
-        Me.Label99.Name = "Label99"
-        Me.Label99.Size = New System.Drawing.Size(42, 13)
-        Me.Label99.TabIndex = 12
-        Me.Label99.Text = "Density"
-        '
         'GroupBox38
         '
         Me.GroupBox38.Controls.Add(Me.CheckBox6)
         Me.GroupBox38.Controls.Add(Me.CheckBox3)
         Me.GroupBox38.Controls.Add(Me.CheckBox2)
         Me.GroupBox38.Controls.Add(Me.CheckBox1)
-        Me.GroupBox38.Location = New System.Drawing.Point(884, 422)
+        Me.GroupBox38.Location = New System.Drawing.Point(886, 409)
         Me.GroupBox38.Name = "GroupBox38"
         Me.GroupBox38.Size = New System.Drawing.Size(152, 120)
         Me.GroupBox38.TabIndex = 18
@@ -4164,7 +4137,7 @@ Partial Class Form1
         '
         Me.GroupBox37.Controls.Add(Me.Button5)
         Me.GroupBox37.Controls.Add(Me.Button4)
-        Me.GroupBox37.Location = New System.Drawing.Point(884, 222)
+        Me.GroupBox37.Location = New System.Drawing.Point(884, 237)
         Me.GroupBox37.Name = "GroupBox37"
         Me.GroupBox37.Size = New System.Drawing.Size(152, 76)
         Me.GroupBox37.TabIndex = 17
@@ -4193,6 +4166,8 @@ Partial Class Form1
         '
         'GroupBox36
         '
+        Me.GroupBox36.Controls.Add(Me.Label226)
+        Me.GroupBox36.Controls.Add(Me.TextBox156)
         Me.GroupBox36.Controls.Add(Me.Label217)
         Me.GroupBox36.Controls.Add(Me.Label151)
         Me.GroupBox36.Controls.Add(Me.TextBox149)
@@ -4200,7 +4175,7 @@ Partial Class Form1
         Me.GroupBox36.Enabled = False
         Me.GroupBox36.Location = New System.Drawing.Point(884, 130)
         Me.GroupBox36.Name = "GroupBox36"
-        Me.GroupBox36.Size = New System.Drawing.Size(152, 73)
+        Me.GroupBox36.Size = New System.Drawing.Size(152, 101)
         Me.GroupBox36.TabIndex = 16
         Me.GroupBox36.TabStop = False
         Me.GroupBox36.Text = "Positie target marker"
@@ -4241,7 +4216,7 @@ Partial Class Form1
         '
         'Button3
         '
-        Me.Button3.Location = New System.Drawing.Point(884, 548)
+        Me.Button3.Location = New System.Drawing.Point(886, 541)
         Me.Button3.Name = "Button3"
         Me.Button3.Size = New System.Drawing.Size(152, 52)
         Me.Button3.TabIndex = 4
@@ -4644,6 +4619,24 @@ Partial Class Form1
         Me.GroupBox29.TabStop = False
         Me.GroupBox29.Text = "Waaier #3"
         '
+        'TextBox155
+        '
+        Me.TextBox155.Enabled = False
+        Me.TextBox155.Location = New System.Drawing.Point(134, 77)
+        Me.TextBox155.Name = "TextBox155"
+        Me.TextBox155.Size = New System.Drawing.Size(59, 20)
+        Me.TextBox155.TabIndex = 35
+        Me.TextBox155.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'Label225
+        '
+        Me.Label225.AutoSize = True
+        Me.Label225.Location = New System.Drawing.Point(15, 78)
+        Me.Label225.Name = "Label225"
+        Me.Label225.Size = New System.Drawing.Size(89, 13)
+        Me.Label225.TabIndex = 34
+        Me.Label225.Text = "P_static  [mbar g]"
+        '
         'NumericUpDown46
         '
         Me.NumericUpDown46.BackColor = System.Drawing.SystemColors.Window
@@ -4886,6 +4879,24 @@ Partial Class Form1
         Me.GroupBox27.TabIndex = 23
         Me.GroupBox27.TabStop = False
         Me.GroupBox27.Text = "Waaier #2"
+        '
+        'TextBox154
+        '
+        Me.TextBox154.Enabled = False
+        Me.TextBox154.Location = New System.Drawing.Point(130, 77)
+        Me.TextBox154.Name = "TextBox154"
+        Me.TextBox154.Size = New System.Drawing.Size(59, 20)
+        Me.TextBox154.TabIndex = 34
+        Me.TextBox154.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'Label224
+        '
+        Me.Label224.AutoSize = True
+        Me.Label224.Location = New System.Drawing.Point(12, 78)
+        Me.Label224.Name = "Label224"
+        Me.Label224.Size = New System.Drawing.Size(89, 13)
+        Me.Label224.TabIndex = 33
+        Me.Label224.Text = "P_static  [mbar g]"
         '
         'NumericUpDown40
         '
@@ -5137,6 +5148,24 @@ Partial Class Form1
         Me.GroupBox25.TabIndex = 21
         Me.GroupBox25.TabStop = False
         Me.GroupBox25.Text = "Waaier #1"
+        '
+        'TextBox153
+        '
+        Me.TextBox153.Enabled = False
+        Me.TextBox153.Location = New System.Drawing.Point(137, 75)
+        Me.TextBox153.Name = "TextBox153"
+        Me.TextBox153.Size = New System.Drawing.Size(59, 20)
+        Me.TextBox153.TabIndex = 32
+        Me.TextBox153.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'Label223
+        '
+        Me.Label223.AutoSize = True
+        Me.Label223.Location = New System.Drawing.Point(8, 78)
+        Me.Label223.Name = "Label223"
+        Me.Label223.Size = New System.Drawing.Size(89, 13)
+        Me.Label223.TabIndex = 31
+        Me.Label223.Text = "P_static  [mbar g]"
         '
         'Label174
         '
@@ -6563,59 +6592,22 @@ Partial Class Form1
         Me.TextBox5.Text = "1"
         Me.TextBox5.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
-        'Label223
+        'TextBox156
         '
-        Me.Label223.AutoSize = True
-        Me.Label223.Location = New System.Drawing.Point(8, 78)
-        Me.Label223.Name = "Label223"
-        Me.Label223.Size = New System.Drawing.Size(89, 13)
-        Me.Label223.TabIndex = 31
-        Me.Label223.Text = "P_static  [mbar g]"
+        Me.TextBox156.Location = New System.Drawing.Point(6, 71)
+        Me.TextBox156.Name = "TextBox156"
+        Me.TextBox156.Size = New System.Drawing.Size(43, 20)
+        Me.TextBox156.TabIndex = 4
+        Me.TextBox156.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
-        'TextBox153
+        'Label226
         '
-        Me.TextBox153.Enabled = False
-        Me.TextBox153.Location = New System.Drawing.Point(137, 75)
-        Me.TextBox153.Name = "TextBox153"
-        Me.TextBox153.Size = New System.Drawing.Size(59, 20)
-        Me.TextBox153.TabIndex = 32
-        Me.TextBox153.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'Label224
-        '
-        Me.Label224.AutoSize = True
-        Me.Label224.Location = New System.Drawing.Point(12, 78)
-        Me.Label224.Name = "Label224"
-        Me.Label224.Size = New System.Drawing.Size(89, 13)
-        Me.Label224.TabIndex = 33
-        Me.Label224.Text = "P_static  [mbar g]"
-        '
-        'Label225
-        '
-        Me.Label225.AutoSize = True
-        Me.Label225.Location = New System.Drawing.Point(15, 78)
-        Me.Label225.Name = "Label225"
-        Me.Label225.Size = New System.Drawing.Size(89, 13)
-        Me.Label225.TabIndex = 34
-        Me.Label225.Text = "P_static  [mbar g]"
-        '
-        'TextBox154
-        '
-        Me.TextBox154.Enabled = False
-        Me.TextBox154.Location = New System.Drawing.Point(130, 77)
-        Me.TextBox154.Name = "TextBox154"
-        Me.TextBox154.Size = New System.Drawing.Size(59, 20)
-        Me.TextBox154.TabIndex = 34
-        Me.TextBox154.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'TextBox155
-        '
-        Me.TextBox155.Enabled = False
-        Me.TextBox155.Location = New System.Drawing.Point(134, 77)
-        Me.TextBox155.Name = "TextBox155"
-        Me.TextBox155.Size = New System.Drawing.Size(59, 20)
-        Me.TextBox155.TabIndex = 35
-        Me.TextBox155.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.Label226.AutoSize = True
+        Me.Label226.Location = New System.Drawing.Point(59, 74)
+        Me.Label226.Name = "Label226"
+        Me.Label226.Size = New System.Drawing.Size(82, 13)
+        Me.Label226.TabIndex = 5
+        Me.Label226.Text = "Density [kg/m3]"
         '
         'Form1
         '
@@ -6708,7 +6700,6 @@ Partial Class Form1
         Me.GroupBox39.PerformLayout()
         CType(Me.NumericUpDown9, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.NumericUpDown10, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.NumericUpDown11, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox38.ResumeLayout(False)
         Me.GroupBox38.PerformLayout()
         Me.GroupBox37.ResumeLayout(False)
@@ -6908,7 +6899,6 @@ Partial Class Form1
     Friend WithEvents Label97 As Label
     Friend WithEvents NumericUpDown9 As NumericUpDown
     Friend WithEvents CheckBox1 As CheckBox
-    Friend WithEvents NumericUpDown11 As NumericUpDown
     Friend WithEvents TextBox91 As TextBox
     Friend WithEvents Label100 As Label
     Friend WithEvents NumericUpDown1 As NumericUpDown
@@ -7058,7 +7048,6 @@ Partial Class Form1
     Friend WithEvents Label149 As Label
     Friend WithEvents TextBox126 As TextBox
     Friend WithEvents CheckBox3 As CheckBox
-    Friend WithEvents Label99 As Label
     Friend WithEvents Label152 As Label
     Friend WithEvents CheckBox4 As CheckBox
     Friend WithEvents CheckBox5 As CheckBox
@@ -7296,4 +7285,6 @@ Partial Class Form1
     Friend WithEvents Label223 As Label
     Friend WithEvents TextBox154 As TextBox
     Friend WithEvents TextBox155 As TextBox
+    Friend WithEvents Label226 As Label
+    Friend WithEvents TextBox156 As TextBox
 End Class
