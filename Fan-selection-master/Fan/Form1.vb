@@ -1548,19 +1548,22 @@ Public Class Form1
     End Function
 
     Private Sub Chart1_Layout(sender As Object, e As LayoutEventArgs) Handles Chart1.Layout
-        Dim ww, hh As Integer
+        Dim ww, hh, sstep As Integer
 
         ww = Chart1.Size.Width - 170
         hh = Chart1.Size.Height * 0.1 + 100
+        sstep = 6
 
         GroupBox36.Location = New Point(ww, hh)
-        hh += GroupBox36.Height + 10
+        hh += GroupBox36.Height + sstep
         GroupBox37.Location = New Point(ww, hh)
-        hh += GroupBox37.Height + 10
+        hh += GroupBox37.Height + sstep
         GroupBox39.Location = New Point(ww, hh)
-        hh += GroupBox39.Height + 10
+        hh += GroupBox39.Height + sstep
         GroupBox38.Location = New Point(ww, hh)
-        hh += GroupBox38.Height + 10
+        hh += GroupBox38.Height + sstep
+        GroupBox42.Location = New Point(ww, hh)
+        hh += GroupBox42.Height + sstep
         Button3.Location = New Point(ww, hh)  'Save button
     End Sub
     'Diameter impeller is changed, recalculate and draw chart
@@ -1574,6 +1577,7 @@ Public Class Form1
                 n1 = Tschets(ty).Tdata(1)       '[rpm]
                 Ro1 = Tschets(ty).Tdata(2)      '[kg/m3]
 
+
                 For hh = 0 To 11
                     If Tschets(ty).TPtot(hh) > 0 Then           'Rest of the array is empty
                         Q1 = Tschets(ty).TFlow(hh)              'Actual volume debiet [Am3/s]
@@ -1584,12 +1588,28 @@ Public Class Form1
                         If n1 < 1 Or Ro1 < 0.01 Or Dia1 < 0.01 Then  'Prevent devision bij zero
                             MessageBox.Show("Problem occured in line 1369")
                         End If
-
-                        Tschets(ty).TFlow_scaled(hh) = Round(Scale_rule_cap(Q1, Dia1, dia2, n1, n2), 2)             '[m3/s]
+                        '======================== waaier #1 ===============================================
+                        Tschets(ty).TFlow_scaled(hh) = Round(Scale_rule_cap(Q1, Dia1, dia2, n1, n2), 2)
                         Tschets(ty).TPtot_scaled(hh) = Round(Scale_rule_Pressure(Pt1, Dia1, dia2, n1, n2, Ro1, ro2), 0)
                         Tschets(ty).TPstat_scaled(hh) = Round(Scale_rule_Pressure(Ps1, Dia1, dia2, n1, n2, Ro1, ro2), 0)
                         Tschets(ty).Tverm_scaled(hh) = Round(Scale_rule_Power(Pow1, Dia1, dia2, n1, n2, Ro1, ro2), 0)
                         Tschets(ty).Teff_scaled(hh) = Tschets(ty).Teff(hh)
+
+                        If RadioButton10.Checked Or RadioButton11.Checked Then
+                            '======================== waaier #2 ===============================================
+                            Tschets(ty).TPtot_scaled(hh) += Round(Scale_rule_Pressure(Pt1, Dia1, dia2, n1, n2, Ro1, ro2), 0)
+                            Tschets(ty).TPstat_scaled(hh) += Round(Scale_rule_Pressure(Ps1, Dia1, dia2, n1, n2, Ro1, ro2), 0)
+                            Tschets(ty).Tverm_scaled(hh) += Round(Scale_rule_Power(Pow1, Dia1, dia2, n1, n2, Ro1, ro2), 0)
+
+                        End If
+                        If RadioButton11.Checked Then
+                            '======================== waaier #3 ===============================================
+                            Tschets(ty).TPtot_scaled(hh) += Round(Scale_rule_Pressure(Pt1, Dia1, dia2, n1, n2, Ro1, ro2), 0)
+                            Tschets(ty).TPstat_scaled(hh) += Round(Scale_rule_Pressure(Ps1, Dia1, dia2, n1, n2, Ro1, ro2), 0)
+                            Tschets(ty).Tverm_scaled(hh) += Round(Scale_rule_Power(Pow1, Dia1, dia2, n1, n2, Ro1, ro2), 0)
+                        End If
+
+
                     End If
                 Next hh
 
@@ -2069,163 +2089,10 @@ Public Class Form1
         TextBox145.Text = Round(spalt_loss, 1).ToString    '[kg/hr]
     End Sub
 
-    Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click, CheckBox6.CheckedChanged, CheckBox3.CheckedChanged, CheckBox2.CheckedChanged, CheckBox1.CheckedChanged, Chart1.Enter, TabPage3.Enter, NumericUpDown9.ValueChanged, NumericUpDown10.ValueChanged
-
+    Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click, CheckBox6.CheckedChanged, CheckBox3.CheckedChanged, CheckBox2.CheckedChanged, CheckBox1.CheckedChanged, Chart1.Enter, TabPage3.Enter, NumericUpDown9.ValueChanged, NumericUpDown10.ValueChanged, RadioButton9.CheckedChanged, RadioButton11.CheckedChanged, RadioButton10.CheckedChanged
         Scale_rules_applied(ComboBox1.SelectedIndex, NumericUpDown9.Value, NumericUpDown10.Value, NumericUpDown12.Value)
         draw_chart1(ComboBox1.SelectedIndex)
     End Sub
 
-    Private Sub draw_chart3(Tschets_no As Integer)
-        Dim hh As Integer
-        Dim debiet As Double
-        Dim Q_target, P_target As Double
-        Dim Weerstand_coefficient, p_loss_line As Double
 
-
-        If (Tschets_no < (ComboBox5.Items.Count - 1)) And (Tschets_no >= 0) Then
-            'MessageBox.Show("Problem in line 1225")
-
-
-            'Gewenste fan  gegevens
-            P_target = NumericUpDown2.Value * 100   '[Pa]
-
-            Try
-                'Clear all series And chart areas so we can re-add them
-                Chart3.Series.Clear()
-                Chart3.ChartAreas.Clear()
-                Chart3.Titles.Clear()
-
-                Chart3.Series.Add("Series0")    'Pressure totaal
-                Chart3.Series.Add("Series1")    'Efficiency
-                Chart3.Series.Add("Series2")    'Power
-                Chart3.Series.Add("Series3")    'Market dot
-                Chart3.Series.Add("Series4")    'Line resistance
-                Chart3.Series.Add("Series5")    'Pressure static
-
-                Chart3.ChartAreas.Add("ChartArea0")
-                Chart3.Series(0).ChartArea = "ChartArea0"
-                Chart3.Series(1).ChartArea = "ChartArea0"
-                Chart3.Series(2).ChartArea = "ChartArea0"
-
-                If CheckBox1.Checked = False Then
-                    Chart3.Series(0).ChartType = DataVisualization.Charting.SeriesChartType.Line
-                    Chart3.Series(1).ChartType = DataVisualization.Charting.SeriesChartType.Line
-                    Chart3.Series(2).ChartType = DataVisualization.Charting.SeriesChartType.Line
-                    Chart3.Series(3).ChartType = DataVisualization.Charting.SeriesChartType.Line
-                Else
-                    Chart3.Series(0).ChartType = DataVisualization.Charting.SeriesChartType.Spline
-                    Chart3.Series(1).ChartType = DataVisualization.Charting.SeriesChartType.Spline
-                    Chart3.Series(2).ChartType = DataVisualization.Charting.SeriesChartType.Spline
-                    Chart3.Series(3).ChartType = DataVisualization.Charting.SeriesChartType.Spline
-                End If
-                Chart3.Series(4).ChartType = DataVisualization.Charting.SeriesChartType.Line
-                Chart3.Series(5).ChartType = DataVisualization.Charting.SeriesChartType.Line
-
-                Chart3.Titles.Add(Tschets(Tschets_no).Tname)
-                Chart3.Titles(0).Font = New Font("Arial", 16, System.Drawing.FontStyle.Bold)
-
-                Chart3.Series(0).Name = "P totaal [Pa]"
-                Chart3.Series(1).Name = "Rendement [%]"
-                Chart3.Series(2).Name = "As vermogen [kW]"
-                Chart3.Series(3).Name = "Line resistance"
-                Chart3.Series(4).Name = "Marker"
-                Chart3.Series(5).Name = "P static [Pa]"
-
-                Chart3.Series(0).Color = Color.Blue
-                Chart3.Series(1).Color = Color.Red
-                Chart3.Series(2).Color = Color.Green
-                Chart3.Series(3).Color = Color.Blue
-
-                '----------- labels on-off ------------------
-                Chart3.Series(0).IsValueShownAsLabel = True
-                If CheckBox6.Checked Then   'Labels on
-                    Chart3.Series(1).IsValueShownAsLabel = True
-                    Chart3.Series(2).IsValueShownAsLabel = True
-                    Chart3.Series(3).IsValueShownAsLabel = True
-                    'Chart1.Series(4).IsValueShownAsLabel = True
-                    Chart3.Series(5).IsValueShownAsLabel = True
-                End If
-
-                Chart3.Series(0).BorderWidth = 4
-                Chart3.Series(1).BorderWidth = 3
-                Chart3.Series(2).BorderWidth = 4
-
-                Chart3.ChartAreas("ChartArea0").AxisX.Minimum = 0
-                Chart3.ChartAreas("ChartArea0").AxisX.MinorTickMark.Enabled = True
-                Chart3.ChartAreas("ChartArea0").AxisY.MinorTickMark.Enabled = True
-                Chart3.ChartAreas("ChartArea0").AxisY2.MinorTickMark.Enabled = True
-
-                '---------------- fan target ---------------------
-                TextBox149.Text = Round(G_Debiet_z_act_hr, 0).ToString  'Debiet [Am3/hr]
-                TextBox148.Text = NumericUpDown2.Value.ToString         'Ptotal [mbar]
-                TextBox156.Text = NumericUpDown12.Value.ToString        'Density [kg/m3]
-
-                If CheckBox2.Checked = False Then
-                    Chart3.ChartAreas("ChartArea0").AxisX.Title = "Debiet [Am3/s]"
-                Else
-                    Chart3.ChartAreas("ChartArea0").AxisX.Title = "Debiet [Am3/hr]"
-                End If
-
-                Chart3.ChartAreas("ChartArea0").AxisY.Title = "Ptotaal [Pa]"
-                Chart3.ChartAreas("ChartArea0").AlignmentOrientation = DataVisualization.Charting.AreaAlignmentOrientations.Vertical
-                Chart3.ChartAreas("ChartArea0").AxisY2.Enabled = AxisEnabled.True
-                Chart3.ChartAreas("ChartArea0").AxisY2.Title = "Rendement [%] As-vermogen [kW]"
-
-                If CheckBox2.Checked = True Then
-                    Chart3.ChartAreas("ChartArea0").AxisX.Title = "Debiet [Am3/s]"
-                    Q_target = G_Debiet_z_act_hr            '[Am3/hr]
-                Else
-                    Chart3.ChartAreas("ChartArea0").AxisX.Title = "Debiet [Am3/hr]"
-                    Q_target = G_Debiet_z_act_hr / 3600     '[Am3/sec]
-                End If
-
-
-                '------------------Weerstand coefficient ---------------------
-                If CheckBox2.Checked = True Then
-                    Weerstand_coefficient = P_target * 2 / (NumericUpDown12.Value * (G_Debiet_z_act_hr) ^ 2)
-                Else
-                    Weerstand_coefficient = P_target * 2 / (NumericUpDown12.Value * (G_Debiet_z_act_hr / 3600) ^ 2)
-                End If
-
-                '-------------------Target dot ---------------------
-                If CheckBox3.Checked = True Then
-                    Chart3.Series(3).YAxisType = AxisType.Primary
-                    Chart3.Series(3).Points.AddXY(Q_target, P_target)
-                    Chart3.Series(3).Points(0).MarkerStyle = DataVisualization.Charting.MarkerStyle.Star10
-                    Chart3.Series(3).Points(0).MarkerSize = 20
-                End If
-
-                '-------------------'P_totaal lijn [mmwc]---------------------
-                For hh = 0 To 11   'Fill line chart
-                    If Tschets(Tschets_no).TPtot(hh) > 0 Then           'Rest of the array is empty
-                        If CheckBox2.Checked = True Then
-                            debiet = Round(Tschets(Tschets_no).TFlow_scaled(hh) * 3600, 0)
-                        Else
-                            debiet = Tschets(Tschets_no).TFlow_scaled(hh)
-                        End If
-
-                        Chart3.Series(0).YAxisType = AxisType.Primary
-                        Chart3.Series(0).Points.AddXY(debiet, Tschets(Tschets_no).TPtot_scaled(hh))
-                        Chart3.Series(1).YAxisType = AxisType.Secondary
-                        Chart3.Series(1).Points.AddXY(debiet, Tschets(Tschets_no).Teff_scaled(hh))
-                        Chart3.Series(2).YAxisType = AxisType.Secondary
-                        Chart3.Series(2).Points.AddXY(debiet, Tschets(Tschets_no).Tverm_scaled(hh))
-                        If CheckBox3.Checked = True Then
-                            p_loss_line = 0.5 * Weerstand_coefficient * NumericUpDown12.Value * debiet ^ 2
-                            Chart3.Series(4).Points.AddXY(debiet, p_loss_line)
-                        End If
-                        Chart3.Series(5).YAxisType = AxisType.Primary
-                        Chart3.Series(5).Points.AddXY(debiet, Tschets(Tschets_no).TPstat_scaled(hh))
-                    End If
-                Next hh
-                Chart3.Refresh()
-            Catch ex As Exception
-                'MessageBox.Show(ex.Message & "Line 1100")  ' Show the exception's message.
-            End Try
-        End If
-    End Sub
-
-    Private Sub Button12_Click(sender As Object, e As EventArgs) Handles Button12.Click
-        draw_chart3(ComboBox5.SelectedIndex)
-    End Sub
 End Class
