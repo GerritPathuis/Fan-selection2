@@ -267,6 +267,9 @@ Public Class Form1
                 TextBox3.Text = Tschets(nrq).Tdata(5)           'Uitlaat breedte inw.
                 TextBox8.Text = Tschets(nrq).Tdata(6)           'Lengte spiraal
 
+
+
+
                 TextBox61.Text = Tschets(nrq).Tdata(12)         'schoep lengte.
                 TextBox9.Text = Tschets(nrq).Tdata(13)          'aantal schoepen.
                 TextBox5.Text = Tschets(nrq).Tdata(14)          'Inw schoep breedte.
@@ -555,15 +558,113 @@ Public Class Form1
                 '---------- temperaturen, lost power is tranferred to heat -----------
                 Direct_temp_uit_c = G_air_temp + (Direct_as_kw / (cp_air * G_Debiet_kg_s))
 
-                '---------- presenteren-----------------------
+                '---------- presenteren 2de bedrijfspunt -----------------------
                 TextBox75.Text = Round(Direct_eff, 3).ToString
                 TextBox77.Text = Round((Direct_reynolds * 10 ^ -6), 2).ToString
                 TextBox78.Text = Round(Direct_as_kw, 0).ToString                            'As vermogen in [kW]
                 TextBox54.Text = Round(Direct_temp_uit_c, 0).ToString                       'Temp uit [c]
                 TextBox83.Text = Round(Direct_Debiet_z_sec * 3600.0, 0)                     'Debiet [m3/hr]
-                TextBox157.Text = Round(Direct_Debiet_z_sec * roo2 * 3600.0, 0)                     'Debiet [kg/hr]
+                TextBox157.Text = Round(Direct_Debiet_z_sec * roo2 * 3600.0, 0)             'Debiet [kg/hr]
+
+                TextBox159.Text = Round(Tschets(nrq).Tdata(3) * diam2 / diam1, 0)          'Zuigmond diameter.
+                TextBox160.Text = Round(Tschets(nrq).Tdata(4) * diam2 / diam1, 0)          'Uitlaat hoogte inw. 
+                TextBox161.Text = Round(Tschets(nrq).Tdata(5) * diam2 / diam1, 0)          'Uitlaat breedte inw.
 
                 '--------------------------------------------------------------------------------------------------
+                '------------------- pressure loss omloop #1 -----------------------------
+                '--------------------- dp = phi* 1/2 ro*v^2 --------------
+                '------------------- calc ro2 @ omloop inlet ----------------
+                'ro_fan1_outlet = calc_density(G_density_act_zuig, (Ptot0 + 101300), (P1_tot_out + 101300), temp0, temp1)
+                'NumericUpDown38.Value = Round(ro_fan1_outlet, 2).ToString            'Density outlet
+
+                ''----------------- ontwerp diameter omloop #1 --------------------
+                'area_omloop1 = (massa_debiet / ro_fan1_outlet) / velos_1_design      '[m2]
+                'dia_omloop1 = Sqrt(area_omloop1 / 4 * PI) * 1000                     '[mm]
+                'NumericUpDown47.Value = Round(dia_omloop1, 0).ToString               '[mm]   'Ontwerp diameter omloop #1
+
+
+                ''----------------- actual drukverlies omloop #1 -------------------
+                'dp_omloop_1 = 0.5 * phi_1 * velos_1_design ^ 2 * ro_fan1_outlet '[Pa]
+                'TextBox64.Text = Round(dp_omloop_1 / 100, 0).ToString           '[mbar]
+                'P2_in = P1_tot_out - dp_omloop_1                                '[Pa]
+
+                'ro_fan2_inlet = calc_density(G_density_act_zuig, (Ptot0 + 101300), (P2_in + 101300), temp0, temp1)
+
+                'NumericUpDown39.Value = Round(ro_fan2_inlet, 2).ToString        '[kg/m3] Density inlet
+
+                '-------------------------- Waaier #2 ----------------------
+                '---------------------------------------------------------------
+                'P2_tot_out = P2_in + Round(Scale_rule_Pressure(Ptot0, dia0, dia2, n0, n2, ro0_inlet, ro_fan2_inlet), 0)     '[Pa] P_total
+                'P2_stat_out = P2_in + Round(Scale_rule_Pressure(Pstat0, dia0, dia2, n0, n2, ro0_inlet, ro_fan2_inlet), 0)   '[Pa] P_static
+                'Pow2 = Round(Scale_rule_Power(Pow0, dia0, dia2, n0, n2, ro0_inlet, ro_fan2_inlet), 0)                       '[kW] 
+                'temp2 = temp0 + ((Pow1 + Pow2) / (cp_air * massa_debiet))                                                   '[c]
+
+                ''----------- present------------------------
+                'TextBox137.Text = Round(P2_in / 100, 0).ToString                '[mbar] inlet flange
+                'TextBox130.Text = Round(temp2, 0).ToString                      '[c] outlet flange
+                'TextBox80.Text = Round(P2_tot_out / 100, 0).ToString            '[mbar] outlet P_total
+                'TextBox154.Text = Round(P2_stat_out / 100, 0).ToString          '[mbar] outlet P_static
+                'TextBox133.Text = Round(Pow2, 0).ToString                       '[kW]
+
+                ''------------------- pressure loss omloop #2 -----------------------------
+                ''--------------------- dp = phi* 1/2 ro*v^2 --------------
+                ''------------------- calc ro2 @ omloop inlet ----------------
+                'ro_fan2_outlet = calc_density(G_density_act_zuig, (Ptot0 + 101300), (P2_tot_out + 101300), temp0, temp2)
+                'NumericUpDown40.Value = Round(ro_fan2_outlet, 2).ToString       'Density outlet
+
+                ''----------------- ontwerp diameter omloop #2 --------------------
+                'area_omloop2 = (massa_debiet / ro_fan2_outlet) / velos_2_design     '[m2]
+                'dia_omloop2 = Sqrt(area_omloop2 / 4 * PI) * 1000                    '[mm]
+                'NumericUpDown48.Value = Round(dia_omloop2, 0).ToString              '[mm]   'Ontwerp diameter omloop #2
+
+                'dp_omloop_2 = 0.5 * phi_2 * velos_2_design ^ 2 * ro_fan2_outlet     '[Pa]
+                'TextBox128.Text = Round(dp_omloop_2 / 100, 0).ToString              '[mbar]
+
+                'P3_in = P2_tot_out - dp_omloop_2                                    '[Pa]
+
+                'ro_fan3_inlet = calc_density(G_density_act_zuig, (Ptot0 + 101300), (P3_in + 101300), temp0, temp2)
+                'NumericUpDown41.Value = Round(ro_fan3_inlet, 2).ToString        '[kg/m3] Density inlet
+
+                ''-------------------------- Waaier #3 ----------------------
+                ''---------------------------------------------------------------
+                'P3_tot_out = P3_in + Round(Scale_rule_Pressure(Ptot0, dia0, dia3, n0, n3, ro0_inlet, ro_fan3_inlet), 0)     '[Pa] P_total
+                'P3_stat_out = P3_in + Round(Scale_rule_Pressure(Pstat0, dia0, dia3, n0, n3, ro0_inlet, ro_fan2_inlet), 0)   '[Pa] P_static
+                'Pow3 = Round(Scale_rule_Power(Pow0, dia0, dia3, n0, n3, ro0_inlet, ro_fan3_inlet), 0)                       '[kW] 
+                'temp3 = temp0 + ((Pow1 + Pow2 + Pow3) / (cp_air * massa_debiet))                                            '[c]
+
+                'ro_fan3_outlet = calc_density(G_density_act_zuig, (Ptot0 + 101300), (P3_tot_out + 101300), temp0, temp3)
+                'NumericUpDown46.Value = Round(ro_fan3_outlet, 2).ToString       'Density outlet
+
+                ''-------------------------- Aantal trappen ----------------------
+                'If RadioButton5.Checked Then    '2 Traps
+                '    GroupBox28.Visible = False
+                '    GroupBox29.Visible = False
+                '    TextBox80.BackColor = Color.FromArgb(192, 255, 192)
+                '    TextBox130.BackColor = Color.FromArgb(192, 255, 192)
+                '    TextBox133.BackColor = Color.FromArgb(192, 255, 192)
+                '    Power_total = Pow1 + Pow2                                           '[kW]
+                '    TextBox147.Text = Round((P2_tot_out - P1_in) / 100, 0).ToString     '[mbar] dP fan total
+                '    TextBox158.Text = Round((P2_stat_out - P1_in) / 100, 0).ToString    '[mbar] dP fan static
+                'Else
+                '    TextBox80.BackColor = SystemColors.Window
+                '    TextBox130.BackColor = SystemColors.Window
+                '    TextBox133.BackColor = SystemColors.Window
+                '    GroupBox28.Visible = True
+                '    GroupBox29.Visible = True
+                '    Power_total = Pow1 + Pow2 + Pow3                                    '[kW]
+                '    TextBox147.Text = Round((P3_tot_out - P1_in) / 100, 0).ToString     '[mbar] dP fan total
+                '    TextBox158.Text = Round((P3_stat_out - P1_in) / 100, 0).ToString    '[mbar] dP fan static
+                'End If
+
+                ''----------- present------------------------
+                'TextBox138.Text = Round(P3_in / 100, 0).ToString                    '[mbar]
+                'TextBox131.Text = Round(temp3, 0).ToString                          '[c]
+                'TextBox82.Text = Round(P3_tot_out / 100, 0).ToString                '[mbar] P_total outlet
+                'TextBox155.Text = Round(P3_stat_out / 100, 0).ToString              '[mbar] outlet P_static
+                'TextBox134.Text = Round(Pow3, 0).ToString                           '[kW]
+                'TextBox139.Text = Round(Power_total, 0).ToString                    '[kW]
+
+
                 TabPage1.Update()
             Catch ex As Exception
                 MessageBox.Show(ex.Message)  ' Show the exception's message.
@@ -1233,7 +1334,7 @@ Public Class Form1
         Dim Weerstand_coefficient, p_loss_line As Double
 
         If (Tschets_no < (ComboBox1.Items.Count)) And (Tschets_no >= 0) Then
-            P_target = NumericUpDown2.Value * 100   '[Pa] 'Gewenste fan  gegevens
+            P_target = NumericUpDown2.Value * 100   '[Pa] Gewenste fan  gegevens
 
             Try
                 'Clear all series And chart areas so we can re-add them
@@ -1259,10 +1360,10 @@ Public Class Form1
                     Chart1.Series(2).ChartType = DataVisualization.Charting.SeriesChartType.Line
                     Chart1.Series(3).ChartType = DataVisualization.Charting.SeriesChartType.Line
                 Else
-                    Chart1.Series(0).ChartType = DataVisualization.Charting.SeriesChartType.Spline
-                    Chart1.Series(1).ChartType = DataVisualization.Charting.SeriesChartType.Spline
-                    Chart1.Series(2).ChartType = DataVisualization.Charting.SeriesChartType.Spline
-                    Chart1.Series(3).ChartType = DataVisualization.Charting.SeriesChartType.Spline
+                    Chart1.Series(0).ChartType = DataVisualization.Charting.SeriesChartType.FastLine
+                    Chart1.Series(1).ChartType = DataVisualization.Charting.SeriesChartType.FastLine
+                    Chart1.Series(2).ChartType = DataVisualization.Charting.SeriesChartType.FastLine
+                    Chart1.Series(3).ChartType = DataVisualization.Charting.SeriesChartType.FastLine
                 End If
                 Chart1.Series(4).ChartType = DataVisualization.Charting.SeriesChartType.Line
                 Chart1.Series(5).ChartType = DataVisualization.Charting.SeriesChartType.Line
@@ -1366,7 +1467,7 @@ Public Class Form1
                 Next hh
                 Chart1.Refresh()
             Catch ex As Exception
-                'MessageBox.Show(ex.Message & "Line 1100")  ' Show the exception's message.
+                'MessageBox.Show(ex.Message & "Line 1400")  ' Show the exception's message.
             End Try
         End If
     End Sub
@@ -1604,7 +1705,7 @@ Public Class Form1
                             '---------- pressure loss omloop #1 ---------------------
                             omloop1_velos = Q1 / omloop1_area
                             omloop1_loss = 0.5 * NumericUpDown43.Value * Ro1 * omloop1_velos ^ 2    '1/2*phi*ro*V*2 
-                            p2 -= omloop1_loss                                                  'Drukverlies in de omloop [Pa]
+                            p2 -= omloop1_loss                                                      'Drukverlies in de omloop [Pa]
 
                             temp2 = temp1 + (Tschets(ty).Tverm_scaled(hh) / (cp_air * mass_flow))  'Temperature outlet flange [celsius]
                             ro2 = calc_density(Ro1, p1, p2, temp1, temp2)
@@ -1620,17 +1721,13 @@ Public Class Form1
                             p1 = (NumericUpDown49.Value + 101300)           'Press total (absoluut) inlet flange
                             p2 = (Tschets(ty).TPtot_scaled(hh) + 101300)    'Press total (absoluut) outlet flange
 
-
                             '---------- pressure loss omloop #2 ---------------------
                             omloop2_velos = Q1 / omloop2_area
                             omloop2_loss = 0.5 * NumericUpDown43.Value * Ro1 * omloop2_velos ^ 2    '1/2*phi*ro*V*2 
                             p2 -= omloop2_loss                                                  'Drukverlies in de omloop [Pa]
 
-
                             temp2 = temp1 + (Tschets(ty).Tverm_scaled(hh) / (cp_air * mass_flow))  'Temperature outlet flange [celsius]
                             ro2 = calc_density(Ro1, p1, p2, temp1, temp2)
-
-
 
                             Tschets(ty).TPtot_scaled(hh) += Round(Scale_rule_Pressure(Pt1, Dia1, dia2, n1, n2, Ro1, ro2), 0)
                             Tschets(ty).TPstat_scaled(hh) += Round(Scale_rule_Pressure(Ps1, Dia1, dia2, n1, n2, Ro1, ro2), 0)
@@ -1679,8 +1776,6 @@ Public Class Form1
                     Chart2.Series(schets_no).Points.AddXY(Tschets(schets_no).TFlow_scaled(hh), Tschets(schets_no).TPtot_scaled(hh))
                 End If
             Next hh
-
-            'MessageBox.Show("Tschets= " & Tschets(schets_no).Tname)
         Next schets_no
     End Sub
     Private Sub TabPage7_Paint(sender As Object, e As PaintEventArgs) Handles TabPage7.Paint
@@ -1858,7 +1953,7 @@ Public Class Form1
         TextBox111.Text = Round(N_max_doorbuiging * 1000, 3).ToString      'Max doorbuiging in [mm]
     End Sub
 
-    Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click, NumericUpDown8.ValueChanged, NumericUpDown7.ValueChanged, NumericUpDown6.ValueChanged, NumericUpDown5.ValueChanged, NumericUpDown4.ValueChanged, NumericUpDown3.ValueChanged, NumericUpDown2.ValueChanged, NumericUpDown13.ValueChanged, NumericUpDown12.ValueChanged, NumericUpDown1.ValueChanged, ComboBox1.SelectedIndexChanged, RadioButton4.CheckedChanged, RadioButton3.CheckedChanged, CheckBox4.CheckedChanged, CheckBox5.CheckedChanged, NumericUpDown33.ValueChanged, ComboBox7.SelectedIndexChanged, TabPage1.Enter
+    Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click, NumericUpDown8.ValueChanged, NumericUpDown7.ValueChanged, NumericUpDown6.ValueChanged, NumericUpDown5.ValueChanged, NumericUpDown4.ValueChanged, NumericUpDown3.ValueChanged, NumericUpDown2.ValueChanged, NumericUpDown13.ValueChanged, NumericUpDown12.ValueChanged, NumericUpDown1.ValueChanged, ComboBox1.SelectedIndexChanged, RadioButton4.CheckedChanged, RadioButton3.CheckedChanged, CheckBox4.CheckedChanged, CheckBox5.CheckedChanged, NumericUpDown33.ValueChanged, ComboBox7.SelectedIndexChanged, TabPage1.Enter, RadioButton14.CheckedChanged, RadioButton13.CheckedChanged, RadioButton12.CheckedChanged, NumericUpDown61.ValueChanged, NumericUpDown58.ValueChanged
         If TabControl1.SelectedTab.Name = "TabPage1" Then
             ComboBox7.SelectedIndex = ComboBox1.SelectedIndex       'type selectie
         End If
