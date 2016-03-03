@@ -27,9 +27,37 @@ Public Structure Tmodel
     Public Tverm_scaled() As Double     'Vermogen[kW]
 End Structure
 
+'Compressor stages
+'1= inlet impellar
+'2= outlet impellar
+
+Public Structure Stage
+    Public Typ As Integer       'Impellar type
+    Public Dia1 As Integer      'Impellar diameter [m]
+    Public Dia2 As Integer      'Impellar diameter [m]
+    Public Rpm1 As Integer      'Impellar speed [rpm]
+    Public Rpm2 As Integer      'Impellar speed [rpm]
+    Public Qkg As Double        'Debiet [kg/s]
+    Public Q1 As Double         'Debiet inlet [Am3/s]
+    Public Q2 As Double         'Debiet outlet [Am3/s]
+    Public Ro1 As Double        'Density[kg/m3]
+    Public Ro2 As Double        'Density[kg/m3]
+    Public Ps1 As Double        'Statische druk [Pa G]
+    Public Ps2 As Double        'Statische druk [Pa G]
+    Public Pt1 As Double        'Totale druk [Pa G]
+    Public Pt2 As Double        'Totale druk [Pa G]
+    Public T1 As Double         'Temp in [c]
+    Public T2 As Double         'Temp uit [c]
+    Public velos As Double      'Omtreksnelheid [m/s]
+    Public Reynolds As Double   'Waaier OD [-]
+    Public Eff As Double        'Rendement [%]
+    Public Power1 As Double     'Vermogen[kW]
+    Public Power2 As Double     'Vermogen[kW]
+End Structure
 Public Class Form1
     Public Tschets(31) As Tmodel            'was 31
     Public cp_air As Double = 1.005         'Specific heat air
+    Public cond(10) As Stage                'Process conditions
 
     '----- "Oude benaming;Norm:;EN10027-1;Werkstof;[mm/m1/100°C];Poisson ;kg/m3;E [Gpa];Rm (20c);Rp0.2(0c);Rp0.2(20c);Rp(50c);Rp(100c);Rp(150c);Rp(200c);Rp(250c);Rp(300c);Rp(350c);Rp(400c);Equiv-ASTM;Opmerking",
     Public Shared steel() As String =
@@ -515,70 +543,49 @@ Public Class Form1
 
                 '========================= 2de Bedrijfspunt===================================================================
                 '=============================================================================================================
-                Direct_Toerental_rpm = NumericUpDown13.Value                                'Kies het waaier toerental
-                Direct_diaw = NumericUpDown33.Value / 1000                                  'Diameter [m]
+                cond(0).Typ = ComboBox1.SelectedIndex               '[-]
+                cond(0).Dia1 = Tschets(Ttype).Tdata(0)              '[mm]
+                cond(0).Dia2 = NumericUpDown33.Value                '[mm]
+                cond(0).Rpm1 = Tschets(Ttype).Tdata(1)              '[rpm] 
+                cond(0).Rpm2 = NumericUpDown13.Value                '[rpm]
+                cond(0).Qkg = NumericUpDown3.Value                  '[kg/hr]
+                cond(0).Q1 = T_Debiet_sec                           '[Am3/s]
+                cond(0).Ro1 = Tschets(Ttype).Tdata(2)               'density [kg/m3]
+                cond(0).Ro2 = NumericUpDown12.Value                 'density [kg/m3]
+                cond(0).T1 = G_air_temp                             '[c]
+                cond(0).Pt1 = Tschets(Ttype).werkp_opT(1)           '[PaG]
+                cond(0).Ps1 = Tschets(Ttype).werkp_opT(2)           '[PaG]
+                cond(0).Power1 = Tschets(Ttype).werkp_opT(3)        '[kW]
 
-                Direct_omtrek_s = PI * Direct_Toerental_rpm / 60 * Direct_diaw
-                TextBox76.Text = Round(Direct_omtrek_s, 1)                                  'Omtrek snelheid [m/s]
+                Calc_stage(cond(0))
 
-                'If CheckBox5.Checked Then
-                '    Direct_diaw_m_R20 = find_Renard_R20(Direct_diaw)                        'Diameter volgens R20 reeks
-                'Else
-                '    Direct_diaw_m_R20 = Round(Direct_diaw, 3)
-                'End If
-                Direct_diaw_m_R20 = Round(Direct_diaw, 3)
+                TextBox75.Text = Round(cond(0).Eff, 3).ToString
+                'TextBox77.Text = Round((Direct_reynolds * 10 ^ -6), 2).ToString
+                TextBox78.Text = Round(cond(0).Power2, 0).ToString                          'As vermogen in [kW]
+                TextBox54.Text = Round(cond(0).T2, 0).ToString                              'Temp uit [c]
+                TextBox81.Text = Round((cond(0).Pt2 / 100), 0).ToString                     'dP_Total  [mbar]
+                TextBox150.Text = Round((cond(0).Ps2 / 100), 0).ToString                    'dp_Static [mbar]
+                TextBox151.Text = Round(((cond(0).Pt2 - cond(0).Ps2) / 100), 0).ToString    'dynamic press [mbar]
+                TextBox83.Text = Round(cond(0).Q2 * 3600.0, 0)                              'Debiet [m3/hr]
+                TextBox157.Text = Round(cond(0).Qkg, 0)                                     'Debiet [kg/hr]
+                TextBox76.Text = Round(cond(0).velos, 0)                                    'Omtrek snelheid [m/s]
+                TextBox77.Text = Round((cond(0).Reynolds * 10 ^ -6), 2).ToString
 
-                '------------ Reynolds 2e bedrijfspunt -----------------------
-                Direct_reynolds = Round(Direct_omtrek_s * Direct_diaw_m_R20 / G_visco_kin, 0)
-
-                '------------ Rendement Waaier (Ackeret) --------------
-                If CheckBox4.Checked Then
-                    Direct_eff = 1 - 0.5 * (1 - T_eff) * Pow((1 + (T_reynolds / Direct_reynolds)), 0.2)
-                Else
-                    Direct_eff = T_eff
-                End If
-
-
-                '---------- Pressure 2e bedrijfspunt -----------------------
-                Ttype = ComboBox1.SelectedIndex
-                dia0 = Tschets(Ttype).Tdata(0)             'waaier diameter [mm]
-                dia1 = NumericUpDown33.Value
-                nn1 = Tschets(Ttype).Tdata(1)               'waaier [rpm]
-                nn2 = NumericUpDown13.Value
-                roo1 = Tschets(Ttype).Tdata(2)              'density [kg/m3]
-                roo2 = NumericUpDown12.Value
-                WP2_total = Tschets(Ttype).werkp_opT(1)     'P_total [Pa]Tschets
-                WP2_stat = Tschets(Ttype).werkp_opT(2)      'P_stat [Pa] Tschets
-
-                WP2_total2 = Round(Scale_rule_Pressure(WP2_total, dia0, dia1, nn1, nn2, roo1, roo2), 0)
-                WP2_stat2 = Round(Scale_rule_Pressure(WP2_stat, dia0, dia1, nn1, nn2, roo1, roo2), 0)
-
-                '---------- Debiet 2e bedrijfspunt ----------------------------------------------
-                Direct_Debiet_z_sec = Round(Scale_rule_cap(T_Debiet_sec, dia0, dia1, nn1, nn2), 2)   '[Am3/s]
-
-                TextBox81.Text = Round(WP2_total2 / 100, 3).ToString                    'dP_Total  [mbar]
-                TextBox150.Text = Round(WP2_stat2 / 100, 3).ToString                    'dp_Static [mbar]
-                TextBox151.Text = Round((WP2_total2 - WP2_stat2) / 100, 3).ToString     'dynamic press [mbar]
-
-                '---------- as vermogen 2e bedrijfspunt -----------------------
-                Pow1 = Round(Scale_rule_Power(T_Power_opt, dia0, dia1, nn1, nn2, roo1, roo2), 0)
-
-                '---------- temperaturen, lost power is tranferred to heat -----------
-                temp1 = G_air_temp + (Pow1 / (cp_air * G_Debiet_kg_s))
-
-                '---------- presenteren 2de bedrijfspunt -----------------------
-                TextBox75.Text = Round(Direct_eff, 3).ToString
-                TextBox77.Text = Round((Direct_reynolds * 10 ^ -6), 2).ToString
-                TextBox78.Text = Round(Pow1, 0).ToString                            'As vermogen in [kW]
-                TextBox54.Text = Round(Direct_temp_uit_c, 0).ToString                       'Temp uit [c]
-                TextBox83.Text = Round(Direct_Debiet_z_sec * 3600.0, 0)                     'Debiet [m3/hr]
-                TextBox157.Text = Round(Direct_Debiet_z_sec * roo2 * 3600.0, 0)             'Debiet [kg/hr]
-
-                TextBox159.Text = Round(Tschets(nrq).Tdata(3) * dia1 / dia0, 0)           'Zuigmond diameter.
-                uitlaat_h = Round(Tschets(nrq).Tdata(4) * dia1 / dia0, 0)                 'Uitlaat hoogte inw.[mm]
+                TextBox159.Text = Round(Tschets(ComboBox1.SelectedIndex).Tdata(3) * cond(0).Dia2 / cond(0).Dia1, 0)         'Zuigmond diameter.
+                uitlaat_h = Round(Tschets(ComboBox1.SelectedIndex).Tdata(4) * cond(0).Dia2 / cond(0).Dia1, 0)               'Uitlaat hoogte inw.[mm]
                 TextBox160.Text = uitlaat_h
-                uitlaat_b = Round(Tschets(nrq).Tdata(5) * dia1 / dia0, 0)                 'Uitlaat breedte inw.[mm]
+                uitlaat_b = Round(Tschets(ComboBox1.SelectedIndex).Tdata(5) * cond(0).Dia2 / cond(0).Dia1, 0)               'Uitlaat breedte inw.[mm]
                 TextBox161.Text = uitlaat_b
+
+
+                '============================================================================================================
+
+                ''------------ Rendement Waaier (Ackeret) --------------
+                'If CheckBox4.Checked Then
+                '    Direct_eff = 1 - 0.5 * (1 - T_eff) * Pow((1 + (T_reynolds / Direct_reynolds)), 0.2)
+                'Else
+                '    Direct_eff = T_eff
+                'End If
 
                 '------------compressors------------------------------------------------------------------
                 '-----------------------------------------------------------------------------------------
@@ -1681,6 +1688,7 @@ Public Class Form1
     End Function
 
     'Scale rules Pressure, Total and Static
+    'Pressure in [Pa] or [Pa abs] or [wwmc] if used consequently
     '1= inlet, 2=outlet
     'Diameter in [m]
     'Q=Capacity in [m3/s]
@@ -2126,4 +2134,54 @@ Public Class Form1
     End Sub
 
 
+    'Calculate a impellar stage process condition inlet and outlet
+    'Bekend moet zijn
+    'Public Typ As Integer       'Impellar type
+    'Public Dia1 As Integer      'Impellar diameter [m]
+    'Public Dia2 As Integer      'Impellar diameter [m]
+    'Public Rpm1 As Integer      'Impellar speed [rpm]
+    'Public Rpm2 As Integer      'Impellar speed [rpm]
+    'Public Qkg As Double        'Debiet [kg/s]
+    'Public Q1 As Double         'Debiet inlet [Am3/s]
+    'Public Ro1 As Double        'Density[kg/m3]
+    'Public Ro2 As Double        'Density[kg/m3]
+    'Public T1 As Double         'Temp in [c]
+    'Public Ps1 As Double        'Statische druk [Pa G]
+    'Public Pt1 As Double        'Totale druk [Pa G]
+    'Public Power1 As Double     'Vermogen[kW]
+
+    Private Sub Calc_stage(ByRef y As Stage)
+        Dim G_visco_kin As Double
+        y.Q2 = Round(Scale_rule_cap(y.Q1, y.Dia1, y.Dia2, y.Rpm1, y.Rpm2), 2)                         '[Am3/s]
+        y.Pt2 = Round(Scale_rule_Pressure(y.Pt1, y.Dia1, y.Dia2, y.Rpm1, y.Rpm2, y.Ro1, y.Ro2), 0)    '[Pa]
+        y.Ps2 = Round(Scale_rule_Pressure(y.Ps1, y.Dia1, y.Dia2, y.Rpm1, y.Rpm2, y.Ro1, y.Ro2), 0)    '[Pa]
+        y.Power2 = Round(Scale_rule_Power(y.Power1, y.Dia1, y.Dia2, y.Rpm1, y.Rpm2, y.Ro1, y.Ro2), 1) '[kW]
+        'Eff = Tschets(typ).Teff(hh)
+        y.Eff = y.Q1 * y.Pt2 / y.Power2
+
+        y.T2 = y.T1 + (y.Power2 / (cp_air * y.Qkg))                     'Temperature outlet flange [celsius]
+        y.velos = PI * y.Dia2 / 1000 * y.Rpm2 / 60                      'Omtreksnelheid waaier
+
+        '--------- Kinmatic viscosity air[m2/s]-----------------------
+        G_visco_kin = kin_visco_air(y.T1)                               'Kin viscositeit [m2/s]
+
+
+        y.Reynolds = Round(y.velos * (y.Dia2 / 1000) / G_visco_kin, 0)
+    End Sub
+
+    Private Sub Button9_Click(sender As Object, e As EventArgs) Handles Button9.Click
+        cond(0).Typ = 11                '[-]
+        cond(0).Rpm1 = 1000             '[rpm]
+        cond(0).Rpm2 = 2000             '[rpm]
+        cond(0).Qkg = 6000              '[kg/hr]
+        cond(0).Q1 = 1.1                '[m3/s]
+        cond(0).Ro1 = 1.2               '[kg/hr]
+        cond(0).T1 = 23                 '[c]
+        cond(0).Pt1 = 6000 + 101300     '[Pa G]
+        cond(0).Ps1 = 5500 + 101300     '[Pa G]
+
+        Calc_stage(cond(0))
+
+        MessageBox.Show(cond(0).Q2.ToString)
+    End Sub
 End Class
