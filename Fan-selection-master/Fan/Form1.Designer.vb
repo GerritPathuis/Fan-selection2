@@ -520,7 +520,6 @@ Partial Class Form1
         Me.TextBox4 = New System.Windows.Forms.TextBox()
         Me.TextBox6 = New System.Windows.Forms.TextBox()
         Me.TextBox5 = New System.Windows.Forms.TextBox()
-        Me.Button9 = New System.Windows.Forms.Button()
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.GroupBox46.SuspendLayout()
@@ -633,7 +632,6 @@ Partial Class Form1
         '
         'TabPage1
         '
-        Me.TabPage1.Controls.Add(Me.Button9)
         Me.TabPage1.Controls.Add(Me.GroupBox46)
         Me.TabPage1.Controls.Add(Me.GroupBox45)
         Me.TabPage1.Controls.Add(Me.GroupBox44)
@@ -1336,22 +1334,22 @@ Partial Class Form1
         'RadioButton13
         '
         Me.RadioButton13.AutoSize = True
-        Me.RadioButton13.Checked = True
         Me.RadioButton13.Location = New System.Drawing.Point(62, 23)
         Me.RadioButton13.Name = "RadioButton13"
         Me.RadioButton13.Size = New System.Drawing.Size(31, 17)
         Me.RadioButton13.TabIndex = 1
-        Me.RadioButton13.TabStop = True
         Me.RadioButton13.Text = "2"
         Me.RadioButton13.UseVisualStyleBackColor = True
         '
         'RadioButton14
         '
         Me.RadioButton14.AutoSize = True
+        Me.RadioButton14.Checked = True
         Me.RadioButton14.Location = New System.Drawing.Point(108, 23)
         Me.RadioButton14.Name = "RadioButton14"
         Me.RadioButton14.Size = New System.Drawing.Size(31, 17)
         Me.RadioButton14.TabIndex = 0
+        Me.RadioButton14.TabStop = True
         Me.RadioButton14.Text = "3"
         Me.RadioButton14.UseVisualStyleBackColor = True
         '
@@ -6224,15 +6222,6 @@ Partial Class Form1
         Me.TextBox5.Text = "1"
         Me.TextBox5.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
-        'Button9
-        '
-        Me.Button9.Location = New System.Drawing.Point(197, 534)
-        Me.Button9.Name = "Button9"
-        Me.Button9.Size = New System.Drawing.Size(117, 35)
-        Me.Button9.TabIndex = 95
-        Me.Button9.Text = "Button9"
-        Me.Button9.UseVisualStyleBackColor = True
-        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -6864,5 +6853,4 @@ Partial Class Form1
     Friend WithEvents TextBox182 As TextBox
     Friend WithEvents TextBox188 As TextBox
     Friend WithEvents TextBox187 As TextBox
-    Friend WithEvents Button9 As Button
 End Class
