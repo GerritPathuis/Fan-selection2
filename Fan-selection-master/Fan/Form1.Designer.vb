@@ -34,6 +34,8 @@ Partial Class Form1
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPage1 = New System.Windows.Forms.TabPage()
         Me.GroupBox46 = New System.Windows.Forms.GroupBox()
+        Me.Label13 = New System.Windows.Forms.Label()
+        Me.TextBox64 = New System.Windows.Forms.TextBox()
         Me.Label257 = New System.Windows.Forms.Label()
         Me.TextBox179 = New System.Windows.Forms.TextBox()
         Me.TextBox180 = New System.Windows.Forms.TextBox()
@@ -520,8 +522,6 @@ Partial Class Form1
         Me.TextBox4 = New System.Windows.Forms.TextBox()
         Me.TextBox6 = New System.Windows.Forms.TextBox()
         Me.TextBox5 = New System.Windows.Forms.TextBox()
-        Me.TextBox64 = New System.Windows.Forms.TextBox()
-        Me.Label13 = New System.Windows.Forms.Label()
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.GroupBox46.SuspendLayout()
@@ -675,6 +675,25 @@ Partial Class Form1
         Me.GroupBox46.TabIndex = 94
         Me.GroupBox46.TabStop = False
         Me.GroupBox46.Text = "Gecombineerde gegevens"
+        '
+        'Label13
+        '
+        Me.Label13.AutoSize = True
+        Me.Label13.Location = New System.Drawing.Point(9, 109)
+        Me.Label13.Name = "Label13"
+        Me.Label13.Size = New System.Drawing.Size(63, 13)
+        Me.Label13.TabIndex = 34
+        Me.Label13.Text = "Temp uit [c]"
+        '
+        'TextBox64
+        '
+        Me.TextBox64.BackColor = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(192, Byte), Integer))
+        Me.TextBox64.Enabled = False
+        Me.TextBox64.Location = New System.Drawing.Point(137, 107)
+        Me.TextBox64.Name = "TextBox64"
+        Me.TextBox64.Size = New System.Drawing.Size(59, 20)
+        Me.TextBox64.TabIndex = 41
+        Me.TextBox64.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'Label257
         '
@@ -1323,10 +1342,12 @@ Partial Class Form1
         'RadioButton12
         '
         Me.RadioButton12.AutoSize = True
+        Me.RadioButton12.Checked = True
         Me.RadioButton12.Location = New System.Drawing.Point(16, 23)
         Me.RadioButton12.Name = "RadioButton12"
         Me.RadioButton12.Size = New System.Drawing.Size(31, 17)
         Me.RadioButton12.TabIndex = 2
+        Me.RadioButton12.TabStop = True
         Me.RadioButton12.Text = "1"
         Me.RadioButton12.UseVisualStyleBackColor = True
         '
@@ -1343,12 +1364,10 @@ Partial Class Form1
         'RadioButton14
         '
         Me.RadioButton14.AutoSize = True
-        Me.RadioButton14.Checked = True
         Me.RadioButton14.Location = New System.Drawing.Point(108, 23)
         Me.RadioButton14.Name = "RadioButton14"
         Me.RadioButton14.Size = New System.Drawing.Size(31, 17)
         Me.RadioButton14.TabIndex = 0
-        Me.RadioButton14.TabStop = True
         Me.RadioButton14.Text = "3"
         Me.RadioButton14.UseVisualStyleBackColor = True
         '
@@ -1777,7 +1796,7 @@ Partial Class Form1
         Me.NumericUpDown2.Size = New System.Drawing.Size(80, 20)
         Me.NumericUpDown2.TabIndex = 75
         Me.NumericUpDown2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        Me.NumericUpDown2.Value = New Decimal(New Integer() {225, 0, 0, 0})
+        Me.NumericUpDown2.Value = New Decimal(New Integer() {1076, 0, 0, 65536})
         '
         'TextBox58
         '
@@ -1804,7 +1823,7 @@ Partial Class Form1
         Me.NumericUpDown3.TabIndex = 76
         Me.NumericUpDown3.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         Me.NumericUpDown3.ThousandsSeparator = True
-        Me.NumericUpDown3.Value = New Decimal(New Integer() {6000, 0, 0, 0})
+        Me.NumericUpDown3.Value = New Decimal(New Integer() {99127, 0, 0, 0})
         '
         'Label60
         '
@@ -1942,7 +1961,7 @@ Partial Class Form1
         Me.NumericUpDown12.Size = New System.Drawing.Size(78, 20)
         Me.NumericUpDown12.TabIndex = 91
         Me.NumericUpDown12.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        Me.NumericUpDown12.Value = New Decimal(New Integer() {1136, 0, 0, 196608})
+        Me.NumericUpDown12.Value = New Decimal(New Integer() {3232, 0, 0, 196608})
         '
         'RadioButton3
         '
@@ -2517,7 +2536,7 @@ Partial Class Form1
         Me.NumericUpDown33.Size = New System.Drawing.Size(80, 20)
         Me.NumericUpDown33.TabIndex = 88
         Me.NumericUpDown33.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        Me.NumericUpDown33.Value = New Decimal(New Integer() {968, 0, 0, 0})
+        Me.NumericUpDown33.Value = New Decimal(New Integer() {1000, 0, 0, 0})
         '
         'NumericUpDown13
         '
@@ -2530,7 +2549,7 @@ Partial Class Form1
         Me.NumericUpDown13.Size = New System.Drawing.Size(80, 20)
         Me.NumericUpDown13.TabIndex = 77
         Me.NumericUpDown13.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        Me.NumericUpDown13.Value = New Decimal(New Integer() {2978, 0, 0, 0})
+        Me.NumericUpDown13.Value = New Decimal(New Integer() {1764, 0, 0, 0})
         '
         'TextBox54
         '
@@ -2739,22 +2758,22 @@ Partial Class Form1
         'RadioButton10
         '
         Me.RadioButton10.AutoSize = True
-        Me.RadioButton10.Checked = True
         Me.RadioButton10.Location = New System.Drawing.Point(51, 14)
         Me.RadioButton10.Name = "RadioButton10"
         Me.RadioButton10.Size = New System.Drawing.Size(31, 17)
         Me.RadioButton10.TabIndex = 1
-        Me.RadioButton10.TabStop = True
         Me.RadioButton10.Text = "2"
         Me.RadioButton10.UseVisualStyleBackColor = True
         '
         'RadioButton9
         '
         Me.RadioButton9.AutoSize = True
+        Me.RadioButton9.Checked = True
         Me.RadioButton9.Location = New System.Drawing.Point(13, 14)
         Me.RadioButton9.Name = "RadioButton9"
         Me.RadioButton9.Size = New System.Drawing.Size(31, 17)
         Me.RadioButton9.TabIndex = 0
+        Me.RadioButton9.TabStop = True
         Me.RadioButton9.Text = "1"
         Me.RadioButton9.UseVisualStyleBackColor = True
         '
@@ -2800,7 +2819,7 @@ Partial Class Form1
         Me.NumericUpDown9.Name = "NumericUpDown9"
         Me.NumericUpDown9.Size = New System.Drawing.Size(59, 22)
         Me.NumericUpDown9.TabIndex = 7
-        Me.NumericUpDown9.Value = New Decimal(New Integer() {1000, 0, 0, 0})
+        Me.NumericUpDown9.Value = New Decimal(New Integer() {970, 0, 0, 0})
         '
         'NumericUpDown10
         '
@@ -6220,25 +6239,6 @@ Partial Class Form1
         Me.TextBox5.TabIndex = 11
         Me.TextBox5.Text = "1"
         Me.TextBox5.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'TextBox64
-        '
-        Me.TextBox64.BackColor = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(192, Byte), Integer))
-        Me.TextBox64.Enabled = False
-        Me.TextBox64.Location = New System.Drawing.Point(137, 107)
-        Me.TextBox64.Name = "TextBox64"
-        Me.TextBox64.Size = New System.Drawing.Size(59, 20)
-        Me.TextBox64.TabIndex = 41
-        Me.TextBox64.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'Label13
-        '
-        Me.Label13.AutoSize = True
-        Me.Label13.Location = New System.Drawing.Point(9, 109)
-        Me.Label13.Name = "Label13"
-        Me.Label13.Size = New System.Drawing.Size(63, 13)
-        Me.Label13.TabIndex = 34
-        Me.Label13.Text = "Temp uit [c]"
         '
         'Form1
         '

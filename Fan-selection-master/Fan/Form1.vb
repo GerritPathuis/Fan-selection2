@@ -43,9 +43,11 @@ Public Structure Stage
     Public Ro1 As Double        'Density[kg/m3] inlet flange
     Public Ro2 As Double        'Density[kg/m3] outlet flange fan
     Public Ro3 As Double        'Density[kg/m3] outlet flange loop
+    Public Ps0 As Double        'Statische druk [Pa G] Tschets
     Public Ps1 As Double        'Statische druk [Pa G] inlet flange
     Public Ps2 As Double        'Statische druk [Pa G] outlet flange fan
     Public Ps3 As Double        'Statische druk [Pa G] outlet omloop
+    Public Pt0 As Double        'Totale druk [Pa G] Tschets
     Public Pt1 As Double        'Totale druk [Pa G] inlet flange
     Public Pt2 As Double        'Totale druk [Pa G] outlet flange fan
     Public Pt3 As Double        'Totale druk [Pa G] outlet omloop
@@ -53,7 +55,9 @@ Public Structure Stage
     Public T2 As Double         'Temp uit [c]
     Public velos As Double      'Omtreksnelheid [m/s]
     Public Reynolds As Double   'Waaier OD [-]
-    Public Eff As Double        'Rendement [%]
+    Public Eff As Double        'VTK gemeten Rendement [%]
+    Public Ackeret As Double    'Rendement [%]
+    Public Power0 As Double     'Vermogen[kW] Tschets
     Public Power As Double      'As Vermogen[kW]
     Public zuig_dia As Double   'Zuig_diameter fan
     Public uitlaat_b As Double  'Uitlaat fan breed
@@ -538,16 +542,20 @@ Public Class Form1
                 '========================= 2de Bedrijfspunt===================================================================
                 '=============================================================================================================
                 cond(1).Typ = ComboBox1.SelectedIndex               '[-]
-                cond(1).Dia1 = Tschets(Ttype).Tdata(0)              '[mm]
+                cond(1).Dia1 = Tschets(cond(1).Typ).Tdata(0)        '[mm]
                 cond(1).Dia2 = NumericUpDown33.Value                '[mm]
-                cond(1).Rpm1 = Tschets(Ttype).Tdata(1)              '[rpm] 
+                cond(1).Rpm1 = Tschets(cond(1).Typ).Tdata(1)        '[rpm] 
                 cond(1).Rpm2 = NumericUpDown13.Value                '[rpm]
                 cond(1).Qkg = NumericUpDown3.Value                  '[kg/hr]
-                cond(1).Q1 = T_Debiet_sec                           '[Am3/s]
+                cond(1).Q1 = Tschets(cond(1).Typ).werkp_opT(4)      '[Am3/s] Tschets
                 cond(1).Ro1 = NumericUpDown12.Value                 'density [kg/m3] inlet flange
                 cond(1).T1 = G_air_temp                             '[c]
+                cond(1).Pt0 = Tschets(cond(1).Typ).werkp_opT(1)     '[PaG] Pressure total Tschets 
+                cond(1).Ps0 = Tschets(cond(1).Typ).werkp_opT(2)     '[PaG] Pressure static Tschets
                 cond(1).Pt1 = P_zuig_Pa - 101300                    '[PaG] inlet flange waaier #1           
                 cond(1).Ps1 = P_zuig_Pa - 101300                    '[PaG] inlet flange waaier #1
+                cond(1).Power0 = Tschets(cond(1).Typ).werkp_opT(3)  '[Am3/s] Tschets
+
 
                 Calc_stage(cond(1))             'Bereken de waaier #1  
                 calc_loop_loss(cond(1))         'Bereken de omloop verliezen  
@@ -568,9 +576,9 @@ Public Class Form1
 
                 '------------ Rendement Waaier (Ackeret) --------------
                 If CheckBox4.Checked Then
-                    Direct_eff = 1 - 0.5 * (1 - T_eff) * Pow((1 + (T_reynolds / cond(1).Reynolds)), 0.2)
+                    Direct_eff = cond(1).Ackeret
                 Else
-                    Direct_eff = T_eff
+                    Direct_eff = cond(1).Eff
                 End If
 
                 '----------------------- present waaier #1 ------------------------
@@ -859,10 +867,10 @@ Public Class Form1
         Tschets(0).Tverm = {4, 5.1, 5.5, 6.1, 6.6, 9.0, 0.0, 0, 0, 0, 0, 0}         '[kW]
         Tschets(0).TPstat = {10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10}        '[Pa]
         Tschets(0).TPtot = {8666, 8542, 8047, 7428, 6809, 3714, 0, 0, 0, 0, 0, 0}   '[Pa]
-        Tschets(0).TFlow = {0, 0.255, 0.51, 0.67, 0.766, 1.021, 0, 0, 0, 0, 0, 0}   '[m3/s]
+        Tschets(0).TFlow = {0, 0.255, 0.51, 0.67, 0.766, 1.021, 0, 0, 0, 0, 0, 0}   '[Am3/s]
         Tschets(0).werkp_opT = {81.0, 7428, 0, 6.144, 0.67}                         'rendement, P_totaal [Pa], P_statisch [Pa], as_vermogen [kW], debiet[m3/sec]
         Tschets(0).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
-        Tschets(0).TFlow_scaled = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}        '[m3/s]
+        Tschets(0).TFlow_scaled = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}        '[Am3/s]
         Tschets(0).TPstat_scaled = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}       'Statische druk
         Tschets(0).TPtot_scaled = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}        'Totale druk
         Tschets(0).Tverm_scaled = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}        'Rendement[%]
@@ -877,9 +885,9 @@ Public Class Form1
         Tschets(1).TFlow = {0.00, 3.83, 4.47, 4.82, 5.21, 5.59, 6.05, 6.48, 6.92, 7.33, 7.79, 8.17}
         Tschets(1).werkp_opT = {83.5, 250, 0, 19.95, 5.0}
         Tschets(1).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
-        Tschets(1).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(1).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(1).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk
+        Tschets(1).TFlow_scaled = Tschets(0).TFlow_scaled        '[Am3/s]
+        Tschets(1).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk [Pa]
+        Tschets(1).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk [Pa]
         Tschets(1).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
         Tschets(1).Teff_scaled = Tschets(0).Teff_scaled          'Vermogen[kW]
 
@@ -1326,7 +1334,6 @@ Public Class Form1
         Dim Weerstand_coefficient, p_loss_line As Double
 
         If (Tschets_no < (ComboBox1.Items.Count)) And (Tschets_no >= 0) Then
-            P_target = NumericUpDown2.Value * 100   '[Pa] Gewenste fan  gegevens
 
             Try
                 'Clear all series And chart areas so we can re-add them
@@ -1363,12 +1370,12 @@ Public Class Form1
                 Chart1.Titles.Add(Tschets(Tschets_no).Tname)
                 Chart1.Titles(0).Font = New Font("Arial", 16, System.Drawing.FontStyle.Bold)
 
-                Chart1.Series(0).Name = "P totaal [Pa]"
+                Chart1.Series(0).Name = "P totaal [mBar]"
                 Chart1.Series(1).Name = "Rendement [%]"
                 Chart1.Series(2).Name = "As vermogen [kW]"
                 Chart1.Series(3).Name = "Line resistance"
                 Chart1.Series(4).Name = "Marker"
-                Chart1.Series(5).Name = "P static [Pa]"
+                Chart1.Series(5).Name = "P static [mBar]"
 
                 Chart1.Series(0).Color = Color.Blue
                 Chart1.Series(1).Color = Color.Red
@@ -1399,31 +1406,20 @@ Public Class Form1
                 TextBox148.Text = NumericUpDown2.Value.ToString         'Ptotal [mbar]
                 TextBox156.Text = NumericUpDown12.Value.ToString        'Density [kg/m3]
 
-                If CheckBox2.Checked = False Then
-                    Chart1.ChartAreas("ChartArea0").AxisX.Title = "Debiet [Am3/s]"
-                Else
-                    Chart1.ChartAreas("ChartArea0").AxisX.Title = "Debiet [Am3/hr]"
-                End If
-
-                Chart1.ChartAreas("ChartArea0").AxisY.Title = "Ptotaal [Pa]"
+                Chart1.ChartAreas("ChartArea0").AxisY.Title = "Ptotaal [mBar]"
                 Chart1.ChartAreas("ChartArea0").AlignmentOrientation = DataVisualization.Charting.AreaAlignmentOrientations.Vertical
                 Chart1.ChartAreas("ChartArea0").AxisY2.Enabled = AxisEnabled.True
                 Chart1.ChartAreas("ChartArea0").AxisY2.Title = "Rendement [%] As-vermogen [kW]"
 
-                If CheckBox2.Checked = True Then
-                    Chart1.ChartAreas("ChartArea0").AxisX.Title = "Debiet [Am3/s]"
-                    Q_target = G_Debiet_z_act_hr            '[Am3/hr]
-                Else
+                '------------------ Grafiek tekst en target ---------------------
+                If CheckBox2.Checked = False Then   '========Per uur=========
                     Chart1.ChartAreas("ChartArea0").AxisX.Title = "Debiet [Am3/hr]"
-                    Q_target = G_Debiet_z_act_hr / 3600     '[Am3/sec]
-                End If
-
-
-                '------------------Weerstand coefficient ---------------------
-                If CheckBox2.Checked = True Then
-                    Weerstand_coefficient = P_target * 2 / (NumericUpDown12.Value * (G_Debiet_z_act_hr) ^ 2)
-                Else
-                    Weerstand_coefficient = P_target * 2 / (NumericUpDown12.Value * (G_Debiet_z_act_hr / 3600) ^ 2)
+                    Q_target = G_Debiet_z_act_hr                                            '[Am3/hr]
+                    P_target = NumericUpDown2.Value                                         '[mBar] Gewenste fan  gegevens
+                Else                                '========Per seconde=========
+                    Chart1.ChartAreas("ChartArea0").AxisX.Title = "Debiet [Am3/sec]"
+                    Q_target = G_Debiet_z_act_hr / 3600                                     '[Am3/sec]
+                    P_target = NumericUpDown2.Value                                         '[mBar] Gewenste fan  gegevens
                 End If
 
                 '-------------------Target dot ---------------------
@@ -1434,27 +1430,35 @@ Public Class Form1
                     Chart1.Series(3).Points(0).MarkerSize = 20
                 End If
 
-                '-------------------'P_totaal lijn [mmwc]---------------------
+                '-------------------'P_totaal lijn --------------------
                 For hh = 0 To 11   'Fill line chart
                     If Tschets(Tschets_no).TPtot(hh) > 0 Then           'Rest of the array is empty
-                        If CheckBox2.Checked = True Then
+                        '------------------ Weerstand lijn ---------------------
+                        If CheckBox2.Checked = False Then   '========Per uur=========
                             debiet = Round(Tschets(Tschets_no).TFlow_scaled(hh) * 3600, 0)
-                        Else
+                            Weerstand_coefficient = P_target * 2 / (NumericUpDown12.Value * Q_target ^ 2)
+                        Else                                '========Per seconde=========
                             debiet = Tschets(Tschets_no).TFlow_scaled(hh)
+                            Weerstand_coefficient = P_target * 2 / (NumericUpDown12.Value * Q_target ^ 2)
                         End If
 
+                        Chart1.Series(5).YAxisType = AxisType.Primary
+                        Chart1.Series(5).Points.AddXY(debiet, Tschets(Tschets_no).TPstat_scaled(hh))
                         Chart1.Series(0).YAxisType = AxisType.Primary
                         Chart1.Series(0).Points.AddXY(debiet, Tschets(Tschets_no).TPtot_scaled(hh))
+
                         Chart1.Series(1).YAxisType = AxisType.Secondary
                         Chart1.Series(1).Points.AddXY(debiet, Tschets(Tschets_no).Teff_scaled(hh))
                         Chart1.Series(2).YAxisType = AxisType.Secondary
                         Chart1.Series(2).Points.AddXY(debiet, Tschets(Tschets_no).Tverm_scaled(hh))
+
+                        'MessageBox.Show("schets= " & Tschets_no.ToString & " debiet=" & debiet.ToString)
+
                         If CheckBox3.Checked = True Then
                             p_loss_line = 0.5 * Weerstand_coefficient * NumericUpDown12.Value * debiet ^ 2
                             Chart1.Series(4).Points.AddXY(debiet, p_loss_line)
                         End If
-                        Chart1.Series(5).YAxisType = AxisType.Primary
-                        Chart1.Series(5).Points.AddXY(debiet, Tschets(Tschets_no).TPstat_scaled(hh))
+
                     End If
                 Next hh
                 Chart1.Refresh()
@@ -1655,12 +1659,8 @@ Public Class Form1
     'Diameter impeller is changed, recalculate and draw chart
     Private Sub Scale_rules_applied(ty As Integer, dia2 As Double, n2 As Double, ro2 As Double)
         Dim hh As Integer
-        Dim Pow1, Q1, Pt1, Ps1, Dia1, n1, Ro1, temp1, temp2 As Double
-        Dim p1, p2, mass_flow As Double
-        Dim omloop_area, omloop_velos, omloop_loss As Double
-        Dim uitlaat_b, uitlaat_h As Double  'Uitlaat hoogte en breedte
-
-
+        Dim Dia1, n1, Ro1, temp1 As Double
+        Dim mass_flow As Double
 
         If (ty >= 0) And (ty < (ComboBox1.Items.Count)) Then    'Preventing exceptions
             Try
@@ -1669,76 +1669,77 @@ Public Class Form1
                 Ro1 = Tschets(ty).Tdata(2)      '[kg/m3]
                 temp1 = NumericUpDown4.Value   '[c]
                 mass_flow = NumericUpDown3.Value   'massa debiet [kg/hr]
-
-
-                '--------------------- gegevens omloop --------------------------
-                uitlaat_h = Round(Tschets(ty).Tdata(4) * dia2 / Dia1, 0)           'Uitlaat hoogte inw.[mm]
-                uitlaat_b = Round(Tschets(ty).Tdata(5) * dia2 / Dia1, 0)           'Uitlaat breedte inw.[mm]
-                omloop_area = uitlaat_b * uitlaat_h / 10 ^ 6                      'Oppervlak omloop [m2]
-
-
+                '------------------------------------
 
                 For hh = 0 To 11
-                    If Tschets(ty).TPtot(hh) > 0 Then           'Rest of the array is empty
-                        Q1 = Tschets(ty).TFlow(hh)              'Actual volume debiet [Am3/s]
-                        Pt1 = Tschets(ty).TPtot(hh)             'P_total [Pa]
-                        Ps1 = Tschets(ty).TPstat(hh)            'P_static [Pa]
-                        Pow1 = Tschets(ty).Tverm(hh)            'as power [kW]
+                    If Tschets(ty).TPtot(hh) > 0 Then            'Rest of the array is empty
+                        'Q1 = Tschets(ty).TFlow(hh)              'Actual volume debiet [Am3/s]
+                        'Pt1 = Tschets(ty).TPtot(hh)             'P_total [Pa]
+                        'Ps1 = Tschets(ty).TPstat(hh)            'P_static [Pa]
+                        'Pow1 = Tschets(ty).Tverm(hh)            'as power [kW]
 
-                        If n1 < 1 Or Ro1 < 0.01 Or Dia1 < 0.01 Then  'Prevent devision bij zero
-                            MessageBox.Show("Problem occured in line 1369")
-                        End If
+                        cond(4).Typ = ty                                                '[-]            OK
+                        cond(4).Dia1 = Tschets(ty).Tdata(0)                             '[mm]           OK
+                        cond(4).Q1 = Tschets(ty).TFlow(hh)                              '[Am3/s]
+                        cond(4).Pt0 = Tschets(ty).TPtot(hh)                             '[PaG] Ptotal Tschets           
+                        cond(4).Ps0 = Tschets(ty).TPstat(hh)                            '[PaG] Pstatic Tschets
+                        cond(4).Power0 = Tschets(ty).Tverm(hh)                          '[PaG] vermogen Tschets
+                        cond(4).Pt1 = Convert.ToDouble(TextBox91.Text) * 100 - 101300   'Press total [Pa] abs. inlet flange                                           
+                        cond(4).Ps1 = Convert.ToDouble(TextBox91.Text) * 100 - 101300   'Press total [Pa] abs. inlet flange                                 
+                        cond(4).Rpm1 = Tschets(ty).Tdata(1)                             '[rpm]          OK
+                        cond(4).Dia2 = dia2                                             '[mm]           OK
+                        cond(4).Rpm2 = n2                                               '[rpm]          OK
+                        cond(4).Qkg = NumericUpDown3.Value                              '[kg/hr]        OK
+                        cond(4).Ro1 = ro2                                               '[kg/m3] density inlet flange       OK
+                        cond(4).T1 = NumericUpDown4.Value                               '[c]                                OK
 
                         '======================== waaier #1 ===============================================
-                        Tschets(ty).TFlow_scaled(hh) = Round(Scale_rule_cap(Q1, Dia1, dia2, n1, n2), 2)                     '[Am3/s]
-                        Tschets(ty).TPtot_scaled(hh) = Round(Scale_rule_Pressure(Pt1, Dia1, dia2, n1, n2, Ro1, ro2), 0)     '[Pa]
-                        Tschets(ty).TPstat_scaled(hh) = Round(Scale_rule_Pressure(Ps1, Dia1, dia2, n1, n2, Ro1, ro2), 0)    '[Pa]
-                        Tschets(ty).Tverm_scaled(hh) = Round(Scale_rule_Power(Pow1, Dia1, dia2, n1, n2, Ro1, ro2), 1)       '[kW]
-                        'Tschets(ty).Teff_scaled(hh) = Tschets(ty).Teff(hh)
-                        Tschets(ty).Teff_scaled(hh) = Tschets(ty).TFlow_scaled(hh) * Tschets(ty).TPtot_scaled(hh) / Tschets(ty).Tverm_scaled(hh)
+                        Calc_stage(cond(4))             'Bereken de waaier #1  
 
-                        If RadioButton10.Checked Or RadioButton11.Checked Then
-                            p1 = Convert.ToDouble(TextBox91.Text) * 100                         'Press total [Pa] abs. inlet flange
-                            p2 = (Tschets(ty).TPtot_scaled(hh) + 101300)                        'Press total [Pa] abs. outlet flange
+                        Tschets(ty).TFlow_scaled(hh) = Round(cond(4).Q2, 2)                     '[Am3/hr]
+                        Tschets(ty).TPtot_scaled(hh) = Round(cond(4).Pt2 / 100, 0)              '[mbar]
+                        Tschets(ty).TPstat_scaled(hh) = Round(cond(4).Ps2 / 100, 0)             '[mbar]
+                        Tschets(ty).Tverm_scaled(hh) = Round(cond(4).Power, 0)                  '[kW]
+                        Tschets(ty).Teff_scaled(hh) = Round((100 * cond(4).Pt2 * cond(4).Q2 / (Tschets(ty).Tverm_scaled(hh) * 1000)), 0)
 
-                            temp2 = temp1 + (Tschets(ty).Tverm_scaled(hh) / (cp_air * mass_flow))  'Temperature outlet flange [celsius]
-                            ro2 = calc_density(Ro1, p1, p2, temp1, temp2)
+                        'Select Case True
+                        '    Case RadioButton10.Checked      '2 traps
+                        '        calc_loop_loss(cond(4))         'Bereken de omloop verliezen  
+                        '        Tschets(ty).TPtot_scaled(hh) = Round(cond(4).Pt3 / 100, 0)     '[mBar]
+                        '        Tschets(ty).TPstat_scaled(hh) = Round(cond(4).Ps3 / 100, 0)    '[mBar]
 
-                            '---------- pressure loss omloop #1 ---------------------
-                            omloop_velos = Tschets(ty).TFlow_scaled(hh) / omloop_area
-                            omloop_loss = 0.5 * NumericUpDown58.Value * ro2 * omloop_velos ^ 2    '1/2*phi*ro*V*2 
-                            p2 -= omloop_loss                                                      'Drukverlies in de omloop [Pa]
+                        '        '======================== waaier #2 ===============================================
+                        '        cond(5) = cond(4)                       'Kopieer de struct
+                        '        cond(5).T1 = cond(4).T2                 '[c] uitlaat waaier#1 is inlaat waaier #2
+                        '        cond(5).Pt1 = cond(4).Pt3               'Inlaat waaier #2 
+                        '        cond(5).Ps1 = cond(4).Ps3               'Inlaat waaier #2
 
-                            ' MessageBox.Show(omloop_loss.ToString)
+                        '        ' MessageBox.Show("Pt2= " & cond(5).Pt2.ToString & " Q2= " & cond(5).Q2.ToString & " Power= " & cond(5).Power.ToString & " eff= " & Tschets(ty).Teff_scaled(hh).ToString)
 
-                            '======================== waaier #2 ===============================================
-                            Tschets(ty).TPtot_scaled(hh) += Round(Scale_rule_Pressure(Pt1, Dia1, dia2, n1, n2, Ro1, ro2), 0)
-                            Tschets(ty).TPstat_scaled(hh) += Round(Scale_rule_Pressure(Ps1, Dia1, dia2, n1, n2, Ro1, ro2), 0)
-                            Tschets(ty).Tverm_scaled(hh) += Round(Scale_rule_Power(Pow1, Dia1, dia2, n1, n2, Ro1, ro2), 1)
-                            Tschets(ty).Teff_scaled(hh) = Tschets(ty).TFlow_scaled(hh) * Tschets(ty).TPtot_scaled(hh) / Tschets(ty).Tverm_scaled(hh)
-                        End If
+                        '        Calc_stage(cond(5))                     'Bereken de waaier #2  
+                        '        calc_loop_loss(cond(5))                 'Bereken de omloop verliezen  
 
-                        If RadioButton11.Checked Then
+                        '        Tschets(ty).TPtot_scaled(hh) = Round((cond(5).Pt2 - cond(1).Pt1) / 100, 0).ToString         '[mbar] dP fan total
+                        '        Tschets(ty).TPstat_scaled(hh) = Round((cond(5).Ps2 - cond(1).Ps1) / 100, 0).ToString        '[mbar] dP fan static
+                        '        Tschets(ty).Tverm_scaled(hh) = cond(4).Power + cond(5).Power                                '[kW]
+                        '        Tschets(ty).Teff_scaled(hh) = Round((100 * cond(5).Pt2 * cond(5).Q2 / (Tschets(ty).Tverm_scaled(hh) * 1000)), 0)
 
-                            p1 = Convert.ToDouble(TextBox91.Text) * 100     'Press total (absoluut) inlet flange
-                            p2 = (Tschets(ty).TPtot_scaled(hh) + 101300)    'Press total (absoluut) outlet flange
+                        '    Case RadioButton11.Checked   '3 traps
+                        '        '======================== waaier #3 ===============================================
+                        '        cond(6) = cond(5)                       'Kopieer de struct
+                        '        cond(6).T1 = cond(5).T2                 '[c] uitlaat waaier#1 is inlaat waaier #2
+                        '        cond(6).Pt1 = cond(5).Pt3               'Inlaat waaier #2 
+                        '        cond(6).Ps1 = cond(5).Ps3               'Inlaat waaier #2
 
-                            temp2 = temp1 + (Tschets(ty).Tverm_scaled(hh) / (cp_air * mass_flow))  'Temperature outlet flange [celsius]
-                            ro2 = calc_density(Ro1, p1, p2, temp1, temp2)
+                        '        'MessageBox.Show("Pt2= " & cond(5).Pt2.ToString & " Q2= " & cond(5).Q2.ToString & " Power= " & cond(5).Power.ToString & " eff= " & Tschets(ty).Teff_scaled(hh).ToString)
 
-                            '---------- pressure loss omloop #2 ---------------------
-                            omloop_velos = Tschets(ty).TFlow_scaled(hh) / omloop_area
-                            omloop_loss = 0.5 * NumericUpDown58.Value * ro2 * omloop_velos ^ 2    '1/2*phi*ro*V*2 
-                            p2 -= omloop_loss                                                      'Drukverlies in de omloop [Pa]
+                        '        Calc_stage(cond(5))                     'Bereken de waaier #2  
 
-
-                            '======================== waaier #3 ===============================================
-                            Tschets(ty).TPtot_scaled(hh) += Round(Scale_rule_Pressure(Pt1, Dia1, dia2, n1, n2, Ro1, ro2), 0)
-                            Tschets(ty).TPstat_scaled(hh) += Round(Scale_rule_Pressure(Ps1, Dia1, dia2, n1, n2, Ro1, ro2), 0)
-                            Tschets(ty).Tverm_scaled(hh) += Round(Scale_rule_Power(Pow1, Dia1, dia2, n1, n2, Ro1, ro2), 1)
-                            Tschets(ty).Teff_scaled(hh) = Tschets(ty).TFlow_scaled(hh) * Tschets(ty).TPtot_scaled(hh) / Tschets(ty).Tverm_scaled(hh)
-                        End If
-                        Tschets(ty).Teff_scaled(hh) = Round(Tschets(ty).Teff_scaled(hh) / 10, 1)    'Efficiency afronden
+                        '        Tschets(ty).TPtot_scaled(hh) = Round((cond(6).Pt2 - cond(1).Pt1) / 100, 0).ToString         '[mbar] dP fan total
+                        '        Tschets(ty).TPstat_scaled(hh) = Round((cond(6).Ps2 - cond(1).Ps1) / 100, 0).ToString        '[mbar] dP fan static
+                        '        Tschets(ty).Tverm_scaled(hh) = cond(4).Power + cond(5).Power + cond(6).Power                '[kW]
+                        '        Tschets(ty).Teff_scaled(hh) = Round((100 * cond(6).Pt2 * cond(6).Q2 / (Tschets(ty).Tverm_scaled(hh) * 1000)), 0)
+                        'End Select
                     End If
                 Next hh
 
@@ -2071,25 +2072,31 @@ Public Class Form1
 
 
     Private Sub Calc_stage(ByRef y As Stage)
-        Dim G_visco_kin As Double
-        y.Q2 = Scale_rule_cap(Tschets(y.Typ).werkp_opT(4), y.Dia1, y.Dia2, y.Rpm1, y.Rpm2)                                                  '[Am3/s]
-        y.Pt2 = y.Pt1 + Scale_rule_Pressure(Tschets(y.Typ).werkp_opT(1), y.Dia1, y.Dia2, y.Rpm1, y.Rpm2, Tschets(y.Typ).Tdata(2), y.Ro1)    '[Pa]
-        y.Ps2 = y.Pt1 + Scale_rule_Pressure(Tschets(y.Typ).werkp_opT(2), y.Dia1, y.Dia2, y.Rpm1, y.Rpm2, Tschets(y.Typ).Tdata(2), y.Ro1)    '[Pa]
-        y.Power = Scale_rule_Power(Tschets(y.Typ).werkp_opT(3), y.Dia1, y.Dia2, y.Rpm1, y.Rpm2, Tschets(y.Typ).Tdata(2), y.Ro1)             '[kW]
+
+        'y.Q2 = Scale_rule_cap(y.Q1, y.Dia1, y.Dia2, y.Rpm1, y.Rpm2)                                                                         '[Am3/s]
+        'y.Pt2 = y.Pt1 + Scale_rule_Pressure(Tschets(y.Typ).werkp_opT(1), y.Dia1, y.Dia2, y.Rpm1, y.Rpm2, Tschets(y.Typ).Tdata(2), y.Ro1)    '[Pa]
+        'y.Ps2 = y.Pt1 + Scale_rule_Pressure(Tschets(y.Typ).werkp_opT(2), y.Dia1, y.Dia2, y.Rpm1, y.Rpm2, Tschets(y.Typ).Tdata(2), y.Ro1)    '[Pa]
+        'y.Power = Scale_rule_Power(Tschets(y.Typ).werkp_opT(3), y.Dia1, y.Dia2, y.Rpm1, y.Rpm2, Tschets(y.Typ).Tdata(2), y.Ro1)             '[kW]
+
+
+        y.Q2 = Scale_rule_cap(y.Q1, y.Dia1, y.Dia2, y.Rpm1, y.Rpm2)                                                                         '[Am3/s]
+        y.Pt2 = y.Pt1 + Scale_rule_Pressure(y.Pt0, y.Dia1, y.Dia2, y.Rpm1, y.Rpm2, Tschets(y.Typ).Tdata(2), y.Ro1)                          '[Pa]
+        y.Ps2 = y.Ps1 + Scale_rule_Pressure(y.Ps0, y.Dia1, y.Dia2, y.Rpm1, y.Rpm2, Tschets(y.Typ).Tdata(2), y.Ro1)                          '[Pa]
+        y.Power = Scale_rule_Power(y.Power0, y.Dia1, y.Dia2, y.Rpm1, y.Rpm2, Tschets(y.Typ).Tdata(2), y.Ro1)                                '[kW]
 
         'Eff = Tschets(typ).Teff(hh)
         y.Eff = y.Q1 * y.Pt2 / y.Power
 
-
         y.T2 = y.T1 + (y.Power * 1000 / (cp_air * y.Qkg))               'Temperature outlet flange [celsius]
         y.velos = PI * y.Dia2 / 1000 * y.Rpm2 / 60                      'Omtreksnelheid waaier
 
+
+        T_reynolds = Round(T_omtrek_s * T_diaw_m / kin_visco_air(20), 0)        '---------- Renolds Tschets ----------------------------------
+        y.Reynolds = Round(y.velos * (y.Dia2 / 1000) / kin_visco_air(y.T1), 0)  '---------- Renolds actueel ---------------------------------
+
         'MessageBox.Show(y.Power.ToString)
 
-        '--------- Kinmatic viscosity air[m2/s]-----------------------
-        G_visco_kin = kin_visco_air(y.T1)                               'Kin viscositeit [m2/s]
-
-        y.Reynolds = Round(y.velos * (y.Dia2 / 1000) / G_visco_kin, 0)
+        y.Ackeret = 1 - 0.5 * (1 - y.Eff) * Pow((1 + (T_reynolds / y.Reynolds)), 0.2)
     End Sub
 
 
