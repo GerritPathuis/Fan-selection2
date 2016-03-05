@@ -45,9 +45,10 @@ Public Structure Stage
     Public Ro3 As Double        'Density[kg/m3] outlet flange loop
     Public Ps1 As Double        'Statische druk [Pa G] inlet flange
     Public Ps2 As Double        'Statische druk [Pa G] outlet flange fan
+    Public Ps3 As Double        'Statische druk [Pa G] outlet omloop
     Public Pt1 As Double        'Totale druk [Pa G] inlet flange
     Public Pt2 As Double        'Totale druk [Pa G] outlet flange fan
-    Public Pt3 As Double        'Totale druk [Pa G] outlet flange loop
+    Public Pt3 As Double        'Totale druk [Pa G] outlet omloop
     Public T1 As Double         'Temp in [c]
     Public T2 As Double         'Temp uit [c]
     Public velos As Double      'Omtreksnelheid [m/s]
@@ -283,22 +284,12 @@ Public Class Form1
         Dim site_altitude As Double
         Dim Ttype As Int16                  'Waaier type
         Dim diam1, diam2, nn1, nn2, roo1, roo2 As Double
-        Dim uitlaat_b, uitlaat_h As Double  'Uitlaat hoogte en breedte
-        Dim WP2_stat, WP2_total As Double   'Work_point_2 inlaat (gegevens uit de T-schetsen)
-        Dim WP2_stat2, WP2_total2 As Double 'Work_point_2 uitlaat (berekend via de schaal regels)
-
-        Dim Pow0, Q0, dia0, n0 As Double                                                'From Tschets
-        Dim Ptot0, Pstat0, ro0_inlet, temp0 As Double                                   'Initial conditions
-
-        Dim massa_debiet As Double
-        Dim Pow1, P1_in As Double      'Impellar #1 
-        Dim Pow2, P2_tot_out, P2_stat_out, dia2, n2, ro_fan2_inlet, ro_fan2_outlet, temp2 As Double      'Impellar #2 
-        Dim Pow3, P3_in, P3_tot_out, P3_stat_out, dia3, n3, ro_fan3_inlet, ro_fan3_outlet, temp3 As Double      'Impellar #3 
-
         Dim Power_total As Double
 
         '0-Diameter,1-Toerental,2-Dichtheid,3-Zuigmond diameter,4-Persmond lengte,5-Breedte huis,6-Lengte spiraal,7 breedte pers,8 lengte pers,9-c,10-d,11-e,
         '12-Schoeplengte,13-Aantal schoepen,14-Breedte inwendig,15-Breedte uitwendig,16-Keeldiameter,17-Inw. dia. schoepen,18-Intrede hoek,19-Uittrede hoek
+
+        TextBox12.Text = NumericUpDown58.Value.ToString
 
         nrq = ComboBox7.SelectedIndex   'Prevent out of bounds error
         If nrq >= 0 And nrq <= 30 Then
@@ -343,7 +334,6 @@ Public Class Form1
                 T_Debiet_sec = Tschets(nrq).werkp_opT(4)    'Debiet [Am3/sec]
                 T_Debiet_hr = Round(T_Debiet_sec * 3600, 0)                     'Debiet [Am3/hr]
                 T_Debiet_kg_sec = T_Debiet_sec * T_sg_gewicht                   'Debiet [kg/s]
-
 
                 '-------------- waaier-------------------------------
                 T_diaw_m = Convert.ToDouble(TextBox1.Text) / 1000               'Diameter waaier [m]
@@ -482,8 +472,7 @@ Public Class Form1
                 nn2 = G_Toerental_rpm
                 roo1 = Tschets(Ttype).Tdata(2)              'density [kg/m3]
                 roo2 = NumericUpDown12.Value
-                WP2_stat = Tschets(Ttype).werkp_opT(2)      'P_stat [Pa] Tschets
-                G_Pstat_Pa = Round(Scale_rule_Pressure(WP2_stat, diam1, diam2, nn1, nn2, roo1, roo2), 0)
+                G_Pstat_Pa = Round(Scale_rule_Pressure(Tschets(Ttype).werkp_opT(2), diam1, diam2, nn1, nn2, roo1, roo2), 0)
 
 
                 '---------- presenteren-----------------------
@@ -516,7 +505,6 @@ Public Class Form1
 
                 '------------ Reynolds Renard waaier  -------------------------------------------------------------
                 Renard_reynolds = Round(Renard_omtrek_s * Renard_diaw_m_R20 / G_visco_kin, 0)
-                TextBox72.Text = Round((Renard_reynolds * 10 ^ -6), 2).ToString
 
                 '------------ Rendement Renard Waaier (Ackeret) --------------
                 If CheckBox4.Checked Then
@@ -529,15 +517,15 @@ Public Class Form1
                 'Renard_as_kw = 0.001 * G_Debiet_z_act_sec * G_Ptot_Pa / Renard_eff   'Go to kW
                 Renard_as_kw = Round(Scale_rule_Power(T_Power_opt, diam1, diam2, nn1, nn2, T_sg_gewicht, G_density_act_zuig), 0)
 
-
                 '---------- temperaturen, lost power is tranferred to heat -----------
                 Renard_temp_uit_c = G_air_temp + (Renard_as_kw / (cp_air * G_Debiet_kg_s))
-                TextBox57.Text = Round(Renard_temp_uit_c, 0).ToString       'Temp uit
 
                 '---------- Debiet -----------------------
                 Renard_Debiet_z_sec = Renard_diaw_m_R20 ^ 2 * PI * Renard_omtrek_s * T_Volumezahl / 4
 
                 '---------- presenteren-----------------------
+                TextBox72.Text = Round((Renard_reynolds * 10 ^ -6), 2).ToString
+                TextBox57.Text = Round(Renard_temp_uit_c, 0).ToString       'Temp uit
                 TextBox73.Text = Round(Renard_omtrek_s, 1)                  'Omtrek snelheid [m/s]
                 TextBox70.Text = visco_temp.ToString                        'Visco T_schets
                 TextBox74.Text = Round(Renard_eff, 3).ToString              'Efficiency
@@ -558,14 +546,14 @@ Public Class Form1
                 cond(1).Q1 = T_Debiet_sec                           '[Am3/s]
                 cond(1).Ro1 = NumericUpDown12.Value                 'density [kg/m3] inlet flange
                 cond(1).T1 = G_air_temp                             '[c]
-                cond(1).Pt1 = P_zuig_Pa - 101300                    '[PaG] inlet flange           
-                cond(1).Ps1 = P_zuig_Pa - 101300                    '[PaG] inlet flange
+                cond(1).Pt1 = P_zuig_Pa - 101300                    '[PaG] inlet flange waaier #1           
+                cond(1).Ps1 = P_zuig_Pa - 101300                    '[PaG] inlet flange waaier #1
 
-                Calc_stage(cond(1))
-                calc_loop_loss(cond(1))
+                Calc_stage(cond(1))             'Bereken de waaier #1  
+                calc_loop_loss(cond(1))         'Bereken de omloop verliezen  
 
                 TextBox75.Text = Round(cond(1).Eff, 3).ToString
-                TextBox78.Text = Round(cond(1).Power, 0).ToString                          'As vermogen in [kW]
+                TextBox78.Text = Round(cond(1).Power, 0).ToString                           'As vermogen in [kW]
                 TextBox54.Text = Round(cond(1).T2, 0).ToString                              'Temp uit [c]
                 TextBox81.Text = Round((cond(1).Pt2 / 100), 0).ToString                     'dP_Total  [mbar]
                 TextBox150.Text = Round((cond(1).Ps2 / 100), 0).ToString                    'dp_Static [mbar]
@@ -601,13 +589,12 @@ Public Class Form1
                 '---------------------------------------------------------------
                 cond(2) = cond(1)                       'Kopieer de struct
                 cond(2).T1 = cond(1).T2                 '[c] uitlaat waaier#1 is inlaat waaier #2
-                cond(2).Pt1 += cond(1).Pt3              'Uitlaat druk waaier2 +=  Uitlaat druk loop1
-                cond(2).Ps1 += cond(1).Ps2
+                cond(2).Pt1 = cond(1).Pt3               'Inlaat waaier #2 
+                cond(2).Ps1 = cond(1).Ps3               'Inlaat waaier #2
 
-                Calc_stage(cond(2))                     'Bereken de waaier    
-                cond(2).Pt2 += cond(1).Pt3              'Uitlaat druk waaier2 +=  Uitlaat druk loop1
-                cond(2).Ps2 += cond(1).Ps2
-                calc_loop_loss(cond(2))
+                Calc_stage(cond(2))                     'Bereken de waaier #2  
+                calc_loop_loss(cond(2))                 'Bereken de omloop verliezen  
+
 
                 '----------- present  waaier #2 ------------------------
                 TextBox169.Text = Round(cond(2).Pt1 / 100, 0).ToString          '[mbar] inlet flange
@@ -620,19 +607,16 @@ Public Class Form1
                 TextBox183.Text = Round(cond(2).loop_velos, 1).ToString         '[m/s]
                 TextBox185.Text = Round(cond(2).Ro3, 2).ToString                '[kg/m3] Density outlet
 
-                '-------------------------- Waaier #3 ----------------------
+                '-------------------------- Waaier #3 (geen omloop)----------------------
                 '---------------------------------------------------------------
                 cond(3) = cond(2)                       'Kopieer de struct
                 cond(3).T1 = cond(2).T2                 '[c] uitlaat waaier#1 is inlaat waaier #2
-                cond(3).Pt1 += cond(2).Pt3              'Uitlaat druk waaier2 +=  Uitlaat druk loop1
-                cond(3).Ps1 += cond(2).Ps2
+                cond(3).Pt1 = cond(2).Pt3               'Inlaat waaier #3 
+                cond(3).Ps1 = cond(2).Ps3               'Inlaat waaier #3
 
-                Calc_stage(cond(2))                     'Bereken de waaier    
-                cond(3).Pt2 += cond(2).Pt3              'Uitlaat druk waaier2 +=  Uitlaat druk loop1
-                cond(3).Ps2 += cond(2).Ps2
-                calc_loop_loss(cond(3))
+                Calc_stage(cond(3))                     'Bereken de waaier #3   
 
-                '----------- present  waaier #3 ------------------------
+                '----------- present  waaier #3 (geen omloop)------------------------
                 TextBox175.Text = Round(cond(3).Pt1 / 100, 0).ToString          '[mbar] inlet flange
                 TextBox178.Text = Round(cond(3).Pt2 / 100, 0).ToString          '[mbar] outlet P_total
                 TextBox174.Text = Round(cond(3).Ps2 / 100, 0).ToString          '[mbar] outlet P_static
@@ -641,41 +625,39 @@ Public Class Form1
                 TextBox186.Text = Round(cond(3).Ro3, 3).ToString                '[kg/m3] Density outlet
 
                 '-------------------------- Aantal trappen ----------------------
-                If RadioButton12.Checked Then    '1 Traps
-                    GroupBox18.Visible = False
-                    GroupBox40.Visible = False
-                    GroupBox43.Visible = False
-                    GroupBox44.Visible = False
-                    GroupBox45.Visible = False
-                    GroupBox46.Visible = False
-                End If
 
-                If RadioButton13.Checked Or RadioButton14.Checked Then    '2 Traps
-                    GroupBox18.Visible = True
-                    GroupBox40.Visible = True
-                    GroupBox43.Visible = True
-                    GroupBox44.Visible = False
-                    GroupBox45.Visible = False
-                    GroupBox46.Visible = True
-                    Power_total = Pow1 + Pow2                                           '[kW]
-                    TextBox180.Text = Round((cond(2).Pt2 - cond(1).Pt1) / 100, 0).ToString     '[mbar] dP fan total
-                    TextBox179.Text = Round((cond(2).Ps2 - cond(1).Ps1) / 100, 0).ToString     '[mbar] dP fan static
-                End If
-
-                If RadioButton14.Checked Then   '3 Traps
-                    GroupBox18.Visible = True
-                    GroupBox40.Visible = True
-                    GroupBox43.Visible = True
-                    GroupBox44.Visible = True
-                    GroupBox45.Visible = True
-                    GroupBox46.Visible = True
-                    Power_total = Pow1 + Pow2 + Pow3                                    '[kW]
-                    TextBox180.Text = Round((P3_tot_out - P1_in) / 100, 0).ToString     '[mbar] dP fan total
-                    TextBox179.Text = Round((P3_stat_out - P1_in) / 100, 0).ToString    '[mbar] dP fan static
-                End If
-
+                Select Case True
+                    Case RadioButton12.Checked              '1 trap
+                        GroupBox18.Visible = False
+                        GroupBox40.Visible = False
+                        GroupBox43.Visible = False
+                        GroupBox44.Visible = False
+                        GroupBox45.Visible = False
+                        GroupBox46.Visible = False
+                    Case RadioButton13.Checked              '2 traps
+                        GroupBox18.Visible = True
+                        GroupBox40.Visible = True
+                        GroupBox43.Visible = True
+                        GroupBox44.Visible = False
+                        GroupBox45.Visible = False
+                        GroupBox46.Visible = True
+                        Power_total = cond(1).Power + cond(2).Power                                '[kW]
+                        TextBox180.Text = Round((cond(2).Pt2 - cond(1).Pt1) / 100, 0).ToString     '[mbar] dP fan total
+                        TextBox179.Text = Round((cond(2).Ps2 - cond(1).Ps1) / 100, 0).ToString     '[mbar] dP fan static
+                        TextBox64.Text = Round(cond(2).T2, 0)
+                    Case RadioButton14.Checked              '3 traps
+                        GroupBox18.Visible = True
+                        GroupBox40.Visible = True
+                        GroupBox43.Visible = True
+                        GroupBox44.Visible = True
+                        GroupBox45.Visible = True
+                        GroupBox46.Visible = True
+                        Power_total = cond(1).Power + cond(2).Power + cond(3).Power                '[kW]
+                        TextBox180.Text = Round((cond(3).Pt2 - cond(1).Pt1) / 100, 0).ToString     '[mbar] dP fan total
+                        TextBox179.Text = Round((cond(3).Ps2 - cond(1).Ps1) / 100, 0).ToString     '[mbar] dP fan static
+                        TextBox64.Text = Round(cond(3).T2, 0)
+                End Select
                 TextBox181.Text = Round(Power_total, 0).ToString               '[kW]
-                TabPage1.Update()
             Catch ex As Exception
                 MessageBox.Show(ex.Message)  ' Show the exception's message.
             End Try
@@ -1746,7 +1728,7 @@ Public Class Form1
 
                             '---------- pressure loss omloop #2 ---------------------
                             omloop_velos = Tschets(ty).TFlow_scaled(hh) / omloop_area
-                            omloop_loss = 0.5 * NumericUpDown61.Value * ro2 * omloop_velos ^ 2    '1/2*phi*ro*V*2 
+                            omloop_loss = 0.5 * NumericUpDown58.Value * ro2 * omloop_velos ^ 2    '1/2*phi*ro*V*2 
                             p2 -= omloop_loss                                                      'Drukverlies in de omloop [Pa]
 
 
@@ -1975,7 +1957,7 @@ Public Class Form1
         TextBox111.Text = Round(N_max_doorbuiging * 1000, 3).ToString      'Max doorbuiging in [mm]
     End Sub
 
-    Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click, NumericUpDown8.ValueChanged, NumericUpDown7.ValueChanged, NumericUpDown6.ValueChanged, NumericUpDown5.ValueChanged, NumericUpDown4.ValueChanged, NumericUpDown3.ValueChanged, NumericUpDown2.ValueChanged, NumericUpDown13.ValueChanged, NumericUpDown12.ValueChanged, NumericUpDown1.ValueChanged, ComboBox1.SelectedIndexChanged, RadioButton4.CheckedChanged, RadioButton3.CheckedChanged, CheckBox4.CheckedChanged, CheckBox5.CheckedChanged, NumericUpDown33.ValueChanged, ComboBox7.SelectedIndexChanged, TabPage1.Enter, RadioButton14.CheckedChanged, RadioButton13.CheckedChanged, RadioButton12.CheckedChanged, NumericUpDown61.ValueChanged, NumericUpDown58.ValueChanged
+    Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click, NumericUpDown8.ValueChanged, NumericUpDown7.ValueChanged, NumericUpDown6.ValueChanged, NumericUpDown5.ValueChanged, NumericUpDown4.ValueChanged, NumericUpDown3.ValueChanged, NumericUpDown2.ValueChanged, NumericUpDown13.ValueChanged, NumericUpDown12.ValueChanged, NumericUpDown1.ValueChanged, ComboBox1.SelectedIndexChanged, RadioButton4.CheckedChanged, RadioButton3.CheckedChanged, CheckBox4.CheckedChanged, CheckBox5.CheckedChanged, NumericUpDown33.ValueChanged, ComboBox7.SelectedIndexChanged, TabPage1.Enter, RadioButton14.CheckedChanged, RadioButton13.CheckedChanged, RadioButton12.CheckedChanged, NumericUpDown58.ValueChanged
         If TabControl1.SelectedTab.Name = "TabPage1" Then
             ComboBox7.SelectedIndex = ComboBox1.SelectedIndex       'type selectie
         End If
@@ -2090,15 +2072,19 @@ Public Class Form1
 
     Private Sub Calc_stage(ByRef y As Stage)
         Dim G_visco_kin As Double
-        y.Q2 = Scale_rule_cap(Tschets(y.Typ).werkp_opT(4), y.Dia1, y.Dia2, y.Rpm1, y.Rpm2)                                        '[Am3/s]
-        y.Pt2 = Scale_rule_Pressure(Tschets(y.Typ).werkp_opT(1), y.Dia1, y.Dia2, y.Rpm1, y.Rpm2, Tschets(y.Typ).Tdata(2), y.Ro1)  '[Pa]
-        y.Ps2 = Scale_rule_Pressure(Tschets(y.Typ).werkp_opT(2), y.Dia1, y.Dia2, y.Rpm1, y.Rpm2, Tschets(y.Typ).Tdata(2), y.Ro1)  '[Pa]
-        y.Power = Scale_rule_Power(Tschets(y.Typ).werkp_opT(3), y.Dia1, y.Dia2, y.Rpm1, y.Rpm2, Tschets(y.Typ).Tdata(2), y.Ro1)   '[kW]
+        y.Q2 = Scale_rule_cap(Tschets(y.Typ).werkp_opT(4), y.Dia1, y.Dia2, y.Rpm1, y.Rpm2)                                                  '[Am3/s]
+        y.Pt2 = y.Pt1 + Scale_rule_Pressure(Tschets(y.Typ).werkp_opT(1), y.Dia1, y.Dia2, y.Rpm1, y.Rpm2, Tschets(y.Typ).Tdata(2), y.Ro1)    '[Pa]
+        y.Ps2 = y.Pt1 + Scale_rule_Pressure(Tschets(y.Typ).werkp_opT(2), y.Dia1, y.Dia2, y.Rpm1, y.Rpm2, Tschets(y.Typ).Tdata(2), y.Ro1)    '[Pa]
+        y.Power = Scale_rule_Power(Tschets(y.Typ).werkp_opT(3), y.Dia1, y.Dia2, y.Rpm1, y.Rpm2, Tschets(y.Typ).Tdata(2), y.Ro1)             '[kW]
+
         'Eff = Tschets(typ).Teff(hh)
         y.Eff = y.Q1 * y.Pt2 / y.Power
 
-        y.T2 = y.T1 + (y.Power / (cp_air * y.Qkg))                      'Temperature outlet flange [celsius]
+
+        y.T2 = y.T1 + (y.Power * 1000 / (cp_air * y.Qkg))               'Temperature outlet flange [celsius]
         y.velos = PI * y.Dia2 / 1000 * y.Rpm2 / 60                      'Omtreksnelheid waaier
+
+        'MessageBox.Show(y.Power.ToString)
 
         '--------- Kinmatic viscosity air[m2/s]-----------------------
         G_visco_kin = kin_visco_air(y.T1)                               'Kin viscositeit [m2/s]
@@ -2120,11 +2106,12 @@ Public Class Form1
         area_omloop = x.uitlaat_b * x.uitlaat_h / 10 ^ 6                        'Oppervlak omloop [m2]
         x.loop_velos = x.Q2 / area_omloop                                       'snelheid uitlaat [m/s]
 
-        '----------------- actual drukverlies omloop #1 -------------------
+        '----------------- actual drukverlies omloop #1 (3 bochten) -------
         phi = NumericUpDown58.Value
         x.loop_loss = 0.5 * phi * x.loop_velos ^ 2 * x.Ro2                      '[Pa]
 
         x.Pt3 = x.Pt2 - x.loop_loss                                             '[Pa]
+        x.Ps3 = x.Ps2 - x.loop_loss
         x.Ro3 = calc_density(x.Ro1, (x.Pt1 + 101300), (x.Pt3 + 101300), x.T1, x.T2)
     End Sub
 
