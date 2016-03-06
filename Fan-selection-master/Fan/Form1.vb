@@ -599,7 +599,7 @@ Public Class Form1
 
                 '-------------------------- Waaier #2 ----------------------
                 '---------------------------------------------------------------
-                cond(2) = cond(1)                       'Kopieer de struct
+                cond(2) = cond(1)                       'Kopieer de struct met gegevens
                 cond(2).T1 = cond(1).T2                 '[c] uitlaat waaier#1 is inlaat waaier #2
                 cond(2).Pt1 = cond(1).Pt3               'Inlaat waaier #2 
                 cond(2).Ps1 = cond(1).Ps3               'Inlaat waaier #2
@@ -620,10 +620,9 @@ Public Class Form1
                 TextBox173.Text = Round(cond(2).loop_loss / 100, 0).ToString    '[mbar]
 
 
-
                 '-------------------------- Waaier #3 (geen omloop)----------------------
                 '---------------------------------------------------------------
-                cond(3) = cond(2)                       'Kopieer de struct
+                cond(3) = cond(2)                       'Kopieer de struct met gegevens
                 cond(3).T1 = cond(2).T2                 '[c] uitlaat waaier#1 is inlaat waaier #2
                 cond(3).Pt1 = cond(2).Pt3               'Inlaat waaier #3 
                 cond(3).Ps1 = cond(2).Ps3               'Inlaat waaier #3
@@ -1665,24 +1664,11 @@ Public Class Form1
     'Diameter impeller is changed, recalculate and draw chart
     Private Sub Scale_rules_applied(ty As Integer, Dia1 As Double, n2 As Double, Ro1 As Double)
         Dim hh As Integer
-        Dim Dia0, n1, Ro0, temp1 As Double
-        Dim mass_flow As Double
 
         If (ty >= 0) And (ty < (ComboBox1.Items.Count)) Then    'Preventing exceptions
             Try
-                Dia0 = Tschets(ty).Tdata(0)     'waaier [mm]
-                n1 = Tschets(ty).Tdata(1)       '[rpm]
-                Ro0 = Tschets(ty).Tdata(2)      '[kg/m3]
-                temp1 = NumericUpDown4.Value   '[c]
-                mass_flow = NumericUpDown3.Value   'massa debiet [kg/hr]
-                '------------------------------------
-
                 For hh = 0 To 11
                     If Tschets(ty).TPtot(hh) > 0 Then            'Rest of the array is empty
-                        'Q1 = Tschets(ty).TFlow(hh)              'Actual volume debiet [Am3/s]
-                        'Pt1 = Tschets(ty).TPtot(hh)             'P_total [Pa]
-                        'Ps1 = Tschets(ty).TPstat(hh)            'P_static [Pa]
-                        'Pow1 = Tschets(ty).Tverm(hh)            'as power [kW]
 
                         cond(4).Typ = ty                                                '[-]        T_SCHETS  
                         cond(4).Q0 = Tschets(ty).TFlow(hh)                              '[Am3/s]    T_SCHETS Volume debiet
@@ -1704,59 +1690,63 @@ Public Class Form1
 
 
                         '======================== waaier #1 ===============================================
-                        Calc_stage(cond(4))             'Bereken de waaier #1  
+                        Calc_stage(cond(4))             'Bereken de waaier #1  (in elf stappen)
                         calc_loop_loss(cond(4))         'Bereken de omloop verliezen 
 
-                        Tschets(ty).TFlow_scaled(hh) = Round(cond(4).Q1, 2)                     '[Am3/hr]
-                        Tschets(ty).TPtot_scaled(hh) = Round((cond(4).Pt2 - cond(4).Pt1) / 100, 0)              '[mbar] dP fan total
-                        Tschets(ty).TPstat_scaled(hh) = Round((cond(4).Ps2 - cond(4).Ps1) / 100, 0)             '[mbar] dP fan static
+                        Tschets(ty).TFlow_scaled(hh) = cond(4).Q1                               '[Am3/hr]
+                        Tschets(ty).TPtot_scaled(hh) = Round((cond(4).Pt2) / 100, 2)            '[mbar] dP fan total
+                        Tschets(ty).TPstat_scaled(hh) = Round((cond(4).Ps2) / 100, 2)           '[mbar] dP fan static
                         Tschets(ty).Tverm_scaled(hh) = Round(cond(4).Power, 0)                  '[kW]
-                        Tschets(ty).Teff_scaled(hh) = Round((100 * (cond(4).Pt2 - cond(4).Pt1) * cond(4).Q1 / (Tschets(ty).Tverm_scaled(hh) * 1000)), 0)
+                        Tschets(ty).Teff_scaled(hh) = Round((100 * cond(4).Pt2 * cond(4).Q1 / (Tschets(ty).Tverm_scaled(hh) * 1000)), 0)
 
                         ' MessageBox.Show(Tschets(ty).Teff_scaled(hh).ToString)
 
                         Select Case True
                             Case RadioButton10.Checked      '2 traps
-
-                                Tschets(ty).TPtot_scaled(hh) = Round(cond(4).Pt3 / 100, 0)     '[mBar]
-                                Tschets(ty).TPstat_scaled(hh) = Round(cond(4).Ps3 / 100, 0)    '[mBar]
-
                                 '======================== waaier #2 ===============================================
-                                cond(5) = cond(4)                       'Kopieer de struct
+                                cond(5) = cond(4)                       'Kopieer de struct met gegevens
                                 cond(5).T1 = cond(4).T2                 '[c] uitlaat waaier#1 is inlaat waaier #2
                                 cond(5).Pt1 = cond(4).Pt3               'Inlaat waaier #2 
                                 cond(5).Ps1 = cond(4).Ps3               'Inlaat waaier #2
 
+                                Calc_stage(cond(5))                     'Bereken de waaier #2  
+                                calc_loop_loss(cond(5))                 'Bereken de omloop verliezen  
+
+                                Tschets(ty).TPtot_scaled(hh) = Round(cond(5).Pt2 / 100, 0)                          '[mbar] dP fan total
+                                Tschets(ty).TPstat_scaled(hh) = Round(cond(5).Ps2 / 100, 0)                         '[mbar] dP fan static
+                                Tschets(ty).Tverm_scaled(hh) = Round(cond(4).Power + cond(5).Power, 0)              '[kW] waaier 1+2
+                                Tschets(ty).Teff_scaled(hh) = Round((100 * cond(5).Pt2 * cond(5).Q1 / (Tschets(ty).Tverm_scaled(hh) * 1000)), 0)
+
+                                ' MessageBox.Show(hh.ToString)
+                                ' MessageBox.Show("Cond(5).Pt1= " & cond(5).Pt1.ToString & " Q1= " & cond(5).Q1.ToString & " Cond(5).Pt2= " & cond(6).Pt2.ToString)
+
+                            Case RadioButton11.Checked   '3 traps
+                                '======================== waaier #2 ===============================================
+                                cond(5) = cond(4)                       'Kopieer de struct met gegevens
+                                cond(5).T1 = cond(4).T2                 '[c] uitlaat waaier#1 is inlaat waaier #2
+                                cond(5).Pt1 = cond(4).Pt3               'Inlaat waaier #2 
+                                cond(5).Ps1 = cond(4).Ps3               'Inlaat waaier #2
 
                                 Calc_stage(cond(5))                     'Bereken de waaier #2  
                                 calc_loop_loss(cond(5))                 'Bereken de omloop verliezen  
 
-                                Tschets(ty).TPtot_scaled(hh) = Round((cond(5).Pt2 - cond(4).Pt1) / 100, 0).ToString         '[mbar] dP fan total
-                                Tschets(ty).TPstat_scaled(hh) = Round((cond(5).Ps2 - cond(4).Ps1) / 100, 0).ToString        '[mbar] dP fan static
-                                Tschets(ty).Tverm_scaled(hh) = Round(cond(4).Power + cond(5).Power, 0)                      '[kW] waaier 1+2
-                                Tschets(ty).Teff_scaled(hh) = Round((100 * (cond(5).Pt2 - cond(4).Pt1) * cond(5).Q1 / (Tschets(ty).Tverm_scaled(hh) * 1000)), 0)
-
-
-
-  ' MessageBox.Show("Pt2= " & cond(5).Pt2.ToString & " Q2= " & cond(5).Q2.ToString & " Power= " & cond(5).Power.ToString & " eff= " & Tschets(ty).Teff_scaled(hh).ToString)
-
-
-
-                            Case RadioButton11.Checked   '3 traps
                                 '======================== waaier #3 ===============================================
-                                cond(6) = cond(5)                       'Kopieer de struct
-                                cond(6).T1 = cond(5).T2                 '[c] uitlaat waaier#1 is inlaat waaier #2
-                                cond(6).Pt1 = cond(5).Pt3               'Inlaat waaier #2 
-                                cond(6).Ps1 = cond(5).Ps3               'Inlaat waaier #2
+                                cond(6) = cond(5)                       'Kopieer de struct met gegevens
+                                cond(6).T1 = cond(5).T2                 '[c] uitlaat waaier#1 is inlaat waaier #3
+                                cond(6).Pt1 = cond(5).Pt3               'Inlaat waaier #3 
+                                cond(6).Ps1 = cond(5).Ps3               'Inlaat waaier #3
 
-                                'MessageBox.Show("Pt2= " & cond(5).Pt2.ToString & " Q2= " & cond(5).Q2.ToString & " Power= " & cond(5).Power.ToString & " eff= " & Tschets(ty).Teff_scaled(hh).ToString)
+                                Calc_stage(cond(6))                     'Bereken de waaier #3  
+                                calc_loop_loss(cond(6))                 'Bereken de omloop verliezen  (niet echt nodig)
 
-                                Calc_stage(cond(6))                     'Bereken de waaier #2  
-
-                                Tschets(ty).TPtot_scaled(hh) = Round((cond(6).Pt2 - cond(4).Pt1) / 100, 0).ToString         '[mbar] dP fan total
-                                Tschets(ty).TPstat_scaled(hh) = Round((cond(6).Ps2 - cond(4).Ps1) / 100, 0).ToString        '[mbar] dP fan static
+                                Tschets(ty).TPtot_scaled(hh) = Round(cond(6).Pt2 / 100, 0)                                  '[mbar] dP fan total
+                                Tschets(ty).TPstat_scaled(hh) = Round(cond(6).Ps2 / 100, 0)                                 '[mbar] dP fan static
                                 Tschets(ty).Tverm_scaled(hh) = Round(cond(4).Power + cond(5).Power + cond(6).Power, 0)      '[kW] waaier 1+2+3
-                                Tschets(ty).Teff_scaled(hh) = Round((100 * (cond(6).Pt2 - cond(4).Pt1) * cond(6).Q1 / (Tschets(ty).Tverm_scaled(hh) * 1000)), 0)
+                                Tschets(ty).Teff_scaled(hh) = Round((100 * cond(6).Pt2 * cond(6).Q1 / (Tschets(ty).Tverm_scaled(hh) * 1000)), 0)
+
+                                'MessageBox.Show("Q1= " & Tschets(ty).TFlow_scaled(hh).ToString)
+                                'MessageBox.Show("hh= " & hh.ToString & " Q1= " & cond(6).Q1.ToString & " cond(6).Pt1=" & cond(6).Pt1.ToString & " Cond(6).Pt2= " & cond(6).Pt2.ToString)
+
                         End Select
                     End If
                 Next hh
@@ -2079,7 +2069,7 @@ Public Class Form1
     Private Sub Calc_stage(ByRef y As Stage)
 
         y.Q1 = Scale_rule_cap(y.Q0, y.Dia0, y.Dia1, y.Rpm0, y.Rpm1)                                                       '[Am3/s]
-        y.Pt2 = y.Pt1 + Scale_rule_Pressure(y.Pt0, y.Dia0, y.Dia1, y.Rpm0, y.Rpm1, y.Ro0, y.Ro1)                          '[Pa]mess
+        y.Pt2 = y.Pt1 + Scale_rule_Pressure(y.Pt0, y.Dia0, y.Dia1, y.Rpm0, y.Rpm1, y.Ro0, y.Ro1)                          '[Pa]
         y.Ps2 = y.Ps1 + Scale_rule_Pressure(y.Ps0, y.Dia0, y.Dia1, y.Rpm0, y.Rpm1, y.Ro0, y.Ro1)                          '[Pa]
         y.Power = Scale_rule_Power(y.Power0, y.Dia0, y.Dia1, y.Rpm0, y.Rpm1, y.Ro0, y.Ro1)                                '[kW]
 
