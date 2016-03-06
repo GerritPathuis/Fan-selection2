@@ -42,8 +42,9 @@ Public Structure Stage
     Public Q1 As Double         'Debiet inlet [Am3/s]
     Public Q2 As Double         'Debiet outlet [Am3/s]
     Public Ro0 As Double        'Density[kg/m3] inlet flange Tschets
-    Public Ro1 As Double        'Density[kg/m3] outlet flange fan
-    Public Ro2 As Double        'Density[kg/m3] outlet flange loop
+    Public Ro1 As Double        'Density[kg/m3] inlet flange fan
+    Public Ro2 As Double        'Density[kg/m3] outlet flange fan
+    Public Ro3 As Double        'Density[kg/m3] outlet flange loop
     Public Ps0 As Double        'Statische druk [Pa G] Tschets
     Public Ps1 As Double        'Statische druk [Pa G] inlet flange
     Public Ps2 As Double        'Statische druk [Pa G] outlet flange fan
@@ -591,8 +592,8 @@ Public Class Form1
                 TextBox162.Text = Round(cond(1).Ps2 / 100, 0).ToString          '[mbar] outlet P_static
                 TextBox164.Text = Round(cond(1).Power, 0).ToString              '[kW]
                 TextBox182.Text = Round(cond(1).loop_velos, 1).ToString         'snelheid [m/s]
-                TextBox187.Text = Round(cond(1).Ro1, 3).ToString                'Density fan outlet
-                TextBox184.Text = Round(cond(1).Ro2, 2).ToString                '[kg/m3] Density loop outlet
+                TextBox187.Text = Round(cond(1).Ro2, 3).ToString                '[kg/m3] Density fan uit
+                TextBox184.Text = Round(cond(1).Ro3, 3).ToString                '[kg/m3] Density loop uit
                 TextBox167.Text = Round(cond(1).loop_loss / 100, 0).ToString    '[mbar]
 
 
@@ -613,10 +614,12 @@ Public Class Form1
                 TextBox168.Text = Round(cond(2).Ps2 / 100, 0).ToString          '[mbar] outlet P_static
                 TextBox171.Text = Round(cond(2).T2, 0).ToString                 '[c] outlet flange
                 TextBox170.Text = Round(cond(2).Power, 0).ToString              '[kW]
-                TextBox188.Text = Round(cond(2).Ro1, 3).ToString                'Density outlet
-                TextBox173.Text = Round(cond(2).loop_loss / 100, 0).ToString    '[mbar]
                 TextBox183.Text = Round(cond(2).loop_velos, 1).ToString         '[m/s]
-                TextBox185.Text = Round(cond(2).Ro2, 2).ToString                '[kg/m3] Density outlet
+                TextBox188.Text = Round(cond(2).Ro2, 3).ToString                '[kg/m3] Density fan uit
+                TextBox185.Text = Round(cond(2).Ro3, 3).ToString                '[kg/m3] Density loop uit
+                TextBox173.Text = Round(cond(2).loop_loss / 100, 0).ToString    '[mbar]
+
+
 
                 '-------------------------- Waaier #3 (geen omloop)----------------------
                 '---------------------------------------------------------------
@@ -633,7 +636,7 @@ Public Class Form1
                 TextBox174.Text = Round(cond(3).Ps2 / 100, 0).ToString          '[mbar] outlet P_static
                 TextBox177.Text = Round(cond(3).T2, 0).ToString                 '[c] outlet flange
                 TextBox176.Text = Round(cond(3).Power, 0).ToString              '[kW]
-                TextBox186.Text = Round(cond(3).Ro2, 3).ToString                '[kg/m3] Density outlet
+                TextBox186.Text = Round(cond(3).Ro2, 3).ToString                '[kg/m3] Density fan uit
 
                 '-------------------------- Aantal trappen ----------------------
 
@@ -1702,51 +1705,59 @@ Public Class Form1
 
                         '======================== waaier #1 ===============================================
                         Calc_stage(cond(4))             'Bereken de waaier #1  
+                        calc_loop_loss(cond(4))         'Bereken de omloop verliezen 
 
                         Tschets(ty).TFlow_scaled(hh) = Round(cond(4).Q1, 2)                     '[Am3/hr]
-                        Tschets(ty).TPtot_scaled(hh) = Round(cond(4).Pt2 / 100, 0)              '[mbar]
-                        Tschets(ty).TPstat_scaled(hh) = Round(cond(4).Ps2 / 100, 0)             '[mbar]
+                        Tschets(ty).TPtot_scaled(hh) = Round((cond(4).Pt2 - cond(4).Pt1) / 100, 0)              '[mbar] dP fan total
+                        Tschets(ty).TPstat_scaled(hh) = Round((cond(4).Ps2 - cond(4).Ps1) / 100, 0)             '[mbar] dP fan static
                         Tschets(ty).Tverm_scaled(hh) = Round(cond(4).Power, 0)                  '[kW]
-                        Tschets(ty).Teff_scaled(hh) = Round((100 * cond(4).Pt2 * cond(4).Q2 / (Tschets(ty).Tverm_scaled(hh) * 1000)), 0)
+                        Tschets(ty).Teff_scaled(hh) = Round((100 * (cond(4).Pt2 - cond(4).Pt1) * cond(4).Q1 / (Tschets(ty).Tverm_scaled(hh) * 1000)), 0)
 
-                        'Select Case True
-                        '    Case RadioButton10.Checked      '2 traps
-                        '        calc_loop_loss(cond(4))         'Bereken de omloop verliezen  
-                        '        Tschets(ty).TPtot_scaled(hh) = Round(cond(4).Pt3 / 100, 0)     '[mBar]
-                        '        Tschets(ty).TPstat_scaled(hh) = Round(cond(4).Ps3 / 100, 0)    '[mBar]
+                        ' MessageBox.Show(Tschets(ty).Teff_scaled(hh).ToString)
 
-                        '        '======================== waaier #2 ===============================================
-                        '        cond(5) = cond(4)                       'Kopieer de struct
-                        '        cond(5).T1 = cond(4).T2                 '[c] uitlaat waaier#1 is inlaat waaier #2
-                        '        cond(5).Pt1 = cond(4).Pt3               'Inlaat waaier #2 
-                        '        cond(5).Ps1 = cond(4).Ps3               'Inlaat waaier #2
+                        Select Case True
+                            Case RadioButton10.Checked      '2 traps
 
-                        '        ' MessageBox.Show("Pt2= " & cond(5).Pt2.ToString & " Q2= " & cond(5).Q2.ToString & " Power= " & cond(5).Power.ToString & " eff= " & Tschets(ty).Teff_scaled(hh).ToString)
+                                Tschets(ty).TPtot_scaled(hh) = Round(cond(4).Pt3 / 100, 0)     '[mBar]
+                                Tschets(ty).TPstat_scaled(hh) = Round(cond(4).Ps3 / 100, 0)    '[mBar]
 
-                        '        Calc_stage(cond(5))                     'Bereken de waaier #2  
-                        '        calc_loop_loss(cond(5))                 'Bereken de omloop verliezen  
+                                '======================== waaier #2 ===============================================
+                                cond(5) = cond(4)                       'Kopieer de struct
+                                cond(5).T1 = cond(4).T2                 '[c] uitlaat waaier#1 is inlaat waaier #2
+                                cond(5).Pt1 = cond(4).Pt3               'Inlaat waaier #2 
+                                cond(5).Ps1 = cond(4).Ps3               'Inlaat waaier #2
 
-                        '        Tschets(ty).TPtot_scaled(hh) = Round((cond(5).Pt2 - cond(1).Pt1) / 100, 0).ToString         '[mbar] dP fan total
-                        '        Tschets(ty).TPstat_scaled(hh) = Round((cond(5).Ps2 - cond(1).Ps1) / 100, 0).ToString        '[mbar] dP fan static
-                        '        Tschets(ty).Tverm_scaled(hh) = cond(4).Power + cond(5).Power                                '[kW]
-                        '        Tschets(ty).Teff_scaled(hh) = Round((100 * cond(5).Pt2 * cond(5).Q2 / (Tschets(ty).Tverm_scaled(hh) * 1000)), 0)
 
-                        '    Case RadioButton11.Checked   '3 traps
-                        '        '======================== waaier #3 ===============================================
-                        '        cond(6) = cond(5)                       'Kopieer de struct
-                        '        cond(6).T1 = cond(5).T2                 '[c] uitlaat waaier#1 is inlaat waaier #2
-                        '        cond(6).Pt1 = cond(5).Pt3               'Inlaat waaier #2 
-                        '        cond(6).Ps1 = cond(5).Ps3               'Inlaat waaier #2
+                                Calc_stage(cond(5))                     'Bereken de waaier #2  
+                                calc_loop_loss(cond(5))                 'Bereken de omloop verliezen  
 
-                        '        'MessageBox.Show("Pt2= " & cond(5).Pt2.ToString & " Q2= " & cond(5).Q2.ToString & " Power= " & cond(5).Power.ToString & " eff= " & Tschets(ty).Teff_scaled(hh).ToString)
+                                Tschets(ty).TPtot_scaled(hh) = Round((cond(5).Pt2 - cond(4).Pt1) / 100, 0).ToString         '[mbar] dP fan total
+                                Tschets(ty).TPstat_scaled(hh) = Round((cond(5).Ps2 - cond(4).Ps1) / 100, 0).ToString        '[mbar] dP fan static
+                                Tschets(ty).Tverm_scaled(hh) = Round(cond(4).Power + cond(5).Power, 0)                      '[kW] waaier 1+2
+                                Tschets(ty).Teff_scaled(hh) = Round((100 * (cond(5).Pt2 - cond(4).Pt1) * cond(5).Q1 / (Tschets(ty).Tverm_scaled(hh) * 1000)), 0)
 
-                        '        Calc_stage(cond(5))                     'Bereken de waaier #2  
 
-                        '        Tschets(ty).TPtot_scaled(hh) = Round((cond(6).Pt2 - cond(1).Pt1) / 100, 0).ToString         '[mbar] dP fan total
-                        '        Tschets(ty).TPstat_scaled(hh) = Round((cond(6).Ps2 - cond(1).Ps1) / 100, 0).ToString        '[mbar] dP fan static
-                        '        Tschets(ty).Tverm_scaled(hh) = cond(4).Power + cond(5).Power + cond(6).Power                '[kW]
-                        '        Tschets(ty).Teff_scaled(hh) = Round((100 * cond(6).Pt2 * cond(6).Q2 / (Tschets(ty).Tverm_scaled(hh) * 1000)), 0)
-                        'End Select
+
+  ' MessageBox.Show("Pt2= " & cond(5).Pt2.ToString & " Q2= " & cond(5).Q2.ToString & " Power= " & cond(5).Power.ToString & " eff= " & Tschets(ty).Teff_scaled(hh).ToString)
+
+
+
+                            Case RadioButton11.Checked   '3 traps
+                                '======================== waaier #3 ===============================================
+                                cond(6) = cond(5)                       'Kopieer de struct
+                                cond(6).T1 = cond(5).T2                 '[c] uitlaat waaier#1 is inlaat waaier #2
+                                cond(6).Pt1 = cond(5).Pt3               'Inlaat waaier #2 
+                                cond(6).Ps1 = cond(5).Ps3               'Inlaat waaier #2
+
+                                'MessageBox.Show("Pt2= " & cond(5).Pt2.ToString & " Q2= " & cond(5).Q2.ToString & " Power= " & cond(5).Power.ToString & " eff= " & Tschets(ty).Teff_scaled(hh).ToString)
+
+                                Calc_stage(cond(6))                     'Bereken de waaier #2  
+
+                                Tschets(ty).TPtot_scaled(hh) = Round((cond(6).Pt2 - cond(4).Pt1) / 100, 0).ToString         '[mbar] dP fan total
+                                Tschets(ty).TPstat_scaled(hh) = Round((cond(6).Ps2 - cond(4).Ps1) / 100, 0).ToString        '[mbar] dP fan static
+                                Tschets(ty).Tverm_scaled(hh) = Round(cond(4).Power + cond(5).Power + cond(6).Power, 0)      '[kW] waaier 1+2+3
+                                Tschets(ty).Teff_scaled(hh) = Round((100 * (cond(6).Pt2 - cond(4).Pt1) * cond(6).Q1 / (Tschets(ty).Tverm_scaled(hh) * 1000)), 0)
+                        End Select
                     End If
                 Next hh
 
@@ -2026,7 +2037,7 @@ Public Class Form1
         temperature1 += 273.15
         temperature2 += 273.15
 
-        If (pressure1 < 90000) Or (pressure1 < 90000) Then
+        If (pressure1 < 80000) Or (pressure1 < 80000) Then
             MessageBox.Show("Density calculation warning Pressure must be in Pa absolute")
         End If
 
@@ -2078,6 +2089,7 @@ Public Class Form1
         y.T2 = y.T1 + (y.Power * 1000 / (cp_air * y.Qkg))               'Temperature outlet flange [celsius]
         y.velos = PI * y.Dia1 / 1000 * y.Rpm1 / 60                      'Omtreksnelheid waaier
 
+        'MessageBox.Show("y.T1= " & y.T1.ToString & " y.Power= " & y.Power.ToString & " y.Qkg= " & y.Qkg.ToString & " y.T2= " & y.T2.ToString)
 
         T_reynolds = Round(T_omtrek_s * T_diaw_m / kin_visco_air(20), 0)        '---------- Renolds Tschets ----------------------------------
         y.Reynolds = Round(y.velos * (y.Dia1 / 1000) / kin_visco_air(y.T1), 0)  '---------- Renolds actueel ---------------------------------
@@ -2094,19 +2106,28 @@ Public Class Form1
 
         x.Ro1 = calc_density(x.Ro0, (x.Pt1 + 101300), (x.Pt2 + 101300), x.T1, x.T2) 'Density fan uit
 
-        '--------------------- gegevens omloop #1--------------------------
+        '--------------------- gegevens omloop --------------------------
         x.uitlaat_h = Round(Tschets(x.Typ).Tdata(4) * x.Dia1 / x.Dia0, 0)       'Uitlaat hoogte inw.[mm]
         x.uitlaat_b = Round(Tschets(x.Typ).Tdata(5) * x.Dia1 / x.Dia0, 0)       'Uitlaat breedte inw.[mm]
         area_omloop = x.uitlaat_b * x.uitlaat_h / 10 ^ 6                        'Oppervlak omloop [m2]
         x.loop_velos = x.Q1 / area_omloop                                       'snelheid uitlaat [m/s]
 
-        '----------------- actual drukverlies omloop #1 (3 bochten) -------
+        '----------------- actual drukverlies omloop  (3 bochten) -------
         phi = NumericUpDown58.Value
         x.loop_loss = 0.5 * phi * x.loop_velos ^ 2 * x.Ro1                      '[Pa]
 
+
+        '===== Druk verlies kan nooit groter zijn dan de begindruk =============
+        If x.loop_loss > x.Pt2 Then
+            x.loop_loss = 0.99 * x.Pt2
+        End If
+        If x.loop_loss > x.Ps2 Then
+            x.loop_loss = 0.99 * x.Ps2
+        End If
+
         x.Pt3 = x.Pt2 - x.loop_loss                                             '[Pa]
         x.Ps3 = x.Ps2 - x.loop_loss
-        x.Ro2 = calc_density(x.Ro0, (x.Pt1 + 101300), (x.Pt3 + 101300), x.T1, x.T2)
+        x.Ro3 = calc_density(x.Ro0, (x.Pt1 + 101300), (x.Pt3 + 101300), x.T1, x.T2)
     End Sub
 
 End Class
