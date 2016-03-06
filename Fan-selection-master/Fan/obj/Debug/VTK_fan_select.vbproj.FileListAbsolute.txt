@@ -52,3 +52,4 @@ C:\Repositories\Fan-selection2.git\Fan-selection2\Fan-selection-master\Fan\obj\D
 C:\Repositories\Fan-selection2.git\Fan-selection2\Fan-selection-master\Fan\obj\Debug\VTK_fan_select.exe
 C:\Repositories\Fan-selection2.git\Fan-selection2\Fan-selection-master\Fan\obj\Debug\VTK_fan_select.xml
 C:\Repositories\Fan-selection2.git\Fan-selection2\Fan-selection-master\Fan\obj\Debug\VTK_fan_select.pdb
+C:\Repositories\Fan-selection2.git\Fan-selection2\Fan-selection-master\Fan\obj\Debug\VTK_fan_select.vbprojResolveAssemblyReference.cache

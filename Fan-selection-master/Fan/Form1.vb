@@ -601,8 +601,9 @@ Public Class Form1
                 '---------------------------------------------------------------
                 cond(2) = cond(1)                       'Kopieer de struct met gegevens
                 cond(2).T1 = cond(1).T2                 '[c] uitlaat waaier#1 is inlaat waaier #2
-                cond(2).Pt1 = cond(1).Pt3               'Inlaat waaier #2 
+                cond(2).Pt1 = cond(1).Ps3               'Inlaat waaier #2 
                 cond(2).Ps1 = cond(1).Ps3               'Inlaat waaier #2
+                cond(2).Ro1 = cond(1).Ro3               'Ro Inlaat waaier #2
 
                 Calc_stage(cond(2))                     'Bereken de waaier #2  
                 calc_loop_loss(cond(2))                 'Bereken de omloop verliezen  
@@ -623,9 +624,10 @@ Public Class Form1
                 '-------------------------- Waaier #3 (geen omloop)----------------------
                 '---------------------------------------------------------------
                 cond(3) = cond(2)                       'Kopieer de struct met gegevens
-                cond(3).T1 = cond(2).T2                 '[c] uitlaat waaier#1 is inlaat waaier #2
-                cond(3).Pt1 = cond(2).Pt3               'Inlaat waaier #3 
+                cond(3).T1 = cond(2).T2                 '[c] uitlaat waaier #1 is inlaat waaier #2
+                cond(3).Pt1 = cond(2).Ps3               'Inlaat waaier #3 
                 cond(3).Ps1 = cond(2).Ps3               'Inlaat waaier #3
+                cond(3).Ro1 = cond(2).Ro3               'Ro Inlaat waaier #3
 
                 Calc_stage(cond(3))                     'Bereken de waaier #3   
 
@@ -641,7 +643,9 @@ Public Class Form1
 
                 Select Case True
                     Case RadioButton12.Checked              '1 trap
+                        GroupBox13.Visible = True
                         GroupBox18.Visible = False
+                        GroupBox24.Visible = True
                         GroupBox40.Visible = False
                         GroupBox43.Visible = False
                         GroupBox44.Visible = False
@@ -649,6 +653,8 @@ Public Class Form1
                         GroupBox46.Visible = False
                     Case RadioButton13.Checked              '2 traps
                         GroupBox18.Visible = True
+                        GroupBox13.Visible = False
+                        GroupBox24.Visible = False
                         GroupBox40.Visible = True
                         GroupBox43.Visible = True
                         GroupBox44.Visible = False
@@ -660,6 +666,8 @@ Public Class Form1
                         TextBox64.Text = Round(cond(2).T2, 0)
                     Case RadioButton14.Checked              '3 traps
                         GroupBox18.Visible = True
+                        GroupBox13.Visible = False
+                        GroupBox24.Visible = False
                         GroupBox40.Visible = True
                         GroupBox43.Visible = True
                         GroupBox44.Visible = True
@@ -1706,8 +1714,9 @@ Public Class Form1
                                 '======================== waaier #2 ===============================================
                                 cond(5) = cond(4)                       'Kopieer de struct met gegevens
                                 cond(5).T1 = cond(4).T2                 '[c] uitlaat waaier#1 is inlaat waaier #2
-                                cond(5).Pt1 = cond(4).Pt3               'Inlaat waaier #2 
+                                cond(5).Pt1 = cond(4).Ps3               'Inlaat waaier #2 
                                 cond(5).Ps1 = cond(4).Ps3               'Inlaat waaier #2
+                                cond(5).Ro1 = cond(4).Ro3               'Ro Inlaat waaier #2
 
                                 Calc_stage(cond(5))                     'Bereken de waaier #2  
                                 calc_loop_loss(cond(5))                 'Bereken de omloop verliezen  
@@ -1724,8 +1733,9 @@ Public Class Form1
                                 '======================== waaier #2 ===============================================
                                 cond(5) = cond(4)                       'Kopieer de struct met gegevens
                                 cond(5).T1 = cond(4).T2                 '[c] uitlaat waaier#1 is inlaat waaier #2
-                                cond(5).Pt1 = cond(4).Pt3               'Inlaat waaier #2 
+                                cond(5).Pt1 = cond(4).Ps3               'Inlaat waaier #2 
                                 cond(5).Ps1 = cond(4).Ps3               'Inlaat waaier #2
+                                cond(5).Ro1 = cond(4).Ro3               'Ro Inlaat waaier #2
 
                                 Calc_stage(cond(5))                     'Bereken de waaier #2  
                                 calc_loop_loss(cond(5))                 'Bereken de omloop verliezen  
@@ -1733,8 +1743,9 @@ Public Class Form1
                                 '======================== waaier #3 ===============================================
                                 cond(6) = cond(5)                       'Kopieer de struct met gegevens
                                 cond(6).T1 = cond(5).T2                 '[c] uitlaat waaier#1 is inlaat waaier #3
-                                cond(6).Pt1 = cond(5).Pt3               'Inlaat waaier #3 
+                                cond(6).Pt1 = cond(5).Ps3               'Inlaat waaier #3 
                                 cond(6).Ps1 = cond(5).Ps3               'Inlaat waaier #3
+                                cond(6).Ro1 = cond(5).Ro3               'Ro Inlaat waaier #3
 
                                 Calc_stage(cond(6))                     'Bereken de waaier #3  
                                 calc_loop_loss(cond(6))                 'Bereken de omloop verliezen  (niet echt nodig)
@@ -2085,7 +2096,7 @@ Public Class Form1
         y.Reynolds = Round(y.velos * (y.Dia1 / 1000) / kin_visco_air(y.T1), 0)  '---------- Renolds actueel ---------------------------------
 
         y.Ackeret = 1 - 0.5 * (1 - y.Eff) * Pow((1 + (T_reynolds / y.Reynolds)), 0.2)
-        y.Ro2 = calc_density(y.Ro0, (y.Pt1 + 101300), (y.Pt2 + 101300), y.T1, y.T2) 'Ro outlet flange fan
+        y.Ro2 = calc_density(y.Ro1, (y.Pt1 + 101300), (y.Pt2 + 101300), y.T1, y.T2) 'Ro outlet flange fan
     End Sub
 
 
@@ -2093,8 +2104,6 @@ Public Class Form1
         Dim phi, area_omloop As Double
 
         x.zuig_dia = Round(Tschets(x.Typ).Tdata(3) * x.Dia1 / x.Dia0, 0)         'Zuigmond diameter.
-
-        x.Ro1 = calc_density(x.Ro0, (x.Pt1 + 101300), (x.Pt2 + 101300), x.T1, x.T2) 'Density fan uit
 
         '--------------------- gegevens omloop --------------------------
         x.uitlaat_h = Round(Tschets(x.Typ).Tdata(4) * x.Dia1 / x.Dia0, 0)       'Uitlaat hoogte inw.[mm]
@@ -2117,7 +2126,7 @@ Public Class Form1
 
         x.Pt3 = x.Pt2 - x.loop_loss                                             '[Pa]
         x.Ps3 = x.Ps2 - x.loop_loss
-        x.Ro3 = calc_density(x.Ro0, (x.Pt1 + 101300), (x.Pt3 + 101300), x.T1, x.T2)
+        x.Ro3 = calc_density(x.Ro1, (x.Pt1 + 101300), (x.Pt3 + 101300), x.T1, x.T2)
     End Sub
 
 End Class
