@@ -33,16 +33,17 @@ End Structure
 
 Public Structure Stage
     Public Typ As Integer       'Impellar type
+    Public Dia0 As Integer      'Impellar diameter [m] Tschets
     Public Dia1 As Integer      'Impellar diameter [m]
-    Public Dia2 As Integer      'Impellar diameter [m]
+    Public Rpm0 As Integer      'Impellar speed [rpm] Tschets
     Public Rpm1 As Integer      'Impellar speed [rpm]
-    Public Rpm2 As Integer      'Impellar speed [rpm]
     Public Qkg As Double        'Debiet [kg/s]
+    Public Q0 As Double         'Debiet inlet [Am3/s] Tschets
     Public Q1 As Double         'Debiet inlet [Am3/s]
     Public Q2 As Double         'Debiet outlet [Am3/s]
-    Public Ro1 As Double        'Density[kg/m3] inlet flange
-    Public Ro2 As Double        'Density[kg/m3] outlet flange fan
-    Public Ro3 As Double        'Density[kg/m3] outlet flange loop
+    Public Ro0 As Double        'Density[kg/m3] inlet flange Tschets
+    Public Ro1 As Double        'Density[kg/m3] outlet flange fan
+    Public Ro2 As Double        'Density[kg/m3] outlet flange loop
     Public Ps0 As Double        'Statische druk [Pa G] Tschets
     Public Ps1 As Double        'Statische druk [Pa G] inlet flange
     Public Ps2 As Double        'Statische druk [Pa G] outlet flange fan
@@ -486,7 +487,7 @@ Public Class Form1
                 TextBox25.Text = Round(G_density_act_pers, 3).ToString
                 TextBox26.Text = Round(G_omtrek_s, 2).ToString              'Omtrek snelheid
                 TextBox28.Text = Round(G_Debiet_p * 3600, 0).ToString       'Pers debiet is kleiner dan zuig debiet door drukverhoging
-                TextBox27.Text = Round(G_diaw_m, 3).ToString
+                TextBox27.Text = Round(G_diaw_m * 1000, 0).ToString         'Diameter waaier [mm]
                 TextBox29.Text = Round(G_Toerental_rpm, 0).ToString
                 TextBox58.Text = Round(G_as_kw, 1).ToString
                 TextBox20.Text = Round(G_Debiet_z_N_hr, 0).ToString         'Debiet [Nm3/hr]  
@@ -541,21 +542,23 @@ Public Class Form1
 
                 '========================= 2de Bedrijfspunt===================================================================
                 '=============================================================================================================
-                cond(1).Typ = ComboBox1.SelectedIndex               '[-]
-                cond(1).Dia1 = Tschets(cond(1).Typ).Tdata(0)        '[mm]
-                cond(1).Dia2 = NumericUpDown33.Value                '[mm]
-                cond(1).Rpm1 = Tschets(cond(1).Typ).Tdata(1)        '[rpm] 
-                cond(1).Rpm2 = NumericUpDown13.Value                '[rpm]
-                cond(1).Qkg = NumericUpDown3.Value                  '[kg/hr]
-                cond(1).Q1 = Tschets(cond(1).Typ).werkp_opT(4)      '[Am3/s] Tschets
-                cond(1).Ro1 = NumericUpDown12.Value                 'density [kg/m3] inlet flange
+                cond(1).Typ = ComboBox1.SelectedIndex               '[-]        T_SCHETS
+                cond(1).Q0 = Tschets(cond(1).Typ).werkp_opT(4)      '[Am3/s]    T_SCHETS
+                cond(1).Pt0 = Tschets(cond(1).Typ).werkp_opT(1)     '[PaG]      T_SCHETS Pressure total  
+                cond(1).Ps0 = Tschets(cond(1).Typ).werkp_opT(2)     '[PaG]      T_SCHETS pressure static 
+                cond(1).Dia0 = Tschets(cond(1).Typ).Tdata(0)        '[mm]       T_SCHETS
+                cond(1).Rpm0 = Tschets(cond(1).Typ).Tdata(1)        '[rpm]      T_SCHETS
+                cond(1).Ro0 = Tschets(cond(1).Typ).Tdata(2)         '[kg/m3]    T_SCHETS density inlet flange 
+
                 cond(1).T1 = G_air_temp                             '[c]
-                cond(1).Pt0 = Tschets(cond(1).Typ).werkp_opT(1)     '[PaG] Pressure total Tschets 
-                cond(1).Ps0 = Tschets(cond(1).Typ).werkp_opT(2)     '[PaG] Pressure static Tschets
+                cond(1).Dia1 = NumericUpDown33.Value                '[mm]
+                cond(1).Rpm1 = NumericUpDown13.Value                '[rpm]
+                cond(1).Qkg = NumericUpDown3.Value                  '[kg/hr]
+
+                cond(1).Ro1 = NumericUpDown12.Value                 'density [kg/m3] inlet flange
                 cond(1).Pt1 = P_zuig_Pa - 101300                    '[PaG] inlet flange waaier #1           
                 cond(1).Ps1 = P_zuig_Pa - 101300                    '[PaG] inlet flange waaier #1
                 cond(1).Power0 = Tschets(cond(1).Typ).werkp_opT(3)  '[Am3/s] Tschets
-
 
                 Calc_stage(cond(1))             'Bereken de waaier #1  
                 calc_loop_loss(cond(1))         'Bereken de omloop verliezen  
@@ -563,10 +566,10 @@ Public Class Form1
                 TextBox75.Text = Round(cond(1).Eff, 3).ToString
                 TextBox78.Text = Round(cond(1).Power, 0).ToString                           'As vermogen in [kW]
                 TextBox54.Text = Round(cond(1).T2, 0).ToString                              'Temp uit [c]
-                TextBox81.Text = Round((cond(1).Pt2 / 100), 0).ToString                     'dP_Total  [mbar]
-                TextBox150.Text = Round((cond(1).Ps2 / 100), 0).ToString                    'dp_Static [mbar]
+                TextBox81.Text = Round((cond(1).Pt2 / 100), 1).ToString                     'dP_Total  [mbar]
+                TextBox150.Text = Round((cond(1).Ps2 / 100), 1).ToString                    'dp_Static [mbar]
                 TextBox151.Text = Round(((cond(1).Pt2 - cond(1).Ps2) / 100), 0).ToString    'dynamic press [mbar]
-                TextBox83.Text = Round(cond(1).Q2 * 3600.0, 0).ToString                     'Debiet [m3/hr]
+                TextBox83.Text = Round(cond(1).Q1 * 3600.0, 0).ToString                     'Debiet inlet [m3/hr]
                 TextBox157.Text = Round(cond(1).Qkg, 0).ToString                            'Debiet [kg/hr]
                 TextBox76.Text = Round(cond(1).velos, 0).ToString                           'Omtrek snelheid [m/s]
                 TextBox77.Text = Round((cond(1).Reynolds * 10 ^ -6), 2).ToString
@@ -588,8 +591,8 @@ Public Class Form1
                 TextBox162.Text = Round(cond(1).Ps2 / 100, 0).ToString          '[mbar] outlet P_static
                 TextBox164.Text = Round(cond(1).Power, 0).ToString              '[kW]
                 TextBox182.Text = Round(cond(1).loop_velos, 1).ToString         'snelheid [m/s]
-                TextBox187.Text = Round(cond(1).Ro2, 3).ToString                'Density fan outlet
-                TextBox184.Text = Round(cond(1).Ro3, 2).ToString                '[kg/m3] Density loop outlet
+                TextBox187.Text = Round(cond(1).Ro1, 3).ToString                'Density fan outlet
+                TextBox184.Text = Round(cond(1).Ro2, 2).ToString                '[kg/m3] Density loop outlet
                 TextBox167.Text = Round(cond(1).loop_loss / 100, 0).ToString    '[mbar]
 
 
@@ -610,10 +613,10 @@ Public Class Form1
                 TextBox168.Text = Round(cond(2).Ps2 / 100, 0).ToString          '[mbar] outlet P_static
                 TextBox171.Text = Round(cond(2).T2, 0).ToString                 '[c] outlet flange
                 TextBox170.Text = Round(cond(2).Power, 0).ToString              '[kW]
-                TextBox188.Text = Round(cond(2).Ro2, 3).ToString                'Density outlet
+                TextBox188.Text = Round(cond(2).Ro1, 3).ToString                'Density outlet
                 TextBox173.Text = Round(cond(2).loop_loss / 100, 0).ToString    '[mbar]
                 TextBox183.Text = Round(cond(2).loop_velos, 1).ToString         '[m/s]
-                TextBox185.Text = Round(cond(2).Ro3, 2).ToString                '[kg/m3] Density outlet
+                TextBox185.Text = Round(cond(2).Ro2, 2).ToString                '[kg/m3] Density outlet
 
                 '-------------------------- Waaier #3 (geen omloop)----------------------
                 '---------------------------------------------------------------
@@ -630,7 +633,7 @@ Public Class Form1
                 TextBox174.Text = Round(cond(3).Ps2 / 100, 0).ToString          '[mbar] outlet P_static
                 TextBox177.Text = Round(cond(3).T2, 0).ToString                 '[c] outlet flange
                 TextBox176.Text = Round(cond(3).Power, 0).ToString              '[kW]
-                TextBox186.Text = Round(cond(3).Ro3, 3).ToString                '[kg/m3] Density outlet
+                TextBox186.Text = Round(cond(3).Ro2, 3).ToString                '[kg/m3] Density outlet
 
                 '-------------------------- Aantal trappen ----------------------
 
@@ -1603,10 +1606,10 @@ Public Class Form1
     'Q=Capacity in [m3/s]
     'Speed in [rpm] or [rad/s] or [rps] if used consequently
     'Note; sg medum speelt geen rol !!!!!!!!!!
-    Private Function Scale_rule_cap(Q1 As Double, Dia1 As Double, Dia2 As Double, n1 As Double, n2 As Double)
+    Private Function Scale_rule_cap(Q1 As Double, Dia0 As Double, Dia1 As Double, n1 As Double, n2 As Double)
         Dim Q2 As Double
 
-        Q2 = Q1 * (n2 / n1) * (Dia2 / Dia1) ^ 3
+        Q2 = Q1 * (n2 / n1) * (Dia1 / Dia0) ^ 3
 
         Return (Q2)
     End Function
@@ -1617,10 +1620,10 @@ Public Class Form1
     'Diameter in [m]
     'Q=Capacity in [m3/s]
     'Speed in [rpm] or [rad/s] or [rps] if used consequently
-    Private Function Scale_rule_Pressure(Pt1 As Double, Dia1 As Double, Dia2 As Double, n1 As Double, n2 As Double, Ro1 As Double, Ro2 As Double)
+    Private Function Scale_rule_Pressure(Pt1 As Double, Dia0 As Double, Dia1 As Double, n1 As Double, n2 As Double, Ro0 As Double, Ro1 As Double)
         Dim Pt2 As Double
 
-        Pt2 = Pt1 * (n2 / n1) ^ 2 * (Ro2 / Ro1) * (Dia2 / Dia1) ^ 2
+        Pt2 = Pt1 * (n2 / n1) ^ 2 * (Ro1 / Ro0) * (Dia1 / Dia0) ^ 2
 
         Return (Pt2)
     End Function
@@ -1629,10 +1632,10 @@ Public Class Form1
     'Diameter in [m]
     'Q=Capacity in [m3/s]
     'Speed in [rpm] or [rad/s] or [rps] if used consequently
-    Private Function Scale_rule_Power(Power1 As Double, Dia1 As Double, Dia2 As Double, n1 As Double, n2 As Double, Ro1 As Double, Ro2 As Double)
+    Private Function Scale_rule_Power(Power1 As Double, Dia0 As Double, Dia1 As Double, n1 As Double, n2 As Double, Ro0 As Double, Ro1 As Double)
         Dim Power2 As Double
 
-        Power2 = Power1 * (n2 / n1) ^ 3 * (Ro2 / Ro1) * (Dia2 / Dia1) ^ 5
+        Power2 = Power1 * (n2 / n1) ^ 3 * (Ro1 / Ro0) * (Dia1 / Dia0) ^ 5
 
         Return (Power2)
     End Function
@@ -1657,16 +1660,16 @@ Public Class Form1
         Button3.Location = New Point(ww, hh)  'Save button
     End Sub
     'Diameter impeller is changed, recalculate and draw chart
-    Private Sub Scale_rules_applied(ty As Integer, dia2 As Double, n2 As Double, ro2 As Double)
+    Private Sub Scale_rules_applied(ty As Integer, Dia1 As Double, n2 As Double, Ro1 As Double)
         Dim hh As Integer
-        Dim Dia1, n1, Ro1, temp1 As Double
+        Dim Dia0, n1, Ro0, temp1 As Double
         Dim mass_flow As Double
 
         If (ty >= 0) And (ty < (ComboBox1.Items.Count)) Then    'Preventing exceptions
             Try
-                Dia1 = Tschets(ty).Tdata(0)     'waaier [mm]
+                Dia0 = Tschets(ty).Tdata(0)     'waaier [mm]
                 n1 = Tschets(ty).Tdata(1)       '[rpm]
-                Ro1 = Tschets(ty).Tdata(2)      '[kg/m3]
+                Ro0 = Tschets(ty).Tdata(2)      '[kg/m3]
                 temp1 = NumericUpDown4.Value   '[c]
                 mass_flow = NumericUpDown3.Value   'massa debiet [kg/hr]
                 '------------------------------------
@@ -1678,25 +1681,29 @@ Public Class Form1
                         'Ps1 = Tschets(ty).TPstat(hh)            'P_static [Pa]
                         'Pow1 = Tschets(ty).Tverm(hh)            'as power [kW]
 
-                        cond(4).Typ = ty                                                '[-]            OK
-                        cond(4).Dia1 = Tschets(ty).Tdata(0)                             '[mm]           OK
-                        cond(4).Q1 = Tschets(ty).TFlow(hh)                              '[Am3/s]
-                        cond(4).Pt0 = Tschets(ty).TPtot(hh)                             '[PaG] Ptotal Tschets           
-                        cond(4).Ps0 = Tschets(ty).TPstat(hh)                            '[PaG] Pstatic Tschets
-                        cond(4).Power0 = Tschets(ty).Tverm(hh)                          '[PaG] vermogen Tschets
+                        cond(4).Typ = ty                                                '[-]        T_SCHETS  
+                        cond(4).Q0 = Tschets(ty).TFlow(hh)                              '[Am3/s]    T_SCHETS Volume debiet
+                        cond(4).Pt0 = Tschets(ty).TPtot(hh)                             '[PaG]      T_SCHETS Ptotal          
+                        cond(4).Ps0 = Tschets(ty).TPstat(hh)                            '[PaG]      T_SCHETS Pstatic 
+                        cond(4).Power0 = Tschets(ty).Tverm(hh)                          '[PaG]      T_SCHETS vermogen 
+                        cond(4).Rpm0 = Tschets(ty).Tdata(1)                             '[rpm]      T_SCHETS
+                        cond(4).Dia0 = Tschets(ty).Tdata(0)                             '[mm]       T_SCHETS diameter waaier
+                        cond(4).Ro0 = Tschets(cond(1).Typ).Tdata(2)                     '[kg/m3]    T_SCHETS density inlet flange                         
+
+                        cond(4).Dia1 = Dia1                                             '[mm]           
+                        cond(4).Qkg = NumericUpDown3.Value                              '[kg/hr]
                         cond(4).Pt1 = Convert.ToDouble(TextBox91.Text) * 100 - 101300   'Press total [Pa] abs. inlet flange                                           
                         cond(4).Ps1 = Convert.ToDouble(TextBox91.Text) * 100 - 101300   'Press total [Pa] abs. inlet flange                                 
-                        cond(4).Rpm1 = Tschets(ty).Tdata(1)                             '[rpm]          OK
-                        cond(4).Dia2 = dia2                                             '[mm]           OK
-                        cond(4).Rpm2 = n2                                               '[rpm]          OK
-                        cond(4).Qkg = NumericUpDown3.Value                              '[kg/hr]        OK
-                        cond(4).Ro1 = ro2                                               '[kg/m3] density inlet flange       OK
-                        cond(4).T1 = NumericUpDown4.Value                               '[c]                                OK
+                        cond(4).Rpm1 = n2                                               '[rpm]          
+                        cond(4).Qkg = NumericUpDown3.Value                              '[kg/hr]       
+                        cond(4).Ro1 = NumericUpDown12.Value                             '[kg/m3] density inlet flange       
+                        cond(4).T1 = NumericUpDown4.Value                               '[c]                                
+
 
                         '======================== waaier #1 ===============================================
                         Calc_stage(cond(4))             'Bereken de waaier #1  
 
-                        Tschets(ty).TFlow_scaled(hh) = Round(cond(4).Q2, 2)                     '[Am3/hr]
+                        Tschets(ty).TFlow_scaled(hh) = Round(cond(4).Q1, 2)                     '[Am3/hr]
                         Tschets(ty).TPtot_scaled(hh) = Round(cond(4).Pt2 / 100, 0)              '[mbar]
                         Tschets(ty).TPstat_scaled(hh) = Round(cond(4).Ps2 / 100, 0)             '[mbar]
                         Tschets(ty).Tverm_scaled(hh) = Round(cond(4).Power, 0)                  '[kW]
@@ -2056,70 +2063,50 @@ Public Class Form1
 
 
     'Calculate a impellar stage process condition inlet and outlet
-    'Bekend moet zijn
-    'Public Typ As Integer       'Impellar type
-    'Public Dia1 As Integer      'Impellar diameter [m]
-    'Public Dia2 As Integer      'Impellar diameter [m]
-    'Public Rpm1 As Integer      'Impellar speed [rpm]
-    'Public Rpm2 As Integer      'Impellar speed [rpm]
-    'Public Qkg As Double        'Debiet [kg/s]
-    'Public Q1 As Double         'Debiet inlet [Am3/s]
-    'Public Ro1 As Double        'Density[kg/m3] inlet flange
-    'Public T1 As Double         'Temp in [c] inlet flange
-    'Public Ps1 As Double        'Statische druk [Pa G] inlet flange
-    'Public Pt1 As Double        'Totale druk [Pa G] inlet flange
-    'Public Power As Double     'Vermogen[kW]
-
+    ' Gebaseerd op de schaal regels voor vetilatoren
 
     Private Sub Calc_stage(ByRef y As Stage)
 
-        'y.Q2 = Scale_rule_cap(y.Q1, y.Dia1, y.Dia2, y.Rpm1, y.Rpm2)                                                                         '[Am3/s]
-        'y.Pt2 = y.Pt1 + Scale_rule_Pressure(Tschets(y.Typ).werkp_opT(1), y.Dia1, y.Dia2, y.Rpm1, y.Rpm2, Tschets(y.Typ).Tdata(2), y.Ro1)    '[Pa]
-        'y.Ps2 = y.Pt1 + Scale_rule_Pressure(Tschets(y.Typ).werkp_opT(2), y.Dia1, y.Dia2, y.Rpm1, y.Rpm2, Tschets(y.Typ).Tdata(2), y.Ro1)    '[Pa]
-        'y.Power = Scale_rule_Power(Tschets(y.Typ).werkp_opT(3), y.Dia1, y.Dia2, y.Rpm1, y.Rpm2, Tschets(y.Typ).Tdata(2), y.Ro1)             '[kW]
-
-
-        y.Q2 = Scale_rule_cap(y.Q1, y.Dia1, y.Dia2, y.Rpm1, y.Rpm2)                                                                         '[Am3/s]
-        y.Pt2 = y.Pt1 + Scale_rule_Pressure(y.Pt0, y.Dia1, y.Dia2, y.Rpm1, y.Rpm2, Tschets(y.Typ).Tdata(2), y.Ro1)                          '[Pa]
-        y.Ps2 = y.Ps1 + Scale_rule_Pressure(y.Ps0, y.Dia1, y.Dia2, y.Rpm1, y.Rpm2, Tschets(y.Typ).Tdata(2), y.Ro1)                          '[Pa]
-        y.Power = Scale_rule_Power(y.Power0, y.Dia1, y.Dia2, y.Rpm1, y.Rpm2, Tschets(y.Typ).Tdata(2), y.Ro1)                                '[kW]
+        y.Q1 = Scale_rule_cap(y.Q0, y.Dia0, y.Dia1, y.Rpm0, y.Rpm1)                                                       '[Am3/s]
+        y.Pt2 = y.Pt1 + Scale_rule_Pressure(y.Pt0, y.Dia0, y.Dia1, y.Rpm0, y.Rpm1, y.Ro0, y.Ro1)                          '[Pa]mess
+        y.Ps2 = y.Ps1 + Scale_rule_Pressure(y.Ps0, y.Dia0, y.Dia1, y.Rpm0, y.Rpm1, y.Ro0, y.Ro1)                          '[Pa]
+        y.Power = Scale_rule_Power(y.Power0, y.Dia0, y.Dia1, y.Rpm0, y.Rpm1, y.Ro0, y.Ro1)                                '[kW]
 
         'Eff = Tschets(typ).Teff(hh)
         y.Eff = y.Q1 * y.Pt2 / y.Power
 
         y.T2 = y.T1 + (y.Power * 1000 / (cp_air * y.Qkg))               'Temperature outlet flange [celsius]
-        y.velos = PI * y.Dia2 / 1000 * y.Rpm2 / 60                      'Omtreksnelheid waaier
+        y.velos = PI * y.Dia1 / 1000 * y.Rpm1 / 60                      'Omtreksnelheid waaier
 
 
         T_reynolds = Round(T_omtrek_s * T_diaw_m / kin_visco_air(20), 0)        '---------- Renolds Tschets ----------------------------------
-        y.Reynolds = Round(y.velos * (y.Dia2 / 1000) / kin_visco_air(y.T1), 0)  '---------- Renolds actueel ---------------------------------
-
-        'MessageBox.Show(y.Power.ToString)
+        y.Reynolds = Round(y.velos * (y.Dia1 / 1000) / kin_visco_air(y.T1), 0)  '---------- Renolds actueel ---------------------------------
 
         y.Ackeret = 1 - 0.5 * (1 - y.Eff) * Pow((1 + (T_reynolds / y.Reynolds)), 0.2)
+        y.Ro2 = calc_density(y.Ro0, (y.Pt1 + 101300), (y.Pt2 + 101300), y.T1, y.T2) 'Ro outlet flange fan
     End Sub
 
 
     Private Sub calc_loop_loss(ByRef x As Stage)
         Dim phi, area_omloop As Double
 
-        x.zuig_dia = Round(Tschets(x.Typ).Tdata(3) * x.Dia2 / x.Dia1, 0)         'Zuigmond diameter.
+        x.zuig_dia = Round(Tschets(x.Typ).Tdata(3) * x.Dia1 / x.Dia0, 0)         'Zuigmond diameter.
 
-        x.Ro2 = calc_density(x.Ro1, (x.Pt1 + 101300), (x.Pt2 + 101300), x.T1, x.T2) 'Density fan uit
+        x.Ro1 = calc_density(x.Ro0, (x.Pt1 + 101300), (x.Pt2 + 101300), x.T1, x.T2) 'Density fan uit
 
         '--------------------- gegevens omloop #1--------------------------
-        x.uitlaat_h = Round(Tschets(x.Typ).Tdata(4) * x.Dia2 / x.Dia1, 0)       'Uitlaat hoogte inw.[mm]
-        x.uitlaat_b = Round(Tschets(x.Typ).Tdata(5) * x.Dia2 / x.Dia1, 0)       'Uitlaat breedte inw.[mm]
+        x.uitlaat_h = Round(Tschets(x.Typ).Tdata(4) * x.Dia1 / x.Dia0, 0)       'Uitlaat hoogte inw.[mm]
+        x.uitlaat_b = Round(Tschets(x.Typ).Tdata(5) * x.Dia1 / x.Dia0, 0)       'Uitlaat breedte inw.[mm]
         area_omloop = x.uitlaat_b * x.uitlaat_h / 10 ^ 6                        'Oppervlak omloop [m2]
-        x.loop_velos = x.Q2 / area_omloop                                       'snelheid uitlaat [m/s]
+        x.loop_velos = x.Q1 / area_omloop                                       'snelheid uitlaat [m/s]
 
         '----------------- actual drukverlies omloop #1 (3 bochten) -------
         phi = NumericUpDown58.Value
-        x.loop_loss = 0.5 * phi * x.loop_velos ^ 2 * x.Ro2                      '[Pa]
+        x.loop_loss = 0.5 * phi * x.loop_velos ^ 2 * x.Ro1                      '[Pa]
 
         x.Pt3 = x.Pt2 - x.loop_loss                                             '[Pa]
         x.Ps3 = x.Ps2 - x.loop_loss
-        x.Ro3 = calc_density(x.Ro1, (x.Pt1 + 101300), (x.Pt3 + 101300), x.T1, x.T2)
+        x.Ro2 = calc_density(x.Ro0, (x.Pt1 + 101300), (x.Pt3 + 101300), x.T1, x.T2)
     End Sub
 
 End Class
