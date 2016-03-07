@@ -1696,31 +1696,40 @@ Public Class Form1
                         cond(4).Ro1 = NumericUpDown12.Value                             '[kg/m3] density inlet flange       
                         cond(4).T1 = NumericUpDown4.Value                               '[c]                                
 
-
                         '======================== waaier #1 ===============================================
                         Calc_stage(cond(4))             'Bereken de waaier #1  (in elf stappen)
                         calc_loop_loss(cond(4))         'Bereken de omloop verliezen 
 
-                        Tschets(ty).TFlow_scaled(hh) = cond(4).Q1                               '[Am3/hr]
-                        Tschets(ty).TPtot_scaled(hh) = Round((cond(4).Pt2) / 100, 2)            '[mbar] dP fan total
-                        Tschets(ty).TPstat_scaled(hh) = Round((cond(4).Ps2) / 100, 2)           '[mbar] dP fan static
-                        Tschets(ty).Tverm_scaled(hh) = Round(cond(4).Power, 0)                  '[kW]
-                        Tschets(ty).Teff_scaled(hh) = Round((100 * cond(4).Pt2 * cond(4).Q1 / (Tschets(ty).Tverm_scaled(hh) * 1000)), 0)
+                        '======================== waaier #2 ===============================================
+                        cond(5) = cond(4)                       'Kopieer de struct met gegevens
+                        cond(5).T1 = cond(4).T2                 '[c] uitlaat waaier#1 is inlaat waaier #2
+                        cond(5).Pt1 = cond(4).Ps3               'Inlaat waaier #2 
+                        cond(5).Ps1 = cond(4).Ps3               'Inlaat waaier #2
+                        cond(5).Ro1 = cond(4).Ro3               'Ro Inlaat waaier #2
 
+                        Calc_stage(cond(5))                     'Bereken de waaier #2  
+                        calc_loop_loss(cond(5))                 'Bereken de omloop verliezen  
+
+                        '======================== waaier #3 ===============================================
+                        cond(6) = cond(5)                       'Kopieer de struct met gegevens
+                        cond(6).T1 = cond(5).T2                 '[c] uitlaat waaier#1 is inlaat waaier #2
+                        cond(6).Pt1 = cond(5).Ps3               'Inlaat waaier #2 
+                        cond(6).Ps1 = cond(5).Ps3               'Inlaat waaier #2
+                        cond(6).Ro1 = cond(5).Ro3               'Ro Inlaat waaier #2
+
+                        Calc_stage(cond(6))                     'Bereken de waaier #2  
+                        calc_loop_loss(cond(6))                 'Bereken de omloop verliezen (niet echt nodig)
                         ' MessageBox.Show(Tschets(ty).Teff_scaled(hh).ToString)
 
                         Select Case True
+                            Case RadioButton9.Checked      '1 traps
+                                Tschets(ty).TFlow_scaled(hh) = cond(4).Q1                               '[Am3/hr]
+                                Tschets(ty).TPtot_scaled(hh) = Round((cond(4).Pt2) / 100, 2)            '[mbar] dP fan total
+                                Tschets(ty).TPstat_scaled(hh) = Round((cond(4).Ps2) / 100, 2)           '[mbar] dP fan static
+                                Tschets(ty).Tverm_scaled(hh) = Round(cond(4).Power, 0)                  '[kW]
+                                Tschets(ty).Teff_scaled(hh) = Round((100 * cond(4).Pt2 * cond(4).Q1 / (Tschets(ty).Tverm_scaled(hh) * 1000)), 0)
+
                             Case RadioButton10.Checked      '2 traps
-                                '======================== waaier #2 ===============================================
-                                cond(5) = cond(4)                       'Kopieer de struct met gegevens
-                                cond(5).T1 = cond(4).T2                 '[c] uitlaat waaier#1 is inlaat waaier #2
-                                cond(5).Pt1 = cond(4).Ps3               'Inlaat waaier #2 
-                                cond(5).Ps1 = cond(4).Ps3               'Inlaat waaier #2
-                                cond(5).Ro1 = cond(4).Ro3               'Ro Inlaat waaier #2
-
-                                Calc_stage(cond(5))                     'Bereken de waaier #2  
-                                calc_loop_loss(cond(5))                 'Bereken de omloop verliezen  
-
                                 Tschets(ty).TPtot_scaled(hh) = Round(cond(5).Pt2 / 100, 0)                          '[mbar] dP fan total
                                 Tschets(ty).TPstat_scaled(hh) = Round(cond(5).Ps2 / 100, 0)                         '[mbar] dP fan static
                                 Tschets(ty).Tverm_scaled(hh) = Round(cond(4).Power + cond(5).Power, 0)              '[kW] waaier 1+2
@@ -1730,26 +1739,6 @@ Public Class Form1
                                 ' MessageBox.Show("Cond(5).Pt1= " & cond(5).Pt1.ToString & " Q1= " & cond(5).Q1.ToString & " Cond(5).Pt2= " & cond(6).Pt2.ToString)
 
                             Case RadioButton11.Checked   '3 traps
-                                '======================== waaier #2 ===============================================
-                                cond(5) = cond(4)                       'Kopieer de struct met gegevens
-                                cond(5).T1 = cond(4).T2                 '[c] uitlaat waaier#1 is inlaat waaier #2
-                                cond(5).Pt1 = cond(4).Ps3               'Inlaat waaier #2 
-                                cond(5).Ps1 = cond(4).Ps3               'Inlaat waaier #2
-                                cond(5).Ro1 = cond(4).Ro3               'Ro Inlaat waaier #2
-
-                                Calc_stage(cond(5))                     'Bereken de waaier #2  
-                                calc_loop_loss(cond(5))                 'Bereken de omloop verliezen  
-
-                                '======================== waaier #3 ===============================================
-                                cond(6) = cond(5)                       'Kopieer de struct met gegevens
-                                cond(6).T1 = cond(5).T2                 '[c] uitlaat waaier#1 is inlaat waaier #3
-                                cond(6).Pt1 = cond(5).Ps3               'Inlaat waaier #3 
-                                cond(6).Ps1 = cond(5).Ps3               'Inlaat waaier #3
-                                cond(6).Ro1 = cond(5).Ro3               'Ro Inlaat waaier #3
-
-                                Calc_stage(cond(6))                     'Bereken de waaier #3  
-                                calc_loop_loss(cond(6))                 'Bereken de omloop verliezen  (niet echt nodig)
-
                                 Tschets(ty).TPtot_scaled(hh) = Round(cond(6).Pt2 / 100, 0)                                  '[mbar] dP fan total
                                 Tschets(ty).TPstat_scaled(hh) = Round(cond(6).Ps2 / 100, 0)                                 '[mbar] dP fan static
                                 Tschets(ty).Tverm_scaled(hh) = Round(cond(4).Power + cond(5).Power + cond(6).Power, 0)      '[kW] waaier 1+2+3
@@ -2099,7 +2088,6 @@ Public Class Form1
         y.Ro2 = calc_density(y.Ro1, (y.Pt1 + 101300), (y.Pt2 + 101300), y.T1, y.T2) 'Ro outlet flange fan
     End Sub
 
-
     Private Sub calc_loop_loss(ByRef x As Stage)
         Dim phi, area_omloop As Double
 
@@ -2114,7 +2102,6 @@ Public Class Form1
         '----------------- actual drukverlies omloop  (3 bochten) -------
         phi = NumericUpDown58.Value
         x.loop_loss = 0.5 * phi * x.loop_velos ^ 2 * x.Ro1                      '[Pa]
-
 
         '===== Druk verlies kan nooit groter zijn dan de begindruk =============
         If x.loop_loss > x.Pt2 Then
