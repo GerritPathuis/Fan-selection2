@@ -223,15 +223,12 @@ Public Class Form1
         ComboBox2.Items.Clear()                     'Note Combobox1 contains "startup" to prevent exceptions
         ComboBox3.Items.Clear()                     'Note Combobox1 contains "startup" to prevent exceptions
         ComboBox4.Items.Clear()                     'Note Combobox1 contains "startup" to prevent exceptions
-        ' ComboBox5.Items.Clear()                     'Note Combobox1 contains "startup" to prevent exceptions
         ComboBox6.Items.Clear()                     'Note Combobox1 contains "startup" to prevent exceptions
         ComboBox7.Items.Clear()                     'Note Combobox1 contains "startup" to prevent exceptions
-
 
         For hh = 0 To (UBound(Tschets) - 1)            'Fill combobox 1, 2 +5 met Fan Types
             ComboBox1.Items.Add(Tschets(hh).Tname)
             ComboBox2.Items.Add(Tschets(hh).Tname)
-            ' ComboBox5.Items.Add(Tschets(hh).Tname)
             ComboBox7.Items.Add(Tschets(hh).Tname)
         Next hh
 
@@ -250,7 +247,6 @@ Public Class Form1
             ComboBox6.Items.Add(words(0))
         Next hh
 
-
         '----------------- prevent out of bounds------------------
         If ComboBox1.Items.Count > 0 Then
             ComboBox1.SelectedIndex = 6                 'Select T17B
@@ -262,9 +258,6 @@ Public Class Form1
         If ComboBox3.Items.Count > 0 Then
             ComboBox3.SelectedIndex = 5                 'Select Domex
         End If
-        'If ComboBox5.Items.Count > 0 Then
-        '    ComboBox5.SelectedIndex = 6                 'Select T17B
-        'End If
         If ComboBox7.Items.Count > 0 Then
             ComboBox7.SelectedIndex = 6                 'Select T17B
         End If
@@ -274,8 +267,6 @@ Public Class Form1
         If ComboBox6.Items.Count > 0 Then
             ComboBox6.SelectedIndex = 1
         End If
-
-
     End Sub
 
     Private Sub Selectie_1()
@@ -1730,6 +1721,7 @@ Public Class Form1
                                 Tschets(ty).Teff_scaled(hh) = Round((100 * cond(4).Pt2 * cond(4).Q1 / (Tschets(ty).Tverm_scaled(hh) * 1000)), 0)
 
                             Case RadioButton10.Checked      '2 traps
+                                Tschets(ty).TFlow_scaled(hh) = cond(4).Q1                               '[Am3/hr]
                                 Tschets(ty).TPtot_scaled(hh) = Round(cond(5).Pt2 / 100, 0)                          '[mbar] dP fan total
                                 Tschets(ty).TPstat_scaled(hh) = Round(cond(5).Ps2 / 100, 0)                         '[mbar] dP fan static
                                 Tschets(ty).Tverm_scaled(hh) = Round(cond(4).Power + cond(5).Power, 0)              '[kW] waaier 1+2
@@ -1739,6 +1731,7 @@ Public Class Form1
                                 ' MessageBox.Show("Cond(5).Pt1= " & cond(5).Pt1.ToString & " Q1= " & cond(5).Q1.ToString & " Cond(5).Pt2= " & cond(6).Pt2.ToString)
 
                             Case RadioButton11.Checked   '3 traps
+                                Tschets(ty).TFlow_scaled(hh) = cond(4).Q1                               '[Am3/hr]
                                 Tschets(ty).TPtot_scaled(hh) = Round(cond(6).Pt2 / 100, 0)                                  '[mbar] dP fan total
                                 Tschets(ty).TPstat_scaled(hh) = Round(cond(6).Ps2 / 100, 0)                                 '[mbar] dP fan static
                                 Tschets(ty).Tverm_scaled(hh) = Round(cond(4).Power + cond(5).Power + cond(6).Power, 0)      '[kW] waaier 1+2+3
@@ -2014,9 +2007,7 @@ Public Class Form1
         TextBox120.Text = Round(Lp2000, 0).ToString
         TextBox121.Text = Round(Lp4000, 0).ToString
         TextBox122.Text = Round(LP8000, 0).ToString
-
     End Sub
-
 
     'Calculate density
     '1= inlet, 2= outlet
@@ -2057,7 +2048,7 @@ Public Class Form1
         TextBox145.Text = Round(spalt_loss, 1).ToString     '[kg/hr]
     End Sub
 
-    Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click, CheckBox6.CheckedChanged, CheckBox3.CheckedChanged, CheckBox2.CheckedChanged, CheckBox1.CheckedChanged, Chart1.Enter, TabPage3.Enter, NumericUpDown9.ValueChanged, NumericUpDown10.ValueChanged, RadioButton9.CheckedChanged, RadioButton11.CheckedChanged, RadioButton10.CheckedChanged
+    Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click, CheckBox6.CheckedChanged, CheckBox3.CheckedChanged, CheckBox2.CheckedChanged, CheckBox1.CheckedChanged, TabPage3.Enter, NumericUpDown9.ValueChanged, NumericUpDown10.ValueChanged, RadioButton9.CheckedChanged, RadioButton11.CheckedChanged, RadioButton10.CheckedChanged
         Scale_rules_applied(ComboBox1.SelectedIndex, NumericUpDown9.Value, NumericUpDown10.Value, NumericUpDown12.Value)
         draw_chart1(ComboBox1.SelectedIndex)
     End Sub
