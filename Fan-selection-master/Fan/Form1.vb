@@ -12,19 +12,24 @@ Public Structure Tmodel
     '0-Diameter,1-Toerental,2-Dichtheid,3-Zuigmond diameter,4-Persmond lengte,5-Breedte huis,6-Lengte spiraal,7-a,8-b,9-c,10-d,11-e,
     '12-Schoeplengte,13-Aantal schoepen,14-Breedte inwendig,15-Breedte uitwendig,16-Keeldiameter,17-Inw. dia. schoepen,18-Intrede hoek,19-Uittrede hoek......
     Public Tdata() As Double
-    Public Teff() As Double             'Rendement [%]
-    Public Tverm() As Double            'Vermogen[kW]
-    Public TPstat() As Double           'Statische druk
-    Public TPdyn() As Double            'Dynamische druk
-    Public TPtot() As Double            'Totale druk
-    Public TFlow() As Double            'Debiet[m3/s]
-    Public werkp_opT() As Double        'rendement, P_totaal [Pa],P_statisch [Pa], as_vermogen [kW], debiet[m3/sec]
-    Public Geljon() As Double           'A,B,C,E,F,G,q0_min,q0_max
-    Public TFlow_scaled() As Double     'Debiet[m3/s]
-    Public TPstat_scaled() As Double    'Statische druk
-    Public TPtot_scaled() As Double     'Totale druk
-    Public Teff_scaled() As Double      'Rendement [%]
-    Public Tverm_scaled() As Double     'Vermogen[kW]
+    Public Teff() As Double                 'Rendement [%]
+    Public Tverm() As Double                'Vermogen[kW]
+    Public TPstat() As Double               'Statische druk
+    Public TPdyn() As Double                'Dynamische druk
+    Public TPtot() As Double                'Totale druk
+    Public TFlow() As Double                'Debiet[m3/s]
+    Public werkp_opT() As Double            'rendement, P_totaal [Pa],P_statisch [Pa], as_vermogen [kW], debiet[m3/sec]
+    Public Geljon() As Double               'A,B,C,E,F,G,q0_min,q0_max
+    Public TFlow_scaled() As Double         'Debiet[m3/s]   (scale rules are applied)
+    Public TPstat_scaled() As Double        'Statische druk (scale rules are applied)
+    Public TPtot_scaled() As Double         'Totale druk    (scale rules are applied)
+    Public Teff_scaled() As Double          'Rendement [%]  (scale rules are applied)
+    Public Tverm_scaled() As Double         'Vermogen[kW]   (scale rules are applied)
+    Public TFlow_scaled_poly() As Double    'Debiet[m3/s]   (scale rules are applied + polynoom regressie)
+    Public TPstat_scaled_poly() As Double   'Statische druk (scale rules are applied + polynoom regressie)
+    Public TPtot_scaled_poly() As Double    'Totale druk    (scale rules are applied + polynoom regressie)
+    Public Teff_scaled_poly() As Double     'Rendement [%]  (scale rules are applied + polynoom regressie)
+    Public Tverm_scaled_poly() As Double    'Vermogen[kW]   (scale rules are applied + polynoom regressie)
 End Structure
 
 'Compressor stages
@@ -70,10 +75,18 @@ Public Structure Stage
     Public delta_ps As Double   'Drukverhoging waaier [Pa] static
 End Structure
 
+Public Structure PPOINT         'Polynomial regression
+    Public x As Double
+    Public y As Double
+End Structure
+
 Public Class Form1
     Public Tschets(31) As Tmodel            'was 31
     Public cp_air As Double = 1.005         'Specific heat air
     Public cond(10) As Stage                'Process conditions
+    Public PZ(10) As PPOINT                  'Raw data, Polynomial regression
+    Public BZ(,) As Double                   'Poly Coefficients, Polynomial regression
+
 
     '----- "Oude benaming;Norm:;EN10027-1;Werkstof;[mm/m1/100°C];Poisson ;kg/m3;E [Gpa];Rm (20c);Rp0.2(0c);Rp0.2(20c);Rp(50c);Rp(100c);Rp(150c);Rp(200c);Rp(250c);Rp(300c);Rp(350c);Rp(400c);Equiv-ASTM;Opmerking",
     Public Shared steel() As String =
@@ -426,20 +439,25 @@ Public Class Form1
                     G_density_act_zuig = calc_sg_air(P_zuig_Pa, G_air_temp, Rel_humidity, Gas_mol_weight)       'Actual conditions zuig
                     G_density_N_zuig = calc_sg_air(101325, 0, Rel_humidity, Gas_mol_weight)                     'Normal conditions zuig
                     NumericUpDown12.Text = Round(G_density_act_zuig, 3).ToString                                'Density zuig
-                    NumericUpDown12.BackColor = Color.White
-                    NumericUpDown5.Visible = True          'Relative humidity
-                    NumericUpDown7.Visible = True          'Site hoogte
-                    Label95.Visible = True                 'Site hoogte
-                    GroupBox16.Visible = True              'Molair weight
+                    NumericUpDown12.BackColor = Color.White         'Density invullen
+                    NumericUpDown1.BackColor = Color.Yellow         'Whole system under pressure
+                    NumericUpDown6.BackColor = Color.Yellow         'dp inlet ascessories
+                    NumericUpDown5.Visible = True                   'Relative humidity
+                    NumericUpDown7.Visible = True                   'Site hoogte
+                    Label95.Visible = True                          'Site hoogte
+                    GroupBox16.Visible = True                       'Molair weight
                 Else
-                    NumericUpDown12.Enabled = True          'Density invullen
+                    NumericUpDown12.Enabled = True                  'Density invullen
                     G_density_act_zuig = NumericUpDown12.Value
                     G_density_N_zuig = calc_sg_air(101325, 0, Rel_humidity, Gas_mol_weight)                     'Normal conditions zuig
-                    NumericUpDown12.BackColor = Color.Yellow
-                    NumericUpDown5.Visible = False          'Relative humidity  
-                    NumericUpDown7.Visible = False          'Site hoogte
-                    Label95.Visible = False                 'Site hoogte
-                    GroupBox16.Visible = False              'Molair weight
+                    NumericUpDown1.BackColor = DefaultBackColor    'Whole system under pressure
+                    NumericUpDown6.BackColor = DefaultBackColor    'dp inlet ascessories
+
+                    NumericUpDown12.BackColor = Color.Yellow        'Density invullen
+                    NumericUpDown5.Visible = False                  'Relative humidity  
+                    NumericUpDown7.Visible = False                  'Site hoogte
+                    Label95.Visible = False                         'Site hoogte
+                    GroupBox16.Visible = False                      'Molair weight
                 End If
 
 
@@ -889,6 +907,11 @@ Public Class Form1
         Tschets(0).TPtot_scaled = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}        'Totale druk
         Tschets(0).Tverm_scaled = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}        'Rendement[%]
         Tschets(0).Teff_scaled = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}         'Vermogen[kW]
+        Tschets(0).TFlow_scaled_poly = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}        '[Am3/s]
+        Tschets(0).TPstat_scaled_poly = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}       'Statische druk
+        Tschets(0).TPtot_scaled_poly = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}        'Totale druk
+        Tschets(0).Tverm_scaled_poly = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}        'Rendement[%]
+        Tschets(0).Teff_scaled_poly = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}         'Vermogen[kW]
 
         Tschets(1).Tname = "T1A"
         Tschets(1).Tdata = {1000, 1480, 1.205, 605.4, 832.4, 373.0, 6075.7, 702.7, 881.1, 1063.8, 878.9, 1295.1, 364.3, 12, 133.0, 133.0, 524.3, 605.4, 30, 30}
@@ -899,26 +922,16 @@ Public Class Form1
         Tschets(1).TFlow = {0.00, 3.83, 4.47, 4.82, 5.21, 5.59, 6.05, 6.48, 6.92, 7.33, 7.79, 8.17}
         Tschets(1).werkp_opT = {83.5, 250, 0, 19.95, 5.0}
         Tschets(1).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
-        Tschets(1).TFlow_scaled = Tschets(0).TFlow_scaled        '[Am3/s]
-        Tschets(1).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk [Pa]
-        Tschets(1).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk [Pa]
-        Tschets(1).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(1).Teff_scaled = Tschets(0).Teff_scaled          'Vermogen[kW]
 
         Tschets(2).Tname = "T1B"
         Tschets(2).Tdata = {1000, 1480, 1.205, 679.0, 814.8, 370.4, 5679.0, 685.2, 850.6, 1043.2, 861.7, 1269.1, 416.0, 12, 129.6, 129.6, 596.3, 30, 30, 0}
-        Tschets(2).Teff = {0.00, 30.6, 47.0, 59.5, 69.0, 77.0, 81.0, 80.5, 77.0, 69.0, 55.0, 0}
-        Tschets(2).Tverm = {7.0, 10.3, 13.6, 16.8, 19.5, 21.6, 23.1, 23.8, 23.5, 22.3, 20.5, 0}
-        Tschets(2).TPstat = {3179.6, 3296.0, 3392.6, 3455.4, 3460.0, 3334.4, 3041.7, 2580.4, 1999.7, 1156.9, 567.0, 0}
-        Tschets(2).TPtot = {3179.6, 3302.2, 3417.1, 3509.0, 3555.0, 3486.1, 3256.2, 2873.1, 2382.8, 1792.8, 1164.6, 0}
-        Tschets(2).TFlow = {0.00, 0.95, 1.9, 2.85, 3.8, 4.75, 5.7, 6.65, 7.6, 8.55, 9.5, 0}
+        Tschets(2).Teff = {0.00, 15, 30.6, 47.0, 59.5, 69.0, 77.0, 81.0, 80.5, 77.0, 69.0, 55.0}
+        Tschets(2).Tverm = {7.0, 9, 10.3, 13.6, 16.8, 19.5, 21.6, 23.1, 23.8, 23.5, 22.3, 20.5}
+        Tschets(2).TPstat = {3179.6, 3240, 3296.0, 3392.6, 3455.4, 3460.0, 3334.4, 3041.7, 2580.4, 1999.7, 1156.9, 567.0}
+        Tschets(2).TPtot = {3179.6, 3250, 3302.2, 3417.1, 3509.0, 3555.0, 3486.1, 3256.2, 2873.1, 2382.8, 1792.8, 1164.6}
+        Tschets(2).TFlow = {0.00, 0.6, 0.95, 1.9, 2.85, 3.8, 4.75, 5.7, 6.65, 7.6, 8.55, 9.5}
         Tschets(2).werkp_opT = {99, 99, 9, 9, 9}
         Tschets(2).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
-        Tschets(2).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(2).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(2).TPtot_scaled = Tschets(0).TPtot_scaled       'Totale druk
-        Tschets(2).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(2).Teff_scaled = Tschets(0).Teff_scaled         'Vermogen[kW]
 
         Tschets(3).Tname = "T1E"
         Tschets(3).Tdata = {1000, 1480, 1.205, 617.3, 814.8, 370.4, 5679.0, 685.2, 866.7, 1045.7, 859.3, 1044.4, 385.2, 12, 129.6, 129.6, 512.3, 592.6, 30, 30}
@@ -929,11 +942,6 @@ Public Class Form1
         Tschets(3).TFlow = {0.00, 2.85, 3.8, 4.28, 4.75, 5.25, 5.7, 6.25, 6.65, 7.6, 8.55, 9.5}
         Tschets(3).werkp_opT = {78.5, 297, 0, 31.6, 6.25}
         Tschets(3).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
-        Tschets(3).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(3).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(3).TPtot_scaled = Tschets(0).TPtot_scaled       'Totale druk
-        Tschets(3).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(3).Teff_scaled = Tschets(0).Teff_scaled         'Vermogen[kW]
 
         Tschets(4).Tname = "T12A+"
         Tschets(4).Tdata = {1000, 1480, 1.205, 897.2, 978.8, 489.4, 6107.7, 685.2, 913.5, 1151.7, 901.3, 1390.7, 243.1, 12, 187.6, 187.6, 758.6, 783.0, 21, 30}
@@ -944,11 +952,7 @@ Public Class Form1
         Tschets(4).TFlow = {0.00, 6.58, 8.33, 8.9, 9.52, 10.13, 10.75, 11.4, 12.06, 12.72, 13.38, 14.35}
         Tschets(4).werkp_opT = {83.0, 82, 0, 3.3, 2.5}
         Tschets(4).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
-        Tschets(4).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(4).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(4).TPtot_scaled = Tschets(0).TPtot_scaled       'Totale druk
-        Tschets(4).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(4).Teff_scaled = Tschets(0).Teff_scaled         'Vermogen[kW]
+
 
         Tschets(5).Tname = "T16B+"
         Tschets(5).Tdata = {1000, 1480, 1.205, 291.3, 359.2, 184.5, 4708.7, 689.3, 666.0, 728.2, 631.6, 811.2, 469.4, 10, 32.5, 14.6, 240.8, 289.3, 45, 40}
@@ -959,11 +963,6 @@ Public Class Form1
         Tschets(5).TFlow = {0.00, 0.23, 0.46, 0.52, 0.59, 0.65, 0.72, 0.8, 0.87, 0.96, 1.04, 1.34}
         Tschets(5).werkp_opT = {69.0, 1522, 0, 44.4, 1.5}
         Tschets(5).Geljon = {0.141944, 6.35969, -2229.46, 0.0001695, 0.201068, -13.27, 0.00148, 0.00671}
-        Tschets(5).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(5).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(5).TPtot_scaled = Tschets(0).TPtot_scaled       'Totale druk
-        Tschets(5).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(5).Teff_scaled = Tschets(0).Teff_scaled         'Vermogen[kW]
 
         Tschets(6).Tname = "T17B+"
         Tschets(6).Tdata = {1000, 1480, 1.205, 738.3, 872.5, 402.7, 5704.7, 617.4, 735.6, 974.5, 837.6, 1273.8, 351.7, 12, 134.2, 134.2, 624.2, 644.3, 27, 30}
@@ -974,11 +973,6 @@ Public Class Form1
         Tschets(6).TFlow = {0.00, 4.64, 5.86, 6.21, 6.57, 6.94, 7.33, 7.67, 8.14, 8.6, 9.04, 10.02}
         Tschets(6).werkp_opT = {83.0, 138, 0, 7.4, 3.0}
         Tschets(6).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
-        Tschets(6).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(6).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(6).TPtot_scaled = Tschets(0).TPtot_scaled       'Totale druk
-        Tschets(6).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(6).Teff_scaled = Tschets(0).Teff_scaled         'Vermogen[kW]
 
         Tschets(7).Tname = "T20B"
         Tschets(7).Tdata = {1000, 1480, 1.205, 472.4, 570.1, 275.6, 5275.6, 708.7, 749.6, 859.1, 733.9, 1018.9, 433.1, 10, 126.8, 71.7, 389.0, 442.5, 29, 40}
@@ -989,11 +983,6 @@ Public Class Form1
         Tschets(7).TFlow = {0.00, 1.68, 1.97, 2.25, 2.54, 2.84, 3.16, 3.47, 3.79, 4.1, 4.44, 4.73}
         Tschets(7).werkp_opT = {80, 628, 0, 16.8, 1.6}
         Tschets(7).Geljon = {0.15345, 1.44388, -116.84, 0.00019665, 0.22452, -3.1435, 0.01084, 0.028648}
-        Tschets(7).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(7).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(7).TPtot_scaled = Tschets(0).TPtot_scaled       'Totale druk
-        Tschets(7).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(7).Teff_scaled = Tschets(0).Teff_scaled         'Vermogen[kW]
 
         Tschets(8).Tname = "T21E"
         Tschets(8).Tdata = {1000, 1480, 1.205, 755.6, 673.3, 500.0, 5044.4, 622.2, 706.7, 844.4, 736.9, 1073.6, 242.2, 8, 160.0, 124.4, 626.7, 640.0, 35, 59}
@@ -1004,11 +993,6 @@ Public Class Form1
         Tschets(8).TFlow = {0.00, 2.77, 4.43, 5.21, 6.04, 6.87, 7.76, 8.54, 9.31, 9.92, 10.53, 11.09}
         Tschets(8).werkp_opT = {73.5, 232, 0, 5.9, 1.4}
         Tschets(8).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
-        Tschets(8).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(8).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(8).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk
-        Tschets(8).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(8).Teff_scaled = Tschets(0).Teff_scaled          'Vermogen[kW]
 
         Tschets(9).Tname = "T21F"
         Tschets(9).Tdata = {1000, 1480, 1.205, 755.6, 673.3, 500.0, 5044.4, 622.2, 706.7, 844.4, 736.9, 1073.6, 242.2, 16, 160.0, 124.4, 626.7, 640.0, 35, 59}
@@ -1019,11 +1003,11 @@ Public Class Form1
         Tschets(9).TFlow = {0.00, 4.99, 5.54, 6.1, 6.71, 7.32, 8.04, 8.81, 9.59, 10.37, 11.09, 12.09}
         Tschets(9).werkp_opT = {75.2, 286, 0, 7.1, 1.4}
         Tschets(9).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
-        Tschets(9).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(9).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(9).TPtot_scaled = Tschets(0).TPtot_scaled       'Totale druk
-        Tschets(9).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(9).Teff_scaled = Tschets(0).Teff_scaled         'Vermogen[kW]
+        'Tschets(9).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
+        'Tschets(9).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
+        'Tschets(9).TPtot_scaled = Tschets(0).TPtot_scaled       'Totale druk
+        'Tschets(9).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
+        'Tschets(9).Teff_scaled = Tschets(0).Teff_scaled         'Vermogen[kW]
 
         Tschets(10).Tname = "T22B"
         Tschets(10).Tdata = {1000, 1480, 1.205, 964.9, 905.3, 659.6, 4666.7, 666.7, 731.6, 912.3, 649.1, 1101.8, 243.9, 24, 321.1, 271.9, 800.0, 800.0, 20, 25}
@@ -1034,11 +1018,6 @@ Public Class Form1
         Tschets(10).TFlow = {0.00, 3.79, 6.31, 7.57, 8.41, 9.67, 10.52, 12.2, 12.62, 13.88, 14.72, 15.98}
         Tschets(10).werkp_opT = {0, 0, 0, 0, 0}
         Tschets(10).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
-        Tschets(10).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(10).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(10).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk
-        Tschets(10).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(10).Teff_scaled = Tschets(0).Teff_scaled          'Vermogen[kW]
 
         Tschets(11).Tname = "T22C"
         Tschets(11).Tdata = {1000, 1480, 1.205, 964.9, 905.3, 659.6, 4666.7, 666.7, 731.6, 912.3, 649.1, 1101.8, 243.9, 12, 321.1, 271.9, 800.0, 800.0, 20, 25}
@@ -1049,11 +1028,6 @@ Public Class Form1
         Tschets(11).TFlow = {0.00, 4.21, 6.31, 8.41, 9.46, 10.52, 11.57, 12.62, 13.67, 14.72, 15.98, 17.67}
         Tschets(11).werkp_opT = {0, 0, 0, 0, 0}
         Tschets(11).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
-        Tschets(11).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(11).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(11).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk
-        Tschets(11).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(11).Teff_scaled = Tschets(0).Teff_scaled          'Vermogen[kW]
 
         Tschets(12).Tname = "T25B"
         Tschets(12).Tdata = {758, 1465, 1.205, 584.0, 650.0, 345.0, 4766.0, 600.0, 665.6, 804.2, 665.0, 990.0, 220.0, 12, 194.0, 122.0, 430.0, 460.0, 30, 31}
@@ -1064,11 +1038,6 @@ Public Class Form1
         Tschets(12).TFlow = {0.00, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.4}
         Tschets(12).werkp_opT = {0, 0, 0, 0, 0}
         Tschets(12).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
-        Tschets(12).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(12).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(12).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk
-        Tschets(12).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(12).Teff_scaled = Tschets(0).Teff_scaled          'Vermogen[kW]
 
         Tschets(13).Tname = "T26"
         Tschets(13).Tdata = {1000, 1480, 1.205, 349.9, 438.1, 213.4, 5689.9, 625.9, 694.2, 768.1, 666.4, 885.5, 470.8, 10, 60.7, 28.9, 290.2, 331.4, 40, 40}
@@ -1079,11 +1048,6 @@ Public Class Form1
         Tschets(13).TFlow = {0.00, 0.39, 0.76, 0.92, 1.09, 1.27, 1.45, 1.65, 1.86, 2.06, 2.27, 2.62}
         Tschets(13).werkp_opT = {77.5, 179, 0, 1.5, 0.5}
         Tschets(13).Geljon = {0.14663, 1.5415, -408.8, 0.00032837, 0.1665, -4.3091, 0.002516, 0.016904}
-        Tschets(13).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(13).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(13).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk
-        Tschets(13).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(13).Teff_scaled = Tschets(0).Teff_scaled          'Vermogen[kW]
 
         Tschets(14).Tname = "T27"
         Tschets(14).Tdata = {1000, 1480, 1.205, 285.7, 347.8, 183.9, 4596.3, 677.0, 648.9, 701.9, 618.6, 792.5, 414.3, 16, 54.7, 23.6, 288.2, 511.8, 44, 60}
@@ -1094,11 +1058,6 @@ Public Class Form1
         Tschets(14).TFlow = {0.00, 0.7, 0.8, 0.85, 0.91, 0.98, 1.05, 1.11, 1.17, 1.23, 1.28, 1.6}
         Tschets(14).werkp_opT = {74.0, 1043, 0, 18.7, 1.0}
         Tschets(14).Geljon = {0.16763, 0.12793, -479.67, -0.000030339, 0.27083, -9.9922, 0.0045166, 0.010324}
-        Tschets(14).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(14).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(14).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk
-        Tschets(14).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(14).Teff_scaled = Tschets(0).Teff_scaled          'Vermogen[kW]
 
         Tschets(15).Tname = "T28"
         Tschets(15).Tdata = {1000, 1480, 1.205, 477.3, 477.3, 378.8, 4742.4, 643.9, 706.1, 792.4, 643.9, 882.6, 421.2, 8, 234.8, 151.5, 643.9, 369.7, 0, 0}
@@ -1109,11 +1068,6 @@ Public Class Form1
         Tschets(15).TFlow = {0.00, 1.93, 3.16, 3.58, 4.04, 4.5, 4.92, 5.34, 5.8, 6.22, 6.68, 7.38}
         Tschets(15).werkp_opT = {65.0, 186, 0, 5.3, 1.4}
         Tschets(15).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
-        Tschets(15).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(15).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(15).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk
-        Tschets(15).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(15).Teff_scaled = Tschets(0).Teff_scaled          'Vermogen[kW]
 
         Tschets(16).Tname = "T31A"
         Tschets(16).Tdata = {1000, 1480, 1.205, 770.4, 857.5, 422.2, 6229.6, 791.6, 878.6, 1060.7, 877.3, 1306.1, 403.0, 8, 197.9, 102.9, 567.3, 606.9, 20, 30}
@@ -1124,11 +1078,6 @@ Public Class Form1
         Tschets(16).TFlow = {0.00, 2.09, 2.78, 3.48, 4.18, 4.87, 5.57, 6.26, 6.96, 7.65, 8.35, 9.05}
         Tschets(16).werkp_opT = {0, 0, 0, 0, 0}
         Tschets(16).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
-        Tschets(16).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(16).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(16).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk
-        Tschets(16).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(16).Teff_scaled = Tschets(0).Teff_scaled          'Vermogen[kW]
 
         Tschets(17).Tname = "T31B"
         Tschets(17).Tdata = {1000, 1480, 1.205, 770.4, 857.5, 422.2, 6229.6, 791.6, 878.6, 1060.7, 877.3, 1306.1, 403.0, 8, 213.7, 118.7, 567.3, 606.9, 20, 30}
@@ -1139,11 +1088,6 @@ Public Class Form1
         Tschets(17).TFlow = {0.00, 2.55, 3.25, 3.94, 4.64, 5.34, 6.03, 6.73, 7.42, 8.12, 8.81, 9.51}
         Tschets(17).werkp_opT = {87.7, 161, 0, 7.3, 3.0}
         Tschets(17).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
-        Tschets(17).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(17).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(17).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk
-        Tschets(17).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(17).Teff_scaled = Tschets(0).Teff_scaled          'Vermogen[kW]
 
         Tschets(18).Tname = "T31C+"
         Tschets(18).Tdata = {1000, 1480, 1.205, 770.4, 857.5, 455.1, 6229.6, 791.6, 878.6, 1060.7, 877.3, 1306.1, 403.0, 8, 246.7, 151.7, 567.3, 606.9, 20, 30}
@@ -1154,11 +1098,6 @@ Public Class Form1
         Tschets(18).TFlow = {0.00, 3.25, 3.94, 4.64, 5.34, 6.03, 6.73, 7.42, 8.12, 8.81, 9.51, 10.21}
         Tschets(18).werkp_opT = {0, 0, 0, 0, 0}
         Tschets(18).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
-        Tschets(18).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(18).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(18).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk
-        Tschets(18).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(18).Teff_scaled = Tschets(0).Teff_scaled          'Vermogen[kW]
 
         Tschets(19).Tname = "T31D"
         Tschets(19).Tdata = {1000, 1480, 1.205, 770.4, 857.5, 521.1, 6229.6, 791.6, 878.6, 1060.7, 877.3, 1306.1, 403.0, 8, 278.4, 183.4, 567.3, 606.9, 20, 30}
@@ -1169,11 +1108,6 @@ Public Class Form1
         Tschets(19).TFlow = {0.00, 2.32, 3.25, 4.18, 5.1, 6.03, 6.96, 7.89, 8.81, 9.74, 10.67, 11.6}
         Tschets(19).werkp_opT = {0, 0, 0, 0, 0}
         Tschets(19).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
-        Tschets(19).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(19).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(19).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk
-        Tschets(19).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(19).Teff_scaled = Tschets(0).Teff_scaled          'Vermogen[kW]
 
         Tschets(20).Tname = "T31E"
         Tschets(20).Tdata = {1000, 1480, 1.205, 770.4, 857.5, 521.1, 6229.6, 791.6, 878.6, 1060.7, 877.3, 1306.1, 403.0, 8, 310.0, 215.0, 567.3, 606.9, 20, 30}
@@ -1184,11 +1118,6 @@ Public Class Form1
         Tschets(20).TFlow = {0.00, 3.02, 3.94, 4.87, 5.8, 6.73, 7.65, 8.58, 9.51, 10.44, 11.37, 12.29}
         Tschets(20).werkp_opT = {0, 0, 0, 0, 0}
         Tschets(20).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
-        Tschets(20).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(20).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(20).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk
-        Tschets(20).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(20).Teff_scaled = Tschets(0).Teff_scaled          'Vermogen[kW]
 
         Tschets(21).Tname = "T33B"
         Tschets(21).Tdata = {1000, 1480, 1.205, 1013.2, 857.5, 637.2, 6229.6, 791.6, 877.3, 1060.7, 877.3, 1306.1, 411.6, 8, 314.0, 233.5, 659.6, 688.7, 10, 30}
@@ -1199,11 +1128,6 @@ Public Class Form1
         Tschets(21).TFlow = {0.00, 4.64, 8.12, 8.72, 9.42, 9.97, 10.72, 11.64, 12.34, 13.18, 13.92, 15.08}
         Tschets(21).werkp_opT = {0, 0, 0, 0, 0}
         Tschets(21).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
-        Tschets(21).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(21).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(21).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk
-        Tschets(21).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(21).Teff_scaled = Tschets(0).Teff_scaled          'Vermogen[kW]
 
         Tschets(22).Tname = "T34"
         Tschets(22).Tdata = {1000, 1480, 1.205, 1013.2, 857.5, 693.9, 6229.6, 791.6, 877.3, 1060.7, 877.3, 1306.1, 411.6, 8, 370.7, 290.2, 659.6, 688.7, 10, 30}
@@ -1214,11 +1138,6 @@ Public Class Form1
         Tschets(22).TFlow = {0.00, 6.03, 9.28, 9.97, 10.72, 11.46, 12.2, 12.94, 13.64, 14.38, 15.08, 18.56}
         Tschets(22).werkp_opT = {88.5, 157, 0, 11.8, 5.0}
         Tschets(22).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
-        Tschets(22).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(22).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(22).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk
-        Tschets(22).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(22).Teff_scaled = Tschets(0).Teff_scaled          'Vermogen[kW]
 
         Tschets(23).Tname = "T35A"
         Tschets(23).Tdata = {1000, 1480, 1.205, 233.3, 333.3, 175.0, 5016.7, 792.0, 736.7, 760.0, 650.0, 816.7, 433.3, 8, 108.3, 33.3, 375.0, 133.3, 0, 0}
@@ -1229,11 +1148,6 @@ Public Class Form1
         Tschets(23).TFlow = {0.00, 0.42, 0.82, 0.94, 1.08, 1.2, 1.34, 1.48, 1.64, 1.78, 1.96, 2.57}
         Tschets(23).werkp_opT = {0, 0, 0, 0, 0}
         Tschets(23).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
-        Tschets(23).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(23).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(23).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk
-        Tschets(23).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(23).Teff_scaled = Tschets(0).Teff_scaled          'Vermogen[kW]
 
         Tschets(24).Tname = "T35B"
         Tschets(24).Tdata = {1000, 1480, 1.205, 233.3, 333.3, 175.0, 5016.7, 792.0, 736.7, 760.0, 650.0, 816.7, 433.3, 8, 108.3, 50.0, 375.0, 133.3, 0, 0}
@@ -1244,11 +1158,6 @@ Public Class Form1
         Tschets(24).TFlow = {0.00, 0.47, 0.7, 0.89, 1.1, 1.31, 1.52, 1.94, 2.24, 2.57, 2.92, 3.04}
         Tschets(24).werkp_opT = {0, 0, 0, 0, 0}
         Tschets(24).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
-        Tschets(24).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(24).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(24).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk
-        Tschets(24).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(24).Teff_scaled = Tschets(0).Teff_scaled          'Vermogen[kW]
 
         Tschets(25).Tname = "T35D"  'CHECH TORERENTAL
         Tschets(25).Tdata = {1000, 1480, 1.205, 303.3, 333.3, 175.0, 5016.7, 1208.3, 736.7, 760.0, 650.0, 816.7, 433.3, 8, 108.3, 50.0, 375.0, 133.3, 0, 0}
@@ -1259,11 +1168,6 @@ Public Class Form1
         Tschets(25).TFlow = {0.00, 0.47, 0.94, 1.08, 1.26, 1.43, 1.64, 1.89, 2.15, 2.43, 2.69, 3.27}
         Tschets(25).werkp_opT = {53.0, 600, 0, 10.5, 0.7}
         Tschets(25).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
-        Tschets(25).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(25).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(25).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk
-        Tschets(25).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(25).Teff_scaled = Tschets(0).Teff_scaled          'Vermogen[kW]
 
         Tschets(26).Tname = "T36"
         Tschets(26).Tdata = {1000, 1480, 1.205, 523.7, 572.4, 328.9, 5657.9, 710.5, 750.0, 859.2, 733.6, 1019.7, 425.0, 10, 156.6, 62.5, 442.1, 464.5, 29, 40}
@@ -1274,11 +1178,6 @@ Public Class Form1
         Tschets(26).TFlow = {0.00, 1.61, 2.3, 2.65, 3.01, 3.38, 3.75, 4.19, 4.63, 5.06, 5.52, 5.9}
         Tschets(26).werkp_opT = {87.9, 221, 0, 5.1, 1.5}
         Tschets(26).Geljon = {0.14499, 1.2327, -79.528, 0.00060039, 0.16925, -1.9817, 0.01039, 0.03562}
-        Tschets(26).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(26).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(26).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk
-        Tschets(26).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(26).Teff_scaled = Tschets(0).Teff_scaled          'Vermogen[kW]
 
         Tschets(27).Tname = "T36A+"
         Tschets(27).Tdata = {1000, 1480, 1.205, 523.7, 572.4, 328.9, 5657.9, 710.5, 750.0, 859.2, 733.6, 1019.7, 425.0, 10, 133.6, 62.5, 442.1, 464.5, 29, 40}
@@ -1289,11 +1188,6 @@ Public Class Form1
         Tschets(27).TFlow = {0.00, 1.5, 2.3, 2.55, 2.83, 3.08, 3.34, 3.77, 4.21, 4.67, 5.06, 5.75}
         Tschets(27).werkp_opT = {0, 0, 0, 0, 0}
         Tschets(27).Geljon = {0.14412, 1.3974, -98.38, 0.00040028, 0.19121, -2.6461, 0.009678, 0.032648}
-        Tschets(27).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(27).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(27).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk
-        Tschets(27).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(27).Teff_scaled = Tschets(0).Teff_scaled          'Vermogen[kW]
 
         Tschets(28).Tname = "GALAK"
         Tschets(28).Tdata = {1200, 1465, 1.2, 500, 665, 300, 5500, 820, 886, 1018, 875, 1208, 408, 16, 120.0, 60.0, 455, 500, 38.4, 71.0}
@@ -1303,11 +1197,6 @@ Public Class Form1
         Tschets(28).TPtot = {5258.2, 5670.2, 6043.0, 6317.6, 6415.7, 6327.5, 6209.7, 6043.0, 5827.1, 5562.3, 5268.0, 4905.0}
         Tschets(28).TFlow = {0.00, 1.0, 2.0, 3.0, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5}
         Tschets(28).werkp_opT = {0, 0, 0, 0, 0}
-        Tschets(28).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(28).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(28).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk
-        Tschets(28).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(28).Teff_scaled = Tschets(0).Teff_scaled          'Vermogen[kW]
 
         Tschets(29).Tname = "GW"
         Tschets(29).Tdata = {1000, 1480, 1.205, 127.8, 156.7, 82.5, 4117.5, 618.6, 573.2, 573.2, 536.1, 614.4, 416.5, 12, 20.6, 8.2, 127.8, 167.0, 65, 90}
@@ -1318,11 +1207,6 @@ Public Class Form1
         Tschets(29).TFlow = {0.00, 0.05, 0.1, 0.13, 0.15, 0.18, 0.2, 0.23, 0.25, 0.28, 0.3, 0.33}
         Tschets(29).werkp_opT = {0, 0, 0, 0, 0}
         Tschets(29).Geljon = {0.1327, 32.1, -31159.0, 0.0001441, 0.26841, -23.368, 0.0004895, 0.001958}
-        Tschets(29).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(29).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(29).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk
-        Tschets(29).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(29).Teff_scaled = Tschets(0).Teff_scaled          'Vermogen[kW]
 
         Tschets(30).Tname = "GWA"
         Tschets(30).Tdata = {1000, 1480, 1.205, 127.8, 156.7, 82.5, 4117.5, 618.6, 1191.8, 573.2, 536.1, 577.3, 492.1, 12, 20.6, 8.2, 127.8, 167.0, 90, 50}
@@ -1333,11 +1217,19 @@ Public Class Form1
         Tschets(30).TFlow = {0.00, 0.05, 0.08, 0.1, 0.13, 0.15, 0.18, 0.2, 0.23, 0.25, 0.28, 0.3}
         Tschets(30).werkp_opT = {0, 0, 0, 0, 0}
         Tschets(30).Geljon = {0.13513, 25.537, -28003.0, 0.0000681, 0.21049, -33.199, 0.000566, 0.001838}
-        Tschets(30).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        Tschets(30).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        Tschets(30).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk
-        Tschets(30).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        Tschets(30).Teff_scaled = Tschets(0).Teff_scaled          'Vermogen[kW]
+
+        For j = 1 To 30
+            Tschets(j).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
+            Tschets(j).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
+            Tschets(j).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk
+            Tschets(j).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
+            Tschets(j).Teff_scaled = Tschets(0).Teff_scaled          'Vermogen[kW]
+            Tschets(j).TFlow_scaled_poly = Tschets(0).TFlow_scaled        '[m3/s]
+            Tschets(j).TPstat_scaled_poly = Tschets(0).TPstat_scaled      'Statische druk
+            Tschets(j).TPtot_scaled_poly = Tschets(0).TPtot_scaled        'Totale druk
+            Tschets(j).Tverm_scaled_poly = Tschets(0).Tverm_scaled        'Rendement[%]
+            Tschets(j).Teff_scaled_poly = Tschets(0).Teff_scaled          'Vermogen[kW]
+        Next
 
     End Sub
 
@@ -1367,18 +1259,12 @@ Public Class Form1
                 Chart1.Series(1).ChartArea = "ChartArea0"
                 Chart1.Series(2).ChartArea = "ChartArea0"
 
-                If CheckBox1.Checked = False Then
-                    Chart1.Series(0).ChartType = DataVisualization.Charting.SeriesChartType.Line
+                Chart1.Series(0).ChartType = DataVisualization.Charting.SeriesChartType.Line
                     Chart1.Series(1).ChartType = DataVisualization.Charting.SeriesChartType.Line
                     Chart1.Series(2).ChartType = DataVisualization.Charting.SeriesChartType.Line
                     Chart1.Series(3).ChartType = DataVisualization.Charting.SeriesChartType.Line
-                Else
-                    Chart1.Series(0).ChartType = DataVisualization.Charting.SeriesChartType.FastLine
-                    Chart1.Series(1).ChartType = DataVisualization.Charting.SeriesChartType.FastLine
-                    Chart1.Series(2).ChartType = DataVisualization.Charting.SeriesChartType.FastLine
-                    Chart1.Series(3).ChartType = DataVisualization.Charting.SeriesChartType.FastLine
-                End If
-                Chart1.Series(4).ChartType = DataVisualization.Charting.SeriesChartType.Line
+
+                    Chart1.Series(4).ChartType = DataVisualization.Charting.SeriesChartType.Line
                 Chart1.Series(5).ChartType = DataVisualization.Charting.SeriesChartType.Line
 
                 Chart1.Titles.Add(Tschets(Tschets_no).Tname)
@@ -1415,7 +1301,7 @@ Public Class Form1
                 Chart1.ChartAreas("ChartArea0").AxisY.MinorTickMark.Enabled = True
                 Chart1.ChartAreas("ChartArea0").AxisY2.MinorTickMark.Enabled = True
 
-                '---------------- fan target ---------------------
+                '---------------- fan target info---------------------
                 TextBox149.Text = Round(G_Debiet_z_act_hr, 0).ToString  'Debiet [Am3/hr]
                 TextBox148.Text = NumericUpDown2.Value.ToString         'Ptotal [mbar]
                 TextBox156.Text = NumericUpDown12.Value.ToString        'Density [kg/m3]
@@ -1425,55 +1311,69 @@ Public Class Form1
                 Chart1.ChartAreas("ChartArea0").AxisY2.Enabled = AxisEnabled.True
                 Chart1.ChartAreas("ChartArea0").AxisY2.Title = "Rendement [%] As-vermogen [kW]"
 
+                Chart1.Series(5).YAxisType = AxisType.Primary
+                Chart1.Series(0).YAxisType = AxisType.Primary
+                Chart1.Series(1).YAxisType = AxisType.Secondary
+                Chart1.Series(2).YAxisType = AxisType.Secondary
+
+
                 '------------------ Grafiek tekst en target ---------------------
-                If CheckBox2.Checked = False Then   '========Per uur=========
-                    Chart1.ChartAreas("ChartArea0").AxisX.Title = "Debiet [Am3/hr]"
-                    Q_target = G_Debiet_z_act_hr                                            '[Am3/hr]
-                    P_target = NumericUpDown2.Value                                         '[mBar] Gewenste fan  gegevens
-                Else                                '========Per seconde=========
-                    Chart1.ChartAreas("ChartArea0").AxisX.Title = "Debiet [Am3/sec]"
-                    Q_target = G_Debiet_z_act_hr / 3600                                     '[Am3/sec]
-                    P_target = NumericUpDown2.Value                                         '[mBar] Gewenste fan  gegevens
-                End If
+                'If CheckBox2.Checked = False Then   '========Per uur=========
+                '    Chart1.ChartAreas("ChartArea0").AxisX.Title = "Debiet [Am3/hr]"
+                '    Q_target = G_Debiet_z_act_hr                                            '[Am3/hr]
+                '    P_target = NumericUpDown2.Value                                         '[mBar] Gewenste fan  gegevens
+                'Else                                '========Per seconde=========
+                '    Chart1.ChartAreas("ChartArea0").AxisX.Title = "Debiet [Am3/sec]"
+                '    Q_target = G_Debiet_z_act_hr / 3600                                     '[Am3/sec]
+                '    P_target = NumericUpDown2.Value                                         '[mBar] Gewenste fan  gegevens
+                'End If
 
-                '-------------------Target dot ---------------------
-                If CheckBox3.Checked = True Then
-                    Chart1.Series(3).YAxisType = AxisType.Primary
-                    Chart1.Series(3).Points.AddXY(Q_target, P_target)
-                    Chart1.Series(3).Points(0).MarkerStyle = DataVisualization.Charting.MarkerStyle.Star10
-                    Chart1.Series(3).Points(0).MarkerSize = 20
-                End If
 
-                '-------------------'P_totaal lijn --------------------
-                For hh = 0 To 11   'Fill line chart
-                    If Tschets(Tschets_no).TPtot(hh) > 0 Then           'Rest of the array is empty
-                        '------------------ Weerstand lijn ---------------------
-                        If CheckBox2.Checked = False Then   '========Per uur=========
-                            debiet = Round(Tschets(Tschets_no).TFlow_scaled(hh) * 3600, 0)
-                            Weerstand_coefficient = P_target * 2 / (NumericUpDown12.Value * Q_target ^ 2)
-                        Else                                '========Per seconde=========
-                            debiet = Tschets(Tschets_no).TFlow_scaled(hh)
-                            Weerstand_coefficient = P_target * 2 / (NumericUpDown12.Value * Q_target ^ 2)
-                        End If
+                '------------------- Draw the lines in the chart--------------------
+                '-------------------------------------------------------------------
 
-                        Chart1.Series(5).YAxisType = AxisType.Primary
+                For hh = 0 To 10   'Fill chart
+                    '------------------ Weerstand lijn ---------------------
+
+                    'If CheckBox2.Checked = False Then       '========Per uur=========
+                    '    debiet = Round(debiet * 3600, 0)
+                    '    Weerstand_coefficient = P_target * 2 / (NumericUpDown12.Value * Q_target ^ 2)
+                    'Else
+                    '    debiet = Round(debiet, 3)           '========Per seconde=========
+                    '    Weerstand_coefficient = P_target * 2 / (NumericUpDown12.Value * Q_target ^ 2)
+                    'End If
+
+
+
+                    '---------------- add the fan lines-----------------------
+                    If CheckBox1.Checked Then
+                        debiet = Tschets(Tschets_no).TFlow_scaled_poly(hh)
+                        Chart1.Series(5).Points.AddXY(debiet, Tschets(Tschets_no).TPstat_scaled_poly(hh))
+                        Chart1.Series(0).Points.AddXY(debiet, Tschets(Tschets_no).TPtot_scaled_poly(hh))
+                        Chart1.Series(1).Points.AddXY(debiet, Tschets(Tschets_no).Teff_scaled_poly(hh))
+                        Chart1.Series(2).Points.AddXY(debiet, Tschets(Tschets_no).Tverm_scaled_poly(hh))
+                    Else
+                        debiet = Tschets(Tschets_no).TFlow_scaled(hh)
                         Chart1.Series(5).Points.AddXY(debiet, Tschets(Tschets_no).TPstat_scaled(hh))
-                        Chart1.Series(0).YAxisType = AxisType.Primary
                         Chart1.Series(0).Points.AddXY(debiet, Tschets(Tschets_no).TPtot_scaled(hh))
-
-                        Chart1.Series(1).YAxisType = AxisType.Secondary
                         Chart1.Series(1).Points.AddXY(debiet, Tschets(Tschets_no).Teff_scaled(hh))
-                        Chart1.Series(2).YAxisType = AxisType.Secondary
                         Chart1.Series(2).Points.AddXY(debiet, Tschets(Tschets_no).Tverm_scaled(hh))
+                    End If
+                    'MessageBox.Show("schets= " & Tschets_no.ToString & " debiet=" & debiet.ToString)
 
-                        'MessageBox.Show("schets= " & Tschets_no.ToString & " debiet=" & debiet.ToString)
-
-                        If CheckBox3.Checked = True Then
+                    '-------------------Target dot ---------------------
+                    If CheckBox3.Checked = True Then
+                        Chart1.Series(3).YAxisType = AxisType.Primary
+                        Chart1.Series(3).Points.AddXY(Q_target, P_target)
+                        Chart1.Series(3).Points(0).MarkerStyle = DataVisualization.Charting.MarkerStyle.Star10
+                        Chart1.Series(3).Points(0).MarkerSize = 20
+                        '---------------- add the duct resistance line-----------------------
+                        If debiet < 1.1 * Q_target Then 'To keep the chart looking nice
                             p_loss_line = 0.5 * Weerstand_coefficient * NumericUpDown12.Value * debiet ^ 2
                             Chart1.Series(4).Points.AddXY(debiet, p_loss_line)
                         End If
-
                     End If
+
                 Next hh
                 Chart1.Refresh()
             Catch ex As Exception
@@ -1722,48 +1622,103 @@ Public Class Form1
 
                         Calc_stage(cond(6))                     'Bereken de waaier #2  
                         calc_loop_loss(cond(6))                 'Bereken de omloop verliezen (niet echt nodig)
-                        ' MessageBox.Show(Tschets(ty).Teff_scaled(hh).ToString)
 
-                        Label83.Text = ""
-                        Label84.Text = ""
-                        Label85.Text = ""
 
-                        Label83.Text = "Waaier #1, Ro1= " & Round(cond(4).Ro1, 03).ToString & " [kg/m3], Ro2= " & Round(cond(4).Ro2, 3).ToString & " [kg/m3], Pt1= " & Round(cond(4).Pt1, 0).ToString & " [Pa], Pt2= " & Round(cond(4).Pt2, 0).ToString & " [Pa]"
-                        Label84.Text = "Waaier #2, Ro1= " & Round(cond(5).Ro1, 03).ToString & " [kg/m3], Ro2= " & Round(cond(5).Ro2, 3).ToString & " [kg/m3], Pt1= " & Round(cond(5).Pt1, 0).ToString & " [Pa], Pt2= " & Round(cond(5).Pt2, 0).ToString & " [Pa]"
-                        Label153.Text = "Waaier #3, Ro1= " & Round(cond(6).Ro1, 03).ToString & " [kg/m3], Ro2= " & Round(cond(6).Ro2, 3).ToString & " [kg/m3], Pt1= " & Round(cond(6).Pt1, 0).ToString & " [Pa], Pt2 =" & Round(cond(6).Pt2, 0).ToString & " [Pa]"
+                        'Label83.Text = "Waaier #1, Ro1= " & Round(cond(4).Ro1, 03).ToString & " [kg/m3], Ro2= " & Round(cond(4).Ro2, 3).ToString & " [kg/m3], Pt1= " & Round(cond(4).Pt1, 0).ToString & " [Pa], Pt2= " & Round(cond(4).Pt2, 0).ToString & " [Pa], dp_total= " & Round(cond(4).delta_pt, 0).ToString
+                        'Label84.Text = "Waaier #2, Ro1= " & Round(cond(5).Ro1, 03).ToString & " [kg/m3], Ro2= " & Round(cond(5).Ro2, 3).ToString & " [kg/m3], Pt1= " & Round(cond(5).Pt1, 0).ToString & " [Pa], Pt2= " & Round(cond(5).Pt2, 0).ToString & " [Pa], dp_total= " & Round(cond(5).delta_pt, 0).ToString
+                        'Label153.Text = "Waaier #3, Ro1= " & Round(cond(6).Ro1, 03).ToString & " [kg/m3], Ro2= " & Round(cond(6).Ro2, 3).ToString & " [kg/m3], Pt1= " & Round(cond(6).Pt1, 0).ToString & " [Pa], Pt2 =" & Round(cond(6).Pt2, 0).ToString & " [Pa], d_totalp= " & Round(cond(6).delta_pt, 0).ToString
 
                         Select Case True
                             Case RadioButton9.Checked      '1 traps
-                                Tschets(ty).TFlow_scaled(hh) = cond(4).Q1                               '[Am3/hr]
-                                Tschets(ty).TPtot_scaled(hh) = Round((cond(4).delta_pt) / 100, 2)            '[mbar] dP fan total
-                                Tschets(ty).TPstat_scaled(hh) = Round((cond(4).delta_ps) / 100, 2)           '[mbar] dP fan static
-                                Tschets(ty).Tverm_scaled(hh) = Round(cond(4).Power, 0)                  '[kW]
-                                Tschets(ty).Teff_scaled(hh) = Round((100 * cond(4).delta_pt * cond(4).Q1 / (Tschets(ty).Tverm_scaled(hh) * 1000)), 0)
+                                Tschets(ty).TFlow_scaled(hh) = cond(4).Q1                                       '[Am3/hr]
+                                Tschets(ty).TPtot_scaled(hh) = Round((cond(4).Pt2 - cond(4).Pt1) / 100, 4)      '[mbar] dP fan total
+                                Tschets(ty).TPstat_scaled(hh) = Round((cond(4).Ps2 - cond(4).Ps1) / 100, 4)     '[mbar] dP fan static
+                                Tschets(ty).Tverm_scaled(hh) = Round(cond(4).Power, 4)                          '[kW]
+                                Tschets(ty).Teff_scaled(hh) = Round((100 * cond(4).delta_pt * cond(4).Q1 / (Tschets(ty).Tverm_scaled(hh) * 1000)), 4)
 
                             Case RadioButton10.Checked      '2 traps
-                                Tschets(ty).TFlow_scaled(hh) = cond(4).Q1                               '[Am3/hr]
-                                Tschets(ty).TPtot_scaled(hh) = Round(cond(5).delta_pt / 100, 0)                          '[mbar] dP fan total
-                                Tschets(ty).TPstat_scaled(hh) = Round(cond(5).delta_ps / 100, 0)                         '[mbar] dP fan static
-                                Tschets(ty).Tverm_scaled(hh) = Round(cond(4).Power + cond(5).Power, 0)              '[kW] waaier 1+2
+                                Tschets(ty).TFlow_scaled(hh) = cond(4).Q1                                        '[Am3/hr]
+                                Tschets(ty).TPtot_scaled(hh) = Round((cond(5).Pt2 - cond(4).Pt1) / 100, 2)       '[mbar] dP fan total
+                                Tschets(ty).TPstat_scaled(hh) = Round((cond(5).Ps2 - cond(4).Ps1) / 100, 2)      '[mbar] dP fan static
+                                Tschets(ty).Tverm_scaled(hh) = Round(cond(4).Power + cond(5).Power, 0)           '[kW] waaier 1+2
                                 Tschets(ty).Teff_scaled(hh) = Round((100 * cond(5).delta_pt * cond(5).Q1 / (Tschets(ty).Tverm_scaled(hh) * 1000)), 0)
 
-                                ' MessageBox.Show(hh.ToString)
-                                ' MessageBox.Show("Cond(5).Pt1= " & cond(5).Pt1.ToString & " Q1= " & cond(5).Q1.ToString & " Cond(5).Pt2= " & cond(6).Pt2.ToString)
-
                             Case RadioButton11.Checked   '3 traps
-                                Tschets(ty).TFlow_scaled(hh) = cond(4).Q1                               '[Am3/hr]
-                                Tschets(ty).TPtot_scaled(hh) = Round(cond(6).delta_pt / 100, 0)                                  '[mbar] dP fan total
-                                Tschets(ty).TPstat_scaled(hh) = Round(cond(6).delta_ps / 100, 0)                                 '[mbar] dP fan static
-                                Tschets(ty).Tverm_scaled(hh) = Round(cond(4).Power + cond(5).Power + cond(6).Power, 0)      '[kW] waaier 1+2+3
+                                Tschets(ty).TFlow_scaled(hh) = cond(4).Q1                                           '[Am3/hr]
+                                Tschets(ty).TPtot_scaled(hh) = Round((cond(6).Pt2 - cond(4).Pt1) / 100, 2)          '[mbar] dP fan total
+                                Tschets(ty).TPstat_scaled(hh) = Round((cond(6).Ps2 - cond(4).Ps1) / 100, 2)         '[mbar] dP fan static
+                                Tschets(ty).Tverm_scaled(hh) = Round(cond(4).Power + cond(5).Power + cond(6).Power, 0)                          '[kW] waaier 1+2+3
                                 Tschets(ty).Teff_scaled(hh) = Round((100 * cond(6).delta_pt * cond(6).Q1 / (Tschets(ty).Tverm_scaled(hh) * 1000)), 0)
-
-                                'MessageBox.Show("Q1= " & Tschets(ty).TFlow_scaled(hh).ToString)
-                                'MessageBox.Show("hh= " & hh.ToString & " Q1= " & cond(6).Q1.ToString & " cond(6).Pt1=" & cond(6).Pt1.ToString & " Cond(6).Pt2= " & cond(6).Pt2.ToString)
 
                         End Select
                     End If
                 Next hh
 
+                TextBox158.Clear()
+                Dim j As Integer
+                Dim t() As PPOINT
+                Dim flow As Double
+
+                If CheckBox1.Checked Then
+                    '=============== convert to polynoom, Ptotal ====================
+                    For j = 0 To 10     'Get data
+                        PZ(j).x = Tschets(ty).TFlow_scaled(j)
+                        PZ(j).y = Tschets(ty).TPtot_scaled(j)
+                        'TextBox158.AppendText("count= " & j.ToString & " X (flow)= " & PZ(j).x.ToString & " Y (P_tot)= " & PZ(j).y.ToString & Environment.NewLine)
+                    Next
+                    t = Trend(PZ, 3)
+
+                    For j = 0 To 10     'Calculate new poly data points
+                        flow = j / 10 * Tschets(ty).TFlow_scaled(10)
+                        Tschets(ty).TFlow_scaled_poly(j) = flow
+                        Tschets(ty).TPtot_scaled_poly(j) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3    '+ BZ(4, 0) * flow ^ 4   + BZ(5, 0) * flow ^ 5
+
+                        ' TextBox158.AppendText("count polyt= " & j.ToString & " X (flow)= " & flow.ToString & " Y (P_tot)= " & Tschets(ty).TPtot_scaled_poly(j).ToString & Environment.NewLine)
+                    Next
+                    '=============== convert to polynoom, Pstatic ====================
+                    For j = 0 To 10     'Get data
+                        PZ(j).x = Tschets(ty).TFlow_scaled(j)
+                        PZ(j).y = Tschets(ty).TPstat_scaled(j)
+                        TextBox158.AppendText("count= " & j.ToString & " X (flow)= " & PZ(j).x.ToString & " Y (Pstat)= " & PZ(j).y.ToString & Environment.NewLine)
+                    Next
+                    t = Trend(PZ, 3)
+
+                    For j = 0 To 10     'Calculate new poly data points
+                        flow = j / 10 * Tschets(ty).TFlow_scaled(10)
+                        Tschets(ty).TFlow_scaled_poly(j) = flow
+                        Tschets(ty).TPstat_scaled_poly(j) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3
+
+                        TextBox158.AppendText("count polyt= " & j.ToString & " X (flow)= " & flow.ToString & " Y (P_stat)= " & Tschets(ty).TPstat_scaled_poly(j).ToString & Environment.NewLine)
+
+                    Next
+
+                    '=============== convert to polynoom, Power ====================
+                    For j = 0 To 10     'Get data
+                        PZ(j).x = Tschets(ty).TFlow_scaled(j)
+                        PZ(j).y = Tschets(ty).Tverm_scaled(j)
+                    Next
+                    t = Trend(PZ, 3)
+
+                    For j = 0 To 10     'Calculate new poly data points
+                        flow = j / 10 * Tschets(ty).TFlow_scaled(10)
+                        Tschets(ty).TFlow_scaled_poly(j) = flow
+                        Tschets(ty).Tverm_scaled_poly(j) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3
+                    Next
+                    '=============== convert to polynoom, Efficiency ====================
+                    For j = 0 To 10     'Get data
+                        PZ(j).x = Tschets(ty).TFlow_scaled(j)
+                        PZ(j).y = Tschets(ty).Teff_scaled(j)
+                    Next
+                    t = Trend(PZ, 4)
+
+                    For j = 0 To 10     'Calculate new poly data points
+                        flow = j / 10 * Tschets(ty).TFlow_scaled(10)
+                        Tschets(ty).TFlow_scaled_poly(j) = flow
+                        Tschets(ty).Teff_scaled_poly(j) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3 + BZ(4, 0) * flow ^ 4
+
+                        TextBox158.AppendText("count polyt= " & j.ToString & " X (flow)= " & flow.ToString & " Y (eff)= " & Tschets(ty).Teff_scaled_poly(j).ToString & Environment.NewLine)
+                    Next
+                End If
 
                 draw_chart1(ty)
             Catch ex As Exception
@@ -2114,6 +2069,8 @@ Public Class Form1
         area_omloop = x.uitlaat_b * x.uitlaat_h / 10 ^ 6                        'Oppervlak omloop [m2]
         x.loop_velos = x.Q1 / area_omloop                                       'snelheid uitlaat [m/s]
 
+        'MessageBox.Show(x.loop_velos.ToString)
+
         '----------------- actual drukverlies omloop  (3 bochten) -------
         phi = NumericUpDown58.Value
         x.loop_loss = 0.5 * phi * x.loop_velos ^ 2 * x.Ro1                      '[Pa]
@@ -2131,4 +2088,174 @@ Public Class Form1
         x.Ro3 = calc_density(x.Ro1, (x.Pt1 + 101300), (x.Pt3 + 101300), x.T1, x.T2)
     End Sub
 
+    Public Function Trend(Data() As PPOINT, ByVal Degree As Integer) As PPOINT()
+        'degree 1 = straight line y=a+bx
+        'degree n = polynomials!!
+
+        Dim a(,), Ai(,), P(,) As Double             '2 Dimensional arrays
+        Dim SigmaA(), SigmaP() As Double            '1 Dimensional arrays
+        Dim PointCount, MaxTerm, m, n, i, j As Integer
+        Dim Ret() As PPOINT
+        Dim Equation As String
+
+        Degree = Degree + 1
+
+        MaxTerm = (2 * (Degree - 1))
+        PointCount = Data.Length
+
+        ReDim SigmaA(MaxTerm - 1)
+        ReDim SigmaP(MaxTerm - 1)
+
+        ' Get the coefficients lists for matrices A, and P
+        For m = 0 To (MaxTerm - 1)
+            For n = 0 To (PointCount - 1)
+                ' MessageBox.Show(Data(n).x)
+                SigmaA(m) = SigmaA(m) + (Data(n).x ^ (m + 1))
+                SigmaP(m) = SigmaP(m) + ((Data(n).x ^ m) * Data(n).y)
+            Next
+        Next
+
+        ' Create Matrix A, and fill in the coefficients
+        ReDim a(Degree - 1, Degree - 1)
+
+        For i = 0 To (Degree - 1)
+            For j = 0 To (Degree - 1)
+                If i = 0 And j = 0 Then
+                    a(i, j) = PointCount
+                Else
+                    a(i, j) = SigmaA((i + j) - 1)
+                End If
+            Next
+        Next
+
+        ' Create Matrix P, and fill in the coefficients
+        ReDim P(Degree - 1, 0)
+        For i = 0 To (Degree - 1)
+            P(i, 0) = SigmaP(i)
+        Next
+
+        ' We have A, and P of AB=P, so we can solve B because B=AiP
+        Ai = MxInverse(a)
+        BZ = MxMultiplyCV(Ai, P)
+
+        ' Now we solve the equations and generate the list of points
+        PointCount = PointCount - 1
+        ReDim Ret(PointCount)
+
+        ' Work out non exponential first term
+        For i = 0 To PointCount
+            Ret(i).x = Data(i).x
+            Ret(i).y = BZ(0, 0)
+        Next
+
+        ' Work out other exponential terms including exp 1
+        For i = 0 To PointCount
+            For j = 1 To Degree - 1
+                Ret(i).y = Ret(i).y + (BZ(j, 0) * Ret(i).x ^ j)
+            Next
+        Next
+
+        '-------- show the coefficients-------------
+        Equation = "y=" & Format$(BZ(0, 0), "0.00000") & " + "
+        For j = 1 To Degree - 1
+            Equation = Equation & Format$(BZ(j, 0), "0.00000") & "x^" & j & " + "
+        Next
+        Equation = Microsoft.VisualBasic.Left(Equation, Len(Equation) - 3)
+        Label176.Text = Microsoft.VisualBasic.Left(Equation, Len(Equation) - 3)
+        'MessageBox.Show(Equation)
+
+        Trend = Ret
+    End Function
+
+    Public Function MxMultiplyCV(Matrix1(,) As Double, ColumnVector(,) As Double) As Double(,)
+
+        Dim i, j As Integer
+        Dim Rows, Cols As Integer
+        Dim Ret(,) As Double        '2 Dimensional array
+
+        Rows = Matrix1.GetLength(0) - 1
+        Cols = Matrix1.GetLength(1) - 1
+
+        ReDim Ret(ColumnVector.GetLength(0) - 1, 0) 'returns a column vector
+
+        For i = 0 To Rows
+            For j = 0 To Cols
+                Ret(i, 0) = Ret(i, 0) + (Matrix1(i, j) * ColumnVector(j, 0))
+            Next
+        Next
+
+        MxMultiplyCV = Ret
+    End Function
+
+    Public Function MxInverse(Matrix(,) As Double) As Double(,)
+        Dim i, j As Integer
+        Dim Rows, Cols As Integer          '1 Dimensional array
+        Dim Tmp(,), Ret(,) As Double    '2 Dimensional array
+        Dim Degree As Integer
+
+        Tmp = Matrix
+
+        Rows = Tmp.GetLength(0) - 1     'First dimension of the array
+        Cols = Tmp.GetLength(1) - 1     'Second dimension of the array
+
+        Degree = Cols + 1
+
+        'Augment Identity matrix onto matrix M to get [M|I]
+
+        ReDim Preserve Tmp(Rows, (Degree * 2) - 1)
+        For i = Degree To (Degree * 2) - 1
+            Tmp((i Mod Degree), i) = 1
+        Next
+
+        ' Now find the inverse using Gauss-Jordan Elimination which should get us [I|A-1]
+        MxGaussJordan(Tmp)
+
+        ' Copy the inverse (A-1) part to array to return
+        ReDim Ret(Rows, Cols)
+        For i = 0 To Rows
+            For j = Degree To (Degree * 2) - 1
+                Ret(i, j - Degree) = Tmp(i, j)
+            Next
+        Next
+
+        MxInverse = Ret
+    End Function
+
+    Public Sub MxGaussJordan(Matrix(,) As Double)
+
+        Dim Rows As Integer
+        Dim Cols As Integer
+        Dim P As Integer
+        Dim i As Integer
+        Dim j As Integer
+        Dim m As Double
+        Dim d As Double
+        Dim Pivot As Double
+
+        Rows = Matrix.GetLength(0) - 1     'First dimension of the array
+        Cols = Matrix.GetLength(1) - 1     'Second dimension of the array
+
+        ' Reduce so we get the leading diagonal
+        For P = 0 To Rows
+            Pivot = Matrix(P, P)
+            For i = 0 To Rows
+                If Not P = i Then
+                    m = Matrix(i, P) / Pivot
+                    For j = 0 To Cols
+                        Matrix(i, j) = Matrix(i, j) + (Matrix(P, j) * -m)
+                    Next
+                End If
+            Next
+        Next
+
+        'Divide through to get the identity matrix
+        'Note: the identity matrix may have very small values (close to zero)
+        'because of the way floating points are stored.
+        For i = 0 To Rows
+            d = Matrix(i, i)
+            For j = 0 To Cols
+                Matrix(i, j) = Matrix(i, j) / d
+            Next
+        Next
+    End Sub
 End Class
