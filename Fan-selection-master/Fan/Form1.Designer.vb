@@ -3110,9 +3110,9 @@ Partial Class Form1
         Me.CheckBox2.AutoSize = True
         Me.CheckBox2.Location = New System.Drawing.Point(9, 42)
         Me.CheckBox2.Name = "CheckBox2"
-        Me.CheckBox2.Size = New System.Drawing.Size(87, 17)
+        Me.CheckBox2.Size = New System.Drawing.Size(97, 17)
         Me.CheckBox2.TabIndex = 14
-        Me.CheckBox2.Text = "Scale sec/hr"
+        Me.CheckBox2.Text = "Scale [Am3/hr]"
         Me.CheckBox2.UseVisualStyleBackColor = True
         '
         'CheckBox1
