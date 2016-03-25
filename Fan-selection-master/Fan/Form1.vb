@@ -88,62 +88,87 @@ Public Class Form1
     Public BZ(5, 5) As Double               'Poly Coefficients, Polynomial regression
 
 
-    '----- "Oude benaming;Norm:;EN10027-1;Werkstof;[mm/m1/100°C];Poisson ;kg/m3;E [Gpa];Rm (20c);Rp0.2(0c);Rp0.2(20c);Rp(50c);Rp(100c);Rp(150c);Rp(200c);Rp(250c);Rp(300c);Rp(350c);Rp(400c);Equiv-ASTM;Opmerking",
+    '-----"Oude benaming;Norm:;EN10027-1;Werkstof;[mm/m1/100°C];Poisson ;kg/m3;E [Gpa];Rm (20c);Rp0.2(0c);Rp0.2(20c);Rp(50c);Rp(100c);Rp(150c);Rp(200c);Rp(250c);Rp(300c);Rp(350c);Rp(400c);Equiv-ASTM;Opmerking",
     Public Shared steel() As String =
      {"16M03;EN10028-2 UNS;16M03;1.5415;1.29;0.28;7850;192;440-590;225;265;260;235;225;215;200;170;160;150;A204-GrA;--",
-    "Aluminium D54S;nt.Reg.Nr: DIN1745-1;AA5083 AIMo45Mn-H116;3.3547;2.54;0.33;2700;70;305;121;150;140;135;121;67;0;0;0;0;--;--",
-    "Chromanite Alloy;Robert Zapp UNS;Cr19Mn10N;1.382;1.73;0.28;7810;200;800-1050;400;500;500;445;400;360;330;310;300;295;-;--",
-    "Corten - A / B;EN10155 UNS;S355J2G1W;1.8962/63;1.29;0.28;7850;192;490-630;240;355;340;255;240;226;206;166;0;0;--;Max 300c	",
-    "Dillimax 690T;Dill.HuttWerke;DSE690V;1.8928;1.29;0.28;7850;192;790-940;717;690;790;740;717;698;697;687;659;638;A517-GrA;--",
-    "Domex 690XPD(E);EN10149-2 UNS;S700MCD(E);1.8974;1.29;0.28;7850;192;810;675;740;765;690;675;660;640;620;580;540;--;--",
-    "Duplex(Avesta-2205);EN 10088-1 UfllW;X2CrNiMoN22-5-3 saisna;1.4462;1.4;0.28;7800;200;640-950;335;460;385;360;335;315;300;0;0;0;A240-S31803;Max 300c",
-    "Hastelloy-C22;DIN Nr: ASTM UNS;NiCr21Mo14W 2277 B575 N06022;2.4602;1.25;0.29;9000;205;786-800;310;370;354;338;310;283;260;248;244;241;--;--",
-    "Inconel- 600;DIN Nicrofer7216 ASTM SO ;NiCr15Fe Alloy 600 B168 NiCr15Fe8 Npsepo;2.4816;1.44;0.29;8400;214;550;170;240;185;180;170;165;160;155;152;150;--;--",
-    "Naxtra 70;Thyssen/DIN UNS;TSTE690V;1.8928;1.29;0.28;7850;192;790-940;635;690;700;660;635;605;585;570;550;530;A517-GrA;--",
-    "P265GH;EN 10028-2 UNS;P265GH ;1.0425;1.29;0.28;7850;192;410-530;205;255;234;215;205;195;175;155;140;130;A516-Gr60;--",
-    "S235JRG2;EN 10025 UNS;S235JRG2 ;1.0038;1.29;0.28;7850;192;340-470;180;195;200;190;180;170;150;130;120;110;A283-GrC;--",
-    "S355J2G3;EN10025 UNS;S355J2G3;1.057;1.29;0.28;7850;192;490-630;284;315;340;304;284;255;226;206;0;0;A299;Max 300c	",
-    "SS 304;EN10088-2;X5CrNI18-10 S30400;1.4301;1.76;0.28;7900;200;520-750;142;210;165;157;142;127;118;110;104;98;A240-304;--",
-    "SS 304L;EN10088-2;X2CrNi19-11 S30403;1.4306;1.76;0.28;7900;200;520-670;132;200;155;147;132;118;108;100;94;89;A240-304L;--",
-    "SS 316;EN10088-2;X5CrNiMo17-12-2 S31600;1.4401;1.76;0.28;8000;200;520-680;162;220;180;177;162;147;137;127;120;115;A240-316;--",
-    "SS 316TI;EN10088-2;X6CrNiMoTi17-12-2 S31635;1.4571;1.76;0.28;8000;200;520-690;177;220;191;185;177;167;157;145;140;135;A240-316Ti;--",
-    "SS 321;EN10088-2;X6CrNiTi18-10 S32100;1.4541;1.76;0.28;7900;200;500-720;167;200;184;176;167;157;147;136;130;125;A240-321;--",
-    "SS 410 ;EN 10088-1 U1S;X12Cr13 (Gegloeid) 541000;1.4006;1.15;0.28;7700;216;450-650;230;250;240;235;230;225;225;220;210;195;A240-410;--",
-    "SS316L;EN10088-2;X2CrNiMo17-12-2 S31603;1.4404;1.76;0.28;8000;200;520-680;152;220;170;166;152;137;127;118;113;108;A240-316L;--",
-    "SuperDuplex;--;X2CrNiMoN22-5-3 saisna;1.4501;1.4;0.28;7800;200;730-930;445;550;510;480;445;405;400;395;0;0;--;--",
-    "Titanium-ür 2;ASTM UNS niN;B265/348-Gr2 R50400 785(1;3.7035;0.88;0.32;4500;107;345;177;281;245;226;177;131;99;80;0;0;--;Max 280c i.v.m verbrossing",
-    "Weldox700E;EN10137-2 UNS;S690QL;1.8928;1.29;0.28;7850;192;780-930;590;700;643;600;590;580;570;560;550;540;--;--",
-    "WSTE/TSTE355;EN 10028-3 UNS;P355NH/NL1;1.0565/66;1.29;0.28;7850;192;470-630;284;315;340;304;284;255;226;206;186;157;A516-Gr70;--"}
+   "Aluminium D54S;nt.Reg.Nr: DIN1745-1;AA5083 AIMo45Mn-H116;3.3547;2.54;0.33;2700;70;305;121;150;140;135;121;67;0;0;0;0;--;--",
+   "Chromanite Alloy;Robert Zapp UNS;Cr19Mn10N;1.382;1.73;0.28;7810;200;800-1050;400;500;500;445;400;360;330;310;300;295;-;--",
+   "Corten - A / B;EN10155 UNS;S355J2G1W;1.8962/63;1.29;0.28;7850;192;490-630;240;355;340;255;240;226;206;166;0;0;--;Max 300c",
+   "Dillimax 690T;Dill.HuttWerke;DSE690V;1.8928;1.29;0.28;7850;192;790-940;717;690;790;740;717;698;697;687;659;638;A517-GrA;--",
+   "Domex 690XPD(E);EN10149-2 UNS;S700MCD(E);1.8974;1.29;0.28;7850;192;810;675;740;765;690;675;660;640;620;580;540;--;--",
+   "Duplex(Avesta-2205);EN 10088-1 UfllW;X2CrNiMoN22-5-3 saisna;1.4462;1.4;0.28;7800;200;640-950;335;460;385;360;335;315;300;0;0;0;A240-S31803;Max 300c",
+   "Hastelloy-C22;DIN Nr: ASTM UNS;NiCr21Mo14W 2277 B575 N06022;2.4602;1.25;0.29;9000;205;786-800;310;370;354;338;310;283;260;248;244;241;--;--",
+   "Inconel- 600;DIN Nicrofer7216 ASTM SO ;NiCr15Fe Alloy 600 B168 NiCr15Fe8 Npsepo;2.4816;1.44;0.29;8400;214;550;170;240;185;180;170;165;160;155;152;150;--;--",
+   "Naxtra 70;Thyssen/DIN UNS;TSTE690V;1.8928;1.29;0.28;7850;192;790-940;635;690;700;660;635;605;585;570;550;530;A517-GrA;--",
+   "P265GH;EN 10028-2 UNS;P265GH ;1.0425;1.29;0.28;7850;192;410-530;205;255;234;215;205;195;175;155;140;130;A516-Gr60;--",
+   "S235JRG2;EN 10025 UNS;S235JRG2 ;1.0038;1.29;0.28;7850;192;340-470;180;195;200;190;180;170;150;130;120;110;A283-GrC;--",
+   "S355J2G3;EN10025 UNS;S355J2G3;1.057;1.29;0.28;7850;192;490-630;284;315;340;304;284;255;226;206;0;0;A299;Max 300c",
+   "SS 304;EN10088-2;X5CrNI18-10 S30400;1.4301;1.76;0.28;7900;200;520-750;142;210;165;157;142;127;118;110;104;98;A240-304;--",
+   "SS 304L;EN10088-2;X2CrNi19-11 S30403;1.4306;1.76;0.28;7900;200;520-670;132;200;155;147;132;118;108;100;94;89;A240-304L;--",
+   "SS 316;EN10088-2;X5CrNiMo17-12-2 S31600;1.4401;1.76;0.28;8000;200;520-680;162;220;180;177;162;147;137;127;120;115;A240-316;--",
+   "SS 316TI;EN10088-2;X6CrNiMoTi17-12-2 S31635;1.4571;1.76;0.28;8000;200;520-690;177;220;191;185;177;167;157;145;140;135;A240-316Ti;--",
+   "SS 321;EN10088-2;X6CrNiTi18-10 S32100;1.4541;1.76;0.28;7900;200;500-720;167;200;184;176;167;157;147;136;130;125;A240-321;--",
+   "SS 410 ;EN 10088-1 U1S;X12Cr13 (Gegloeid) 541000;1.4006;1.15;0.28;7700;216;450-650;230;250;240;235;230;225;225;220;210;195;A240-410;--",
+   "SS316L;EN10088-2;X2CrNiMo17-12-2 S31603;1.4404;1.76;0.28;8000;200;520-680;152;220;170;166;152;137;127;118;113;108;A240-316L;--",
+   "SuperDuplex;--;X2CrNiMoN22-5-3 saisna;1.4501;1.4;0.28;7800;200;730-930;445;550;510;480;445;405;400;395;0;0;--;--",
+   "Titanium-ür 2;ASTM UNS niN;B265/348-Gr2 R50400 785(1;3.7035;0.88;0.32;4500;107;345;177;281;245;226;177;131;99;80;0;0;--;Max 280c i.v.m verbrossing",
+   "Weldox700E;EN10137-2 UNS;S690QL;1.8928;1.29;0.28;7850;192;780-930;590;700;643;600;590;580;570;560;550;540;--;--",
+   "WSTE/TSTE355;EN 10028-3 UNS;P355NH/NL1;1.0565/66;1.29;0.28;7850;192;470-630;284;315;340;304;284;255;226;206;186;157;A516-Gr70;--"}
 
     'Motoren
-    Public Shared emotor() As String = {"4.0; 1500", "5.5; 1500", "7.5; 1500", "11;  1500", "15; 1500", "22; 1500",
-                                       "30;   1500", "37;  1500", "45;  1500", "55;  1500", "75; 1500", "90; 1500",
-                                       "110;  1500", "132; 1500", "160; 1500", "200; 1500", "250; 1500", "315; 1500",
-                                       "355;  1500", "400; 1500", "450; 1500", "500; 1500", "560; 1500", "630; 1500",
-                                       "1000; 1500"}
+    'Vermogen,Toerental, Frame, Lengte, Geluid Lp
+    Public Shared emotor() As String = {
+   "4.00; 1500; 112M; 380; 56",
+   "5.50; 1500; 132S; 465; 56",
+   "7.50; 1500; 132M; 505; 59",
+   "11.0; 1500; 160M; 645; 62",
+   "15.0; 1500; 160L; 645; 62",
+   "18.5; 1500; 180M; 700; 62",
+   "22.0; 1500; 180L; 700; 63",
+   "30.0; 1500; 200M; 774; 63",
+   "37.0; 1500; 225S; 866; 66",
+   "45.0; 1500; 225S; 866; 66",
+   "55.0; 1500; 250S; 875; 67",
+   "75.0; 1500; 280S; 1088; 68",
+   "90.0; 1500; 280S; 1088; 68",
+   "110; 1500; 315S; 1204; 70",
+   "132; 1500; 315S; 1204; 70",
+   "160; 1500; 315S; 1204; 70",
+   "200; 1500; 315M; 1315; 70",
+   "250; 1500; 355S; 1594; 80",
+   "315; 1500; 355SM; 1646; 80",
+   "355; 1500; 355SM; 1646; 80",
+   "400; 1500; 355M; 1751; 80",
+   "450; 1500; 355M; 1751; 80",
+   "500; 1500; 355M; 1751; 80",
+   "560; 1500; 400L; 1928; 85",
+   "630; 1500; 400L; 1928; 85",
+   "710; 1500; 400L; 1928; 85",
+   "1000; 1500; Spec; 00; 00"}
+
 
     Public Shared EXD_VSD_torque() As String = {"Hz; rpm; Koppel_%",
-                                       "0 ; 0; 56",
-                                       "5 ; 149; 75",
-                                       "10; 297; 81",
-                                       "15; 446; 85.5",
-                                       "20; 595; 90",
-                                       "25; 744; 92",
-                                       "30; 892; 94",
-                                       "35; 1041; 96",
-                                       "40; 1190; 98",
-                                       "45; 1338; 100",
-                                       "50; 1487; 90",
-                                       "55; 1636, 83",
-                                       "60; 1784; 76",
-                                       "65; 1933; 69",
-                                       "70; 2082; 63",
-                                       "75; 2231; 57.5",
-                                       "80; 2379; 53.5",
-                                       "85; 2528; 49",
-                                       "90; 2677; 46",
-                                       "95; 2825; 43.5",
-                                       "100; 2974; 42"}
+                                      "0 ; 0; 56",
+                                      "5 ; 149; 75",
+                                      "10; 297; 81",
+                                      "15; 446; 85.5",
+                                      "20; 595; 90",
+                                      "25; 744; 92",
+                                      "30; 892; 94",
+                                      "35; 1041; 96",
+                                      "40; 1190; 98",
+                                      "45; 1338; 100",
+                                      "50; 1487; 90",
+                                      "55; 1636, 83",
+                                      "60; 1784; 76",
+                                      "65; 1933; 69",
+                                      "70; 2082; 63",
+                                      "75; 2231; 57.5",
+                                      "80; 2379; 53.5",
+                                      "85; 2528; 49",
+                                      "90; 2677; 46",
+                                      "95; 2825; 43.5",
+                                      "100; 2974; 42"}
 
     Dim flenzen() As Double = {71, 80, 90, 100, 112, 125, 140, 160, 180, 200, 224, 250, 280, 315, 355, 400, 450, 500, 560, 630, 710, 800, 900, 1000, 1120, 1250, 1400, 1600, 1800, 2000}
     Dim R20() As Double
@@ -235,12 +260,12 @@ Public Class Form1
         Thread.CurrentThread.CurrentCulture = New CultureInfo("en-US")
         Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
 
-        ComboBox1.Items.Clear()                     'Note Combobox1 contains "startup" to prevent exceptions
-        ComboBox2.Items.Clear()                     'Note Combobox1 contains "startup" to prevent exceptions
-        ComboBox3.Items.Clear()                     'Note Combobox1 contains "startup" to prevent exceptions
-        ComboBox4.Items.Clear()                     'Note Combobox1 contains "startup" to prevent exceptions
-        ComboBox6.Items.Clear()                     'Note Combobox1 contains "startup" to prevent exceptions
-        ComboBox7.Items.Clear()                     'Note Combobox1 contains "startup" to prevent exceptions
+        ComboBox1.Items.Clear()                     'Note Combobox1 contains"startup" to prevent exceptions
+        ComboBox2.Items.Clear()                     'Note Combobox1 contains"startup" to prevent exceptions
+        ComboBox3.Items.Clear()                     'Note Combobox1 contains"startup" to prevent exceptions
+        ComboBox4.Items.Clear()                     'Note Combobox1 contains"startup" to prevent exceptions
+        ComboBox6.Items.Clear()                     'Note Combobox1 contains"startup" to prevent exceptions
+        ComboBox7.Items.Clear()                     'Note Combobox1 contains"startup" to prevent exceptions
 
         For hh = 0 To (UBound(Tschets) - 1)            'Fill combobox 1, 2 +5 met Fan Types
             ComboBox1.Items.Add(Tschets(hh).Tname)
@@ -597,9 +622,9 @@ Public Class Form1
                 Calc_stage(cond(3))                     'Bereken de waaier #3   
 
 
-                Label154.Text = "Waaier #1, Ro1= " & Round(cond(1).Ro1, 03).ToString & " [kg/m3], Ro2= " & Round(cond(1).Ro2, 3).ToString & " [kg/m3], P2t= " & Round(cond(1).Pt2, 0).ToString & " [Pa]"
-                Label155.Text = "Waaier #2, Ro1= " & Round(cond(2).Ro1, 03).ToString & " [kg/m3], Ro2= " & Round(cond(2).Ro2, 3).ToString & " [kg/m3], Pt2= " & Round(cond(2).Pt2, 0).ToString & " [Pa]"
-                Label156.Text = "Waaier #3, Ro1= " & Round(cond(3).Ro1, 03).ToString & " [kg/m3], Ro2= " & Round(cond(3).Ro2, 3).ToString & " [kg/m3], Pt2= " & Round(cond(3).Pt2, 0).ToString & " [Pa]"
+                Label154.Text = "Waaier #1, Ro1=" & Round(cond(1).Ro1, 03).ToString & " [kg/m3], Ro2=" & Round(cond(1).Ro2, 3).ToString & " [kg/m3], P2t=" & Round(cond(1).Pt2, 0).ToString & " [Pa]"
+                Label155.Text = "Waaier #2, Ro1=" & Round(cond(2).Ro1, 03).ToString & " [kg/m3], Ro2=" & Round(cond(2).Ro2, 3).ToString & " [kg/m3], Pt2=" & Round(cond(2).Pt2, 0).ToString & " [Pa]"
+                Label156.Text = "Waaier #3, Ro1=" & Round(cond(3).Ro1, 03).ToString & " [kg/m3], Ro2=" & Round(cond(3).Ro2, 3).ToString & " [kg/m3], Pt2=" & Round(cond(3).Pt2, 0).ToString & " [Pa]"
 
 
                 '------------ Rendement Waaier (Ackeret) --------------
@@ -804,7 +829,7 @@ Public Class Form1
         sigma_schoep = (sg_staal / 2) * V_omtrek ^ 2 * S_breed ^ 2 * Cos(S_hoek * PI / 180) / (S_dik * Waaier_dia / 2)
         sigma_schoep /= 1000 ^ 2   'Trekstekte in N/m2 niet N/mm2
 
-        'MessageBox.Show("sg=" & sg_staal.ToString & " snelh= " & V_omtrek.ToString & " breed= " & S_breed.ToString & " dik= " & S_dik.ToString & " dia= " & Waaier_dia.ToString & " sigma= " & sigma_schoep.ToString)
+        'MessageBox.Show("sg=" & sg_staal.ToString &" snelh=" & V_omtrek.ToString &" breed=" & S_breed.ToString &" dik=" & S_dik.ToString &" dia=" & Waaier_dia.ToString &" sigma=" & sigma_schoep.ToString)
 
         '------------------ Traagheid (0.5 x m x r2)-----------------
         J1 = 0.5 * Bodem_gewicht * (0.5 * Waaier_dia) ^ 2
@@ -1395,7 +1420,7 @@ Public Class Form1
                 Next hh
                 Chart1.Refresh()
             Catch ex As Exception
-                'MessageBox.Show(ex.Message & "Line 1400")  ' Show the exception's message.
+                'MessageBox.Show(ex.Message &"Line 1400")  ' Show the exception's message.
             End Try
         End If
     End Sub
@@ -1441,7 +1466,7 @@ Public Class Form1
         p1 = p1 * RH / 100
         p2 = P - p1
 
-        'MessageBox.Show("p1= " & p1.ToString & " p2= " & p2.ToString)
+        'MessageBox.Show("p1=" & p1.ToString &" p2=" & p2.ToString)
 
         '-------------------------------- soortelijk gewicht---------------------------
         'gecontroleerd tegen http://www.denysschen.com/catalogue/density.aspx --------
@@ -1477,7 +1502,7 @@ Public Class Form1
             Tschets(jj).werkp_opT(2) = Tschets(jj).TPstat(pos_counter)  'P_statisch [Pa]
             Tschets(jj).werkp_opT(3) = Tschets(jj).Tverm(pos_counter)   'as_vermogen [kW]
             Tschets(jj).werkp_opT(4) = Tschets(jj).TFlow(pos_counter)   'debiet[m3/sec]
-            'MessageBox.Show("JJ=" & jj.ToString & " aantal hh =" & hh)
+            'MessageBox.Show("JJ=" & jj.ToString &" aantal hh =" & hh)
         Next jj
     End Sub
 
@@ -1490,7 +1515,7 @@ Public Class Form1
         Dim text As String
         text = Now.ToString("yyyy_MM_dd_HH_mm_ss_")
 
-        str_file1 = "c:\temp\" & text & "Fan chart.png"
+        str_file1 = "c: \temp\" & text & "Fan chart.png"
         str_file2 = "c:\temp\" & text & "Fan selection data.png"
         str_file3 = "c:\temp\" & text & "Fan stress waaier.png"
 
@@ -1509,7 +1534,7 @@ Public Class Form1
         TabPage2.DrawToBitmap(bmp_tab_page2, DisplayRectangle)
         bmp_tab_page2.Save(str_file3, Imaging.ImageFormat.Png)
 
-        MessageBox.Show("Files is saved to c:\temp ")
+        MessageBox.Show("Files is saved to c:\temp")
 
     End Sub
 
@@ -1642,9 +1667,9 @@ Public Class Form1
                         calc_loop_loss(cond(6))                 'Bereken de omloop verliezen (niet echt nodig)
 
 
-                        'Label83.Text = "Waaier #1, Ro1= " & Round(cond(4).Ro1, 03).ToString & " [kg/m3], Ro2= " & Round(cond(4).Ro2, 3).ToString & " [kg/m3], Pt1= " & Round(cond(4).Pt1, 0).ToString & " [Pa], Pt2= " & Round(cond(4).Pt2, 0).ToString & " [Pa], dp_total= " & Round(cond(4).delta_pt, 0).ToString
-                        'Label84.Text = "Waaier #2, Ro1= " & Round(cond(5).Ro1, 03).ToString & " [kg/m3], Ro2= " & Round(cond(5).Ro2, 3).ToString & " [kg/m3], Pt1= " & Round(cond(5).Pt1, 0).ToString & " [Pa], Pt2= " & Round(cond(5).Pt2, 0).ToString & " [Pa], dp_total= " & Round(cond(5).delta_pt, 0).ToString
-                        'Label153.Text = "Waaier #3, Ro1= " & Round(cond(6).Ro1, 03).ToString & " [kg/m3], Ro2= " & Round(cond(6).Ro2, 3).ToString & " [kg/m3], Pt1= " & Round(cond(6).Pt1, 0).ToString & " [Pa], Pt2 =" & Round(cond(6).Pt2, 0).ToString & " [Pa], d_totalp= " & Round(cond(6).delta_pt, 0).ToString
+                        'Label83.Text ="Waaier #1, Ro1=" & Round(cond(4).Ro1, 03).ToString &" [kg/m3], Ro2=" & Round(cond(4).Ro2, 3).ToString &" [kg/m3], Pt1=" & Round(cond(4).Pt1, 0).ToString &" [Pa], Pt2=" & Round(cond(4).Pt2, 0).ToString &" [Pa], dp_total=" & Round(cond(4).delta_pt, 0).ToString
+                        'Label84.Text ="Waaier #2, Ro1=" & Round(cond(5).Ro1, 03).ToString &" [kg/m3], Ro2=" & Round(cond(5).Ro2, 3).ToString &" [kg/m3], Pt1=" & Round(cond(5).Pt1, 0).ToString &" [Pa], Pt2=" & Round(cond(5).Pt2, 0).ToString &" [Pa], dp_total=" & Round(cond(5).delta_pt, 0).ToString
+                        'Label153.Text ="Waaier #3, Ro1=" & Round(cond(6).Ro1, 03).ToString &" [kg/m3], Ro2=" & Round(cond(6).Ro2, 3).ToString &" [kg/m3], Pt1=" & Round(cond(6).Pt1, 0).ToString &" [Pa], Pt2 =" & Round(cond(6).Pt2, 0).ToString &" [Pa], d_totalp=" & Round(cond(6).delta_pt, 0).ToString
 
                         Select Case True
                             Case RadioButton9.Checked      '1 traps
@@ -1683,62 +1708,62 @@ Public Class Form1
                     For j = 0 To 10     'Get data
                         PZ(j).x = Tschets(ty).TFlow_scaled(j)
                         PZ(j).y = Tschets(ty).TPtot_scaled(j)
-                        TextBox158.AppendText("count= " & j.ToString & " X (flow)= " & PZ(j).x.ToString & " Y (P_tot)= " & PZ(j).y.ToString & Environment.NewLine)
+                        TextBox158.AppendText("count=" & j.ToString & " X (flow)=" & PZ(j).x.ToString & " Y (P_tot)=" & PZ(j).y.ToString & Environment.NewLine)
                     Next
                     t = Trend(PZ, 5)
                     For j = 0 To 10     'Calculate new poly data points
                         flow = j / 10 * Tschets(ty).TFlow_scaled(10)
                         Tschets(ty).TFlow_scaled_poly(j) = flow
                         Tschets(ty).TPtot_scaled_poly(j) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3 + BZ(4, 0) * flow ^ 4 + BZ(5, 0) * flow ^ 5
-                        TextBox158.AppendText("count polyt= " & j.ToString & " X (flow)= " & flow.ToString & " Y (P_tot)= " & Tschets(ty).TPtot_scaled_poly(j).ToString & Environment.NewLine)
+                        TextBox158.AppendText("count polyt=" & j.ToString & " X (flow)=" & flow.ToString & " Y (P_tot)=" & Tschets(ty).TPtot_scaled_poly(j).ToString & Environment.NewLine)
                     Next
 
                     '=============== convert to polynoom, Pstatic ====================
                     For j = 0 To 10     'Get data
                         PZ(j).x = Tschets(ty).TFlow_scaled(j)
                         PZ(j).y = Tschets(ty).TPstat_scaled(j)
-                        TextBox158.AppendText("count= " & j.ToString & " X (flow)= " & PZ(j).x.ToString & " Y (Pstat)= " & PZ(j).y.ToString & Environment.NewLine)
+                        TextBox158.AppendText("count=" & j.ToString & " X (flow)=" & PZ(j).x.ToString & " Y (Pstat)=" & PZ(j).y.ToString & Environment.NewLine)
                     Next
                     t = Trend(PZ, 5)
                     For j = 0 To 10     'Calculate new poly data points
                         flow = j / 10 * Tschets(ty).TFlow_scaled(10)
                         Tschets(ty).TFlow_scaled_poly(j) = flow
                         Tschets(ty).TPstat_scaled_poly(j) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3 + BZ(4, 0) * flow ^ 4 + BZ(5, 0) * flow ^ 5
-                        TextBox158.AppendText("count polyt= " & j.ToString & " X (flow)= " & flow.ToString & " Y (P_stat)= " & Tschets(ty).TPstat_scaled_poly(j).ToString & Environment.NewLine)
+                        TextBox158.AppendText("count polyt=" & j.ToString & " X (flow)=" & flow.ToString & " Y (P_stat)=" & Tschets(ty).TPstat_scaled_poly(j).ToString & Environment.NewLine)
                     Next
 
                     '=============== convert to polynoom, Power ====================
                     For j = 0 To 10     'Get data
                         PZ(j).x = Tschets(ty).TFlow_scaled(j)
                         PZ(j).y = Tschets(ty).Tverm_scaled(j)
-                        TextBox158.AppendText("count= " & j.ToString & " X (flow)= " & PZ(j).x.ToString & " Y (Vermogen)= " & PZ(j).y.ToString & Environment.NewLine)
+                        TextBox158.AppendText("count=" & j.ToString & " X (flow)=" & PZ(j).x.ToString & " Y (Vermogen)=" & PZ(j).y.ToString & Environment.NewLine)
                     Next
                     t = Trend(PZ, 5)
                     For j = 0 To 10     'Calculate new poly data points
                         flow = j / 10 * Tschets(ty).TFlow_scaled(10)
                         Tschets(ty).TFlow_scaled_poly(j) = flow
                         Tschets(ty).Tverm_scaled_poly(j) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3 + BZ(4, 0) * flow ^ 4 + BZ(5, 0) * flow ^ 5
-                        TextBox158.AppendText("count polyt= " & j.ToString & " X (flow)= " & flow.ToString & " Y (Vermogen)= " & Tschets(ty).Tverm_scaled_poly(j).ToString & Environment.NewLine)
+                        TextBox158.AppendText("count polyt=" & j.ToString & " X (flow)=" & flow.ToString & " Y (Vermogen)=" & Tschets(ty).Tverm_scaled_poly(j).ToString & Environment.NewLine)
                     Next
 
                     '=============== convert to polynoom, Efficiency ====================
                     For j = 0 To 10     'Get data
                         PZ(j).x = Tschets(ty).TFlow_scaled(j)
                         PZ(j).y = Tschets(ty).Teff_scaled(j)
-                        TextBox158.AppendText("count= " & j.ToString & " X (flow)= " & PZ(j).x.ToString & " Y (Efficiency)= " & PZ(j).y.ToString & Environment.NewLine)
+                        TextBox158.AppendText("count=" & j.ToString & " X (flow)=" & PZ(j).x.ToString & " Y (Efficiency)=" & PZ(j).y.ToString & Environment.NewLine)
                     Next
                     t = Trend(PZ, 5)
                     For j = 0 To 10     'Calculate new poly data points
                         flow = j / 10 * Tschets(ty).TFlow_scaled(10)
                         Tschets(ty).TFlow_scaled_poly(j) = flow
                         Tschets(ty).Teff_scaled_poly(j) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3 + BZ(4, 0) * flow ^ 4 + BZ(5, 0) * flow ^ 5
-                        TextBox158.AppendText("count polyt= " & j.ToString & " X (flow)= " & flow.ToString & " Y (eff)= " & Tschets(ty).Teff_scaled_poly(j).ToString & Environment.NewLine)
+                        TextBox158.AppendText("count polyt=" & j.ToString & " X (flow)=" & flow.ToString & " Y (eff)=" & Tschets(ty).Teff_scaled_poly(j).ToString & Environment.NewLine)
                     Next
                 End If
 
                 draw_chart1(ty)
             Catch ex As Exception
-                MessageBox.Show(ex.Message & " Problem in Scale_rules_applied ")  ' Show the exception's message.
+                MessageBox.Show(ex.Message & " Problem in Scale_rules_applied")  ' Show the exception's message.
             End Try
         End If
     End Sub
@@ -1925,7 +1950,7 @@ Public Class Form1
             Voorplaat_keel = Tschets(ComboBox1.SelectedIndex).Tdata(16) / 1000 * (Waaier_dia / 1.0)     '[m]
             F_axial = PI / 4 * Voorplaat_keel ^ 2 * NumericUpDown2.Value * 100
         End If
-        ' MessageBox.Show("Voorplaat_keel= " & Voorplaat_keel.ToString & "  F_b_hor = " & F_b_hor.ToString)
+        ' MessageBox.Show("Voorplaat_keel=" & Voorplaat_keel.ToString &"  F_b_hor =" & F_b_hor.ToString)
 
         '----------- Present massa traagheid-------------
         TextBox35.Text = Round(J_shaft_a, 2).ToString           'Massa traagheid (0.5*M*R^2)
@@ -2070,7 +2095,7 @@ Public Class Form1
         y.T2 = y.T1 + (y.Power * 1000 / (cp_air * y.Qkg))               'Temperature outlet flange [celsius]
         y.velos = PI * y.Dia1 / 1000 * y.Rpm1 / 60                      'Omtreksnelheid waaier
 
-        'MessageBox.Show("y.T1= " & y.T1.ToString & " y.Power= " & y.Power.ToString & " y.Qkg= " & y.Qkg.ToString & " y.T2= " & y.T2.ToString)
+        'MessageBox.Show("y.T1=" & y.T1.ToString &" y.Power=" & y.Power.ToString &" y.Qkg=" & y.Qkg.ToString &" y.T2=" & y.T2.ToString)
 
         T_reynolds = Round(T_omtrek_s * T_diaw_m / kin_visco_air(20), 0)        '---------- Renolds Tschets ----------------------------------
         y.Reynolds = Round(y.velos * (y.Dia1 / 1000) / kin_visco_air(y.T1), 0)  '---------- Renolds actueel ---------------------------------
@@ -2177,9 +2202,9 @@ Public Class Form1
         Next
 
         '-------- show the coefficients-------------
-        Equation = "y=" & Format$(BZ(0, 0), "0.00000") & " + "
+        Equation = "y=" & Format$(BZ(0, 0), "0.00000") & " +"
         For j = 1 To Degree - 1
-            Equation = Equation & Format$(BZ(j, 0), "0.00000") & "x^" & j & " + "
+            Equation = Equation & Format$(BZ(j, 0), "0.00000") & "x^" & j & " +"
         Next
         Equation = Microsoft.VisualBasic.Left(Equation, Len(Equation) - 2)
         TextBox158.AppendText(Microsoft.VisualBasic.Left(Equation, Len(Equation) - 3) & Environment.NewLine)
@@ -2275,6 +2300,7 @@ Public Class Form1
         Next
     End Sub
     Private Sub calc_emotor()
+        ' see http://ecatalog.weg.net/files/wegnet/WEG-specification-of-electric-motors-50039409-manual-english.pdf
         Dim Ins_power, aanlooptijd, n_actual, rad As Double
         Dim m_torque_inrush, m_torque_max, m_torque_rated, m_torque_average As Double
         Dim load_inertia, motor_inertia, total_inertia As Double
@@ -2287,6 +2313,7 @@ Public Class Form1
             Dim words() As String = emotor(ComboBox6.SelectedIndex).Split(";")
             Ins_power = words(0) * 1000                         'Geinstalleerd vermogen [Watt]
             n_actual = words(1)                                 'Toerental motor [rpm]
+            TextBox208.Text = words(2)                          'Frame size
             rad = n_actual / 60 * 2 * PI                        'Hoeksnelheid [rad/s]
             m_torque_rated = Ins_power / rad
             m_torque_inrush = m_torque_rated * NumericUpDown14.Value
@@ -2296,9 +2323,25 @@ Public Class Form1
             '---------- aanloop versnelling-------------
             ang_acceleration = rad / NumericUpDown37.Value
 
-            '------------- inertia--------------------
+            '------------- inertia load--------------------
             Double.TryParse(TextBox109.Text, load_inertia)
-            motor_inertia = 0.5 * NumericUpDown35.Value * (NumericUpDown36.Value / 2) ^ 2    '0.5*m*R^2
+            load_inertia = load_inertia * NumericUpDown35.Value ^ 2         'in case speed ratio impeller/motor 
+
+            '------------- inertia motor--------------------
+
+            Select Case True
+                Case n_actual = 3000
+                    motor_inertia = 0.04 * (Ins_power / 1000) ^ 0.9 * 1 ^ 2.5    '2 poles (1 pair) (3000 rpm) [kg.m2]
+                Case n_actual = 1500
+                    motor_inertia = 0.04 * (Ins_power / 1000) ^ 0.9 * 2 ^ 2.5    '4 poles (2 pair) (1500 rpm) [kg.m2]
+                Case n_actual = 1000
+                    motor_inertia = 0.04 * (Ins_power / 1000) ^ 0.9 * 3 ^ 2.5    '6 poles (3 pair) (1000 rpm) [kg.m2]
+                Case n_actual = 750
+                    motor_inertia = 0.04 * (Ins_power / 1000) ^ 0.9 * 4 ^ 2.5    '8 poles (4 pair) (750 rpm) [kg.m2]
+                Case Else
+                    MessageBox.Show("Error occured in Motor Inertia calculation ")
+            End Select
+
             total_inertia = load_inertia + motor_inertia
             load_torque = total_inertia * ang_acceleration
 
@@ -2315,11 +2358,11 @@ Public Class Form1
         TextBox196.Text = Round(rad, 0).ToString                    'Hoeksnelheid [rad/s]
         TextBox197.Text = Round(m_torque_inrush, 0).ToString        'Start torque [N.m]
         TextBox198.Text = Round(m_torque_max, 0).ToString           'Max torque [N.m]
-        TextBox199.Text = Round(motor_inertia, 0).ToString          'Motor inertia [kg.m2]
+        TextBox199.Text = Round(motor_inertia, 2).ToString          'Motor inertia [kg.m2]
         TextBox200.Text = Round(m_torque_rated, 0).ToString         'Rated torque [N.m]
         TextBox201.Text = Round(ang_acceleration, 1).ToString       'Hoekvesnelling [rad/s2]
-        TextBox202.Text = Round(load_inertia, 0).ToString           'Load inertia [kg.m2]
-        TextBox207.Text = Round(total_inertia, 0).ToString          'Total inertia [kg.m2]
+        TextBox202.Text = Round(load_inertia, 1).ToString           'Load inertia [kg.m2]
+        TextBox207.Text = Round(total_inertia, 1).ToString          'Total inertia [kg.m2]
         TextBox206.Text = Round(m_torque_average, 0).ToString       'Torque average [kg.m2]
         TextBox204.Text = Round(verschil, 0).ToString               'Verschil gewenst en aangenomen starttijd [s]
         TextBox203.Text = Round(load_torque, 0).ToString            'Load torque [N.m]
@@ -2350,7 +2393,7 @@ Public Class Form1
 
     End Sub
 
-    Private Sub Button9_Click(sender As Object, e As EventArgs) Handles Button9.Click, TabPage12.Enter, NumericUpDown38.ValueChanged, NumericUpDown37.ValueChanged, NumericUpDown36.ValueChanged, NumericUpDown35.ValueChanged, NumericUpDown34.ValueChanged, NumericUpDown14.ValueChanged, ComboBox6.SelectedIndexChanged
+    Private Sub Button9_Click(sender As Object, e As EventArgs) Handles Button9.Click, TabPage12.Enter, NumericUpDown38.ValueChanged, NumericUpDown37.ValueChanged, NumericUpDown34.ValueChanged, NumericUpDown14.ValueChanged, ComboBox6.SelectedIndexChanged, NumericUpDown35.ValueChanged
         calc_emotor()
     End Sub
 
