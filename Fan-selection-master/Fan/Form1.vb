@@ -730,7 +730,7 @@ Public Class Form1
         Dim V_omtrek As Double
         Dim n_actual As Double
         Dim Voorplaat_keel, gewicht_naaf As Double
-        Dim J1, J2, J3, J4, J_naaf, J_tot, j_as, I_power, aanlooptijd As Double
+        Dim J1, J2, J3, J4, J_naaf, J_tot, j_as As Double
         Dim dia_naaf, gewicht_as As Double
         Dim length_naaf, gewicht_pulley As Double
         Dim sg_staal As Double
@@ -815,12 +815,7 @@ Public Class Form1
         Double.TryParse(TextBox190.Text, j_as)
         J_tot = J1 + J2 + J3 + J4 + J_naaf + j_as
 
-        '----------------- aanlooptijd---------------
-        If (ComboBox6.SelectedIndex > -1) Then      'Prevent exceptions
-            Dim words() As String = emotor(ComboBox6.SelectedIndex).Split(";")
-            I_power = words(0) * 1000          'Geinstalleerd vermogen [Watt]
-            aanlooptijd = 2 * (4 * J_tot) * (n_actual * 60) ^ 2 / (I_power * 10 ^ 3)
-        End If
+
 
         '--------Present data------------
         TextBox32.Text = Round(sigma_bodemplaat, 0).ToString
@@ -847,8 +842,6 @@ Public Class Form1
         TextBox108.Text = Round(J4, 1).ToString
         TextBox92.Text = Round(J_naaf, 2).ToString      'Massa traagheid (0.5*M*R^2)
         TextBox109.Text = Round(J_tot, 1).ToString      'Massa traagheid Totaal
-
-        TextBox146.Text = Round(aanlooptijd, 1).ToString        'Aanlooptijd [s]
 
         '-------------- check schoep stress safety-----------------------
         If sigma_schoep > sigma_allowed / 1000 ^ 2 Then
@@ -2251,14 +2244,9 @@ Public Class Form1
 
     Public Sub MxGaussJordan(Matrix(,) As Double)
 
-        Dim Rows As Integer
-        Dim Cols As Integer
-        Dim P As Integer
-        Dim i As Integer
-        Dim j As Integer
-        Dim m As Double
-        Dim d As Double
-        Dim Pivot As Double
+        Dim Rows, Cols As Integer
+        Dim P, i, j As Integer
+        Dim m, d, Pivot As Double
 
         Rows = Matrix.GetLength(0) - 1     'First dimension of the array
         Cols = Matrix.GetLength(1) - 1     'Second dimension of the array
@@ -2285,6 +2273,85 @@ Public Class Form1
                 Matrix(i, j) = Matrix(i, j) / d
             Next
         Next
+    End Sub
+    Private Sub calc_emotor()
+        Dim Ins_power, aanlooptijd, n_actual, rad As Double
+        Dim m_torque_inrush, m_torque_max, m_torque_rated, m_torque_average As Double
+        Dim load_inertia, motor_inertia, total_inertia As Double
+        Dim ang_acceleration, C_acc, load_torque, verschil As Double
+
+        '----------------- aanlooptijd---------------
+        If (ComboBox6.SelectedIndex > -1) Then      'Prevent exceptions
+
+            '--------- motor torque-------------
+            Dim words() As String = emotor(ComboBox6.SelectedIndex).Split(";")
+            Ins_power = words(0) * 1000                         'Geinstalleerd vermogen [Watt]
+            n_actual = words(1)                                 'Toerental motor [rpm]
+            rad = n_actual / 60 * 2 * PI                        'Hoeksnelheid [rad/s]
+            m_torque_rated = Ins_power / rad
+            m_torque_inrush = m_torque_rated * NumericUpDown14.Value
+            m_torque_max = m_torque_rated * NumericUpDown34.Value
+            m_torque_average = 0.45 * (m_torque_inrush + m_torque_max)
+
+            '---------- aanloop versnelling-------------
+            ang_acceleration = rad / NumericUpDown37.Value
+
+            '------------- inertia--------------------
+            Double.TryParse(TextBox109.Text, load_inertia)
+            motor_inertia = 0.5 * NumericUpDown35.Value * (NumericUpDown36.Value / 2) ^ 2    '0.5*m*R^2
+            total_inertia = load_inertia + motor_inertia
+            load_torque = total_inertia * ang_acceleration
+
+            '-------------- aanloop tijd---------------
+            C_acc = 0.45 * (m_torque_inrush + m_torque_max) - (NumericUpDown38.Value * load_torque)
+            aanlooptijd = 2 * PI * n_actual * total_inertia / (60 * C_acc)
+
+            '------------verschil aanloop tijd en gewenst ---------------
+            verschil = aanlooptijd - NumericUpDown37.Value
+            'aanlooptijd = 2 * (4 * load_inertia) * (n_actual * 60) ^ 2 / (I_power * 10 ^ 3)
+        End If
+
+        TextBox195.Text = Round(n_actual, 0).ToString               'Toerental [rpm]
+        TextBox196.Text = Round(rad, 0).ToString                    'Hoeksnelheid [rad/s]
+        TextBox197.Text = Round(m_torque_inrush, 0).ToString        'Start torque [N.m]
+        TextBox198.Text = Round(m_torque_max, 0).ToString           'Max torque [N.m]
+        TextBox199.Text = Round(motor_inertia, 0).ToString          'Motor inertia [kg.m2]
+        TextBox200.Text = Round(m_torque_rated, 0).ToString         'Rated torque [N.m]
+        TextBox201.Text = Round(ang_acceleration, 1).ToString       'Hoekvesnelling [rad/s2]
+        TextBox202.Text = Round(load_inertia, 0).ToString           'Load inertia [kg.m2]
+        TextBox207.Text = Round(total_inertia, 0).ToString          'Total inertia [kg.m2]
+        TextBox206.Text = Round(m_torque_average, 0).ToString       'Torque average [kg.m2]
+        TextBox204.Text = Round(verschil, 0).ToString               'Verschil gewenst en aangenomen starttijd [s]
+        TextBox203.Text = Round(load_torque, 0).ToString            'Load torque [N.m]
+        TextBox205.Text = Round(C_acc, 0).ToString                  'Effective acceleration torque [N.m]
+        TextBox146.Text = Round(aanlooptijd, 1).ToString            'Aanlooptijd [s]
+
+        '-------------- check Verschil gewenst en aangenomen starttijd ----------------------
+        If Abs(verschil) > 3 Then
+            TextBox204.BackColor = Color.Red
+        Else
+            TextBox204.BackColor = Color.LightGreen
+        End If
+
+        '------- check aanlooptijd --------------------
+        If aanlooptijd > 20 Or aanlooptijd <= 0 Then
+            TextBox146.BackColor = Color.Red
+        Else
+            TextBox146.BackColor = Color.LightGreen
+        End If
+
+        '------- check koppel --------------------
+        If C_acc <= 0 Then
+            TextBox205.BackColor = Color.Red
+        Else
+            TextBox205.BackColor = Color.LightGreen
+        End If
+
+
+    End Sub
+
+    Private Sub Button9_Click(sender As Object, e As EventArgs) Handles Button9.Click, TabPage12.Enter, NumericUpDown38.ValueChanged, NumericUpDown37.ValueChanged, NumericUpDown36.ValueChanged, NumericUpDown35.ValueChanged, NumericUpDown34.ValueChanged, NumericUpDown14.ValueChanged, ComboBox6.SelectedIndexChanged
+        calc_emotor()
     End Sub
 
 End Class
