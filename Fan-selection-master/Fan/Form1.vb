@@ -116,11 +116,11 @@ Public Class Form1
     "WSTE/TSTE355;EN 10028-3 UNS;P355NH/NL1;1.0565/66;1.29;0.28;7850;192;470-630;284;315;340;304;284;255;226;206;186;157;A516-Gr70;--"}
 
     'Motoren
-    Public Shared emotor() As String = {"4.0; 3000", "5.5; 3000", "7.5; 3000", "11;  1500", "15; 3000", "22; 3000",
-                                       "30;   3000", "37;  3000", "45;  3000", "55;  3000", "75; 3000", "90; 3000",
-                                       "110;  3000", "132; 3000", "160; 3000", "200; 3000", "250; 3000", "315; 3000",
-                                       "355;  3000", "400; 3000", "450; 3000", "500; 3000", "560; 3000", "630; 3000",
-                                       "1000; 3000"}
+    Public Shared emotor() As String = {"4.0; 1500", "5.5; 1500", "7.5; 1500", "11;  1500", "15; 1500", "22; 1500",
+                                       "30;   1500", "37;  1500", "45;  1500", "55;  1500", "75; 1500", "90; 1500",
+                                       "110;  1500", "132; 1500", "160; 1500", "200; 1500", "250; 1500", "315; 1500",
+                                       "355;  1500", "400; 1500", "450; 1500", "500; 1500", "560; 1500", "630; 1500",
+                                       "1000; 1500"}
 
     Public Shared EXD_VSD_torque() As String = {"Hz; rpm; Koppel_%",
                                        "0 ; 0; 56",
@@ -705,16 +705,16 @@ Public Class Form1
         End If
     End Sub
 
-    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click, NumericUpDown19.ValueChanged, NumericUpDown17.ValueChanged, NumericUpDown14.ValueChanged, TextBox34.TextChanged, TabPage2.Enter, NumericUpDown20.ValueChanged, NumericUpDown21.ValueChanged, NumericUpDown32.ValueChanged, NumericUpDown31.ValueChanged, ComboBox6.SelectedIndexChanged, NumericUpDown30.ValueChanged, NumericUpDown29.ValueChanged, NumericUpDown28.ValueChanged
-        Calc_Stress_1()
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click, NumericUpDown19.ValueChanged, NumericUpDown17.ValueChanged, TextBox34.TextChanged, TabPage2.Enter, NumericUpDown20.ValueChanged, NumericUpDown21.ValueChanged, NumericUpDown32.ValueChanged, NumericUpDown31.ValueChanged, NumericUpDown30.ValueChanged, NumericUpDown29.ValueChanged, NumericUpDown28.ValueChanged, NumericUpDown11.ValueChanged
+        Calc_stress_impeller()
     End Sub
 
-    Private Sub Calc_Stress_1()
+    Private Sub Calc_stress_impeller()
         Dim T_type As Integer
         Dim maxrpm As Double
         Dim maxV As Double
         Dim sigma_allowed As Double
-        Dim Waaier_dia, Waaier_dik, Waaier_gewicht As Double    'Zonder naaf
+        Dim Waaier_dia, Waaier_dik, Waaier_gewicht, las_gewicht As Double    'Zonder naaf
         Dim labyrinth_gewicht As Double
         Dim S_breed As Double
         Dim S_dik, S_hoek, S_lengte As Double
@@ -734,6 +734,7 @@ Public Class Form1
         Dim dia_naaf, gewicht_as As Double
         Dim length_naaf, gewicht_pulley As Double
         Dim sg_staal As Double
+        Dim n_krit As Double
 
         If S_hoek > 90 Then TextBox37.Text = "90"
 
@@ -769,7 +770,9 @@ Public Class Form1
         labyrinth_gewicht = NumericUpDown32.Value                                                       'Labyrinth
         schoepen_gewicht = aantal_schoep * schoep_gewicht
 
+
         Double.TryParse(TextBox190.Text, gewicht_as)
+        las_gewicht = NumericUpDown11.Value         '[kg] las toevoeg materiaal
 
         gewicht_pulley = NumericUpDown30.Value
         dia_naaf = NumericUpDown28.Value / 1000     '[m]
@@ -778,7 +781,8 @@ Public Class Form1
         gewicht_naaf = PI / 4 * dia_naaf ^ 2 * length_naaf * sg_staal
         TextBox93.Text = Round(gewicht_naaf, 1).ToString
 
-        Waaier_gewicht = Bodem_gewicht + schoepen_gewicht + labyrinth_gewicht + Voorplaat_gewicht + gewicht_as + gewicht_naaf + gewicht_pulley     'totaal gewicht
+
+        Waaier_gewicht = Bodem_gewicht + schoepen_gewicht + labyrinth_gewicht + Voorplaat_gewicht + gewicht_as + gewicht_naaf + gewicht_pulley + las_gewicht     'totaal gewicht
 
         '--------max toerental (beide zijden ingeklemd)-----------
         maxrpm = 0.32 * Sqrt(sigma_allowed * S_dik / (sg_staal * Waaier_dia * S_breed ^ 2 * Cos(S_hoek * PI / 180)))
@@ -832,7 +836,7 @@ Public Class Form1
         TextBox45.Text = Round(Bodem_gewicht, 1).ToString
         TextBox94.Text = Round(Voorplaat_gewicht, 1).ToString
         TextBox95.Text = Round(schoepen_gewicht, 1).ToString
-        NumericUpDown14.Value = Round(Waaier_gewicht, 0).ToString
+        TextBox192.Text = Round(Waaier_gewicht, 0).ToString
         TextBox96.Text = Round(Waaier_gewicht, 1).ToString
         TextBox103.Text = Round(Voorplaat_keel * 1000, 0).ToString
         TextBox104.Text = Round(S_lengte * 1000, 0).ToString
@@ -842,7 +846,7 @@ Public Class Form1
         TextBox107.Text = Round(J3, 1).ToString
         TextBox108.Text = Round(J4, 1).ToString
         TextBox92.Text = Round(J_naaf, 2).ToString      'Massa traagheid (0.5*M*R^2)
-        TextBox109.Text = Round(J_tot, 1).ToString      ''Massa traagheid Totaal
+        TextBox109.Text = Round(J_tot, 1).ToString      'Massa traagheid Totaal
 
         TextBox146.Text = Round(aanlooptijd, 1).ToString        'Aanlooptijd [s]
 
@@ -865,10 +869,22 @@ Public Class Form1
         Else
             TextBox32.BackColor = Color.LightGreen
         End If
+
+
+        '-------------- kritisch toerental---------------
+        Double.TryParse(TextBox47.Text, n_krit)
+
+
+        If n_krit < n_actual * 60 * 1.2 Then
+            TextBox47.BackColor = Color.Red
+        Else
+            TextBox47.BackColor = Color.LightGreen
+        End If
+
     End Sub
 
     Private Sub TabPage2_TextChanged(sender As Object, e As EventArgs) Handles TabPage2.TextChanged
-        ' Calc_Stress_1()
+        ' Calc_stress_impeller()
     End Sub
     'Find the waaier diameter in the Renard reeks
     Function find_Renard_R20(getal As Double)
@@ -1809,7 +1825,10 @@ Public Class Form1
     End Sub
 
     Private Sub Button6_Click(sender As Object, e As EventArgs) Handles Button6.Click, NumericUpDown27.ValueChanged, NumericUpDown26.ValueChanged, NumericUpDown25.ValueChanged, NumericUpDown24.ValueChanged, NumericUpDown23.ValueChanged, NumericUpDown22.ValueChanged, TabPage5.Enter, NumericUpDown16.ValueChanged, ComboBox4.SelectedIndexChanged, RadioButton7.CheckedChanged, NumericUpDown15.ValueChanged
+        calc_bearing_belts()
 
+    End Sub
+    Private Sub calc_bearing_belts()
         Dim length_a, length_b, length_c, length_naaf As Double
         Dim dia_a, dia_b, dia_c, dia_naaf As Double
         Dim g_shaft_a, g_shaft_b, g_shaft_c, sg_staal As Double
@@ -1847,7 +1866,7 @@ Public Class Form1
         g_shaft_c = PI / 4 * dia_c ^ 2 * length_c * sg_staal
         gewicht_as = g_shaft_a + g_shaft_b + g_shaft_c
 
-        gewicht_waaier = NumericUpDown14.Value
+        Double.TryParse(TextBox192.Text, gewicht_waaier)
         gewicht_pulley = NumericUpDown30.Value
         gewicht_naaf = PI / 4 * dia_naaf ^ 2 * length_naaf * sg_staal
 
@@ -1944,6 +1963,7 @@ Public Class Form1
 
         TextBox111.Text = Round(N_max_doorbuiging * 1000, 3).ToString      'Max doorbuiging in [mm]
     End Sub
+
 
     Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click, NumericUpDown8.ValueChanged, NumericUpDown7.ValueChanged, NumericUpDown6.ValueChanged, NumericUpDown5.ValueChanged, NumericUpDown4.ValueChanged, NumericUpDown3.ValueChanged, NumericUpDown2.ValueChanged, NumericUpDown13.ValueChanged, NumericUpDown12.ValueChanged, NumericUpDown1.ValueChanged, ComboBox1.SelectedIndexChanged, RadioButton4.CheckedChanged, RadioButton3.CheckedChanged, CheckBox4.CheckedChanged, CheckBox5.CheckedChanged, NumericUpDown33.ValueChanged, ComboBox7.SelectedIndexChanged, TabPage1.Enter, RadioButton14.CheckedChanged, RadioButton13.CheckedChanged, RadioButton12.CheckedChanged, NumericUpDown58.ValueChanged
         If TabControl1.SelectedTab.Name = "TabPage1" Then
