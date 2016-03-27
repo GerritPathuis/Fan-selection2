@@ -2318,11 +2318,12 @@ Public Class Form1
         Next
     End Sub
     Private Sub calc_emotor()
-        ' see http://ecatalog.weg.net/files/wegnet/WEG-specification-of-electric-motors-50039409-manual-english.pdf
-        Dim Ins_power, aanlooptijd, n_actual, rad As Double
+        'see http://ecatalog.weg.net/files/wegnet/WEG-specification-of-electric-motors-50039409-manual-english.pdf
+        'see http://electrical-engineering-portal.com/calculation-of-motor-starting-time-as-first-approximation
+        Dim Ins_power, required_power, aanlooptijd, n_actual, rad As Double
         Dim m_torque_inrush, m_torque_max, m_torque_rated, m_torque_average As Double
-        Dim load_inertia, motor_inertia, total_inertia As Double
-        Dim ang_acceleration, C_acc, load_torque, verschil As Double
+        Dim impellar_inertia, motor_inertia, total_inertia As Double
+        Dim ang_acceleration, C_acc, inertia_torque, fan_load_torque As Double
 
         '----------------- aanlooptijd---------------
         If (ComboBox6.SelectedIndex > -1) Then      'Prevent exceptions
@@ -2338,15 +2339,15 @@ Public Class Form1
             m_torque_max = m_torque_rated * NumericUpDown34.Value
             m_torque_average = 0.45 * (m_torque_inrush + m_torque_max)
 
-            '---------- aanloop versnelling-------------
-            ang_acceleration = rad / NumericUpDown37.Value
+            '---------- actual required fan power----------------
+            required_power = NumericUpDown36.Value * Ins_power  '[kW]
+            fan_load_torque = required_power / rad              '[N.m]
 
             '------------- inertia load--------------------
-            Double.TryParse(TextBox109.Text, load_inertia)
-            load_inertia = load_inertia * NumericUpDown35.Value ^ 2         'in case speed ratio impeller/motor 
+            Double.TryParse(TextBox109.Text, impellar_inertia)
+            impellar_inertia = impellar_inertia * NumericUpDown35.Value ^ 2         'in case speed ratio impeller/motor 
 
             '------------- inertia motor--------------------
-
             Select Case True
                 Case n_actual = 3000
                     motor_inertia = 0.04 * (Ins_power / 1000) ^ 0.9 * 1 ^ 2.5    '2 poles (1 pair) (3000 rpm) [kg.m2]
@@ -2360,16 +2361,12 @@ Public Class Form1
                     MessageBox.Show("Error occured in Motor Inertia calculation ")
             End Select
 
-            total_inertia = load_inertia + motor_inertia
-            load_torque = total_inertia * ang_acceleration
+            total_inertia = impellar_inertia + motor_inertia    '[kg.m2]
+            inertia_torque = total_inertia * ang_acceleration     '[N.m]
 
             '-------------- aanloop tijd---------------
-            C_acc = 0.45 * (m_torque_inrush + m_torque_max) - (NumericUpDown38.Value * load_torque)
+            C_acc = 0.45 * (m_torque_inrush + m_torque_max) - (NumericUpDown38.Value * fan_load_torque)
             aanlooptijd = 2 * PI * n_actual * total_inertia / (60 * C_acc)
-
-            '------------verschil aanloop tijd en gewenst ---------------
-            verschil = aanlooptijd - NumericUpDown37.Value
-            'aanlooptijd = 2 * (4 * load_inertia) * (n_actual * 60) ^ 2 / (I_power * 10 ^ 3)
         End If
 
         TextBox195.Text = Round(n_actual, 0).ToString               'Toerental [rpm]
@@ -2378,21 +2375,18 @@ Public Class Form1
         TextBox198.Text = Round(m_torque_max, 0).ToString           'Max torque [N.m]
         TextBox199.Text = Round(motor_inertia, 2).ToString          'Motor inertia [kg.m2]
         TextBox200.Text = Round(m_torque_rated, 0).ToString         'Rated torque [N.m]
-        TextBox201.Text = Round(ang_acceleration, 1).ToString       'Hoekvesnelling [rad/s2]
-        TextBox202.Text = Round(load_inertia, 1).ToString           'Load inertia [kg.m2]
-        TextBox207.Text = Round(total_inertia, 1).ToString          'Total inertia [kg.m2]
+
+        TextBox202.Text = Round(impellar_inertia, 1).ToString       'impellar inertia [kg.m2]
+        TextBox207.Text = Round(motor_inertia, 1).ToString          'motor inertia [kg.m2]
+        TextBox213.Text = Round(total_inertia, 1).ToString          'Total inertia[kg.m2]
+
         TextBox206.Text = Round(m_torque_average, 0).ToString       'Torque average [kg.m2]
-        TextBox204.Text = Round(verschil, 0).ToString               'Verschil gewenst en aangenomen starttijd [s]
-        TextBox203.Text = Round(load_torque, 0).ToString            'Load torque [N.m]
         TextBox205.Text = Round(C_acc, 0).ToString                  'Effective acceleration torque [N.m]
+        TextBox214.Text = Round(required_power / 1000, 0).ToString  'Fan power @ max speed [kw]
+        TextBox215.Text = Round(fan_load_torque, 0).ToString        'Fan torque @ max speed [N.m]
+
         TextBox146.Text = Round(aanlooptijd, 1).ToString            'Aanlooptijd [s]
 
-        '-------------- check Verschil gewenst en aangenomen starttijd ----------------------
-        If Abs(verschil) > 3 Then
-            TextBox204.BackColor = Color.Red
-        Else
-            TextBox204.BackColor = Color.LightGreen
-        End If
 
         '------- check aanlooptijd --------------------
         If aanlooptijd > 20 Or aanlooptijd <= 0 Then
@@ -2407,12 +2401,10 @@ Public Class Form1
         Else
             TextBox205.BackColor = Color.LightGreen
         End If
-
-
-
     End Sub
 
-    Private Sub Button9_Click(sender As Object, e As EventArgs) Handles Button9.Click, TabPage12.Enter, NumericUpDown38.ValueChanged, NumericUpDown37.ValueChanged, NumericUpDown34.ValueChanged, NumericUpDown14.ValueChanged, ComboBox6.SelectedIndexChanged, NumericUpDown35.ValueChanged
+    Private Sub Button9_Click(sender As Object, e As EventArgs) Handles Button9.Click, TabPage12.Enter, NumericUpDown38.ValueChanged, NumericUpDown34.ValueChanged, NumericUpDown14.ValueChanged, ComboBox6.SelectedIndexChanged, NumericUpDown35.ValueChanged, NumericUpDown36.ValueChanged
+        Calc_stress_impeller()
         calc_emotor()
         draw_chart3()
     End Sub
