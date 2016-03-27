@@ -146,29 +146,29 @@ Public Class Form1
    "710; 1500; 400L; 1928; 85",
    "1000; 1500; Spec; 00; 00"}
 
-
-    Public Shared EXD_VSD_torque() As String = {"Hz; rpm; Koppel_%",
-                                      "0 ; 0; 56",
-                                      "5 ; 149; 75",
-                                      "10; 297; 81",
-                                      "15; 446; 85.5",
-                                      "20; 595; 90",
-                                      "25; 744; 92",
-                                      "30; 892; 94",
-                                      "35; 1041; 96",
-                                      "40; 1190; 98",
-                                      "45; 1338; 100",
-                                      "50; 1487; 90",
-                                      "55; 1636, 83",
-                                      "60; 1784; 76",
-                                      "65; 1933; 69",
-                                      "70; 2082; 63",
-                                      "75; 2231; 57.5",
-                                      "80; 2379; 53.5",
-                                      "85; 2528; 49",
-                                      "90; 2677; 46",
-                                      "95; 2825; 43.5",
-                                      "100; 2974; 42"}
+    'Hz; rpm; Koppel_%,
+    Public Shared EXD_VSD_torque() As String = {
+     "0 ; 0; 56",
+     "5 ; 149; 75",
+     "10; 297; 81",
+     "15; 446; 85.5",
+     "20; 595; 90",
+     "25; 744; 92",
+     "30; 892; 94",
+     "35; 1041; 96",
+     "40; 1190; 98",
+     "45; 1338; 100",
+     "50; 1487; 90",
+     "55; 1636; 83",
+     "60; 1784; 76",
+     "65; 1933; 69",
+     "70; 2082; 63",
+     "75; 2231; 57.5",
+     "80; 2379; 53.5",
+     "85; 2528; 49",
+     "90; 2677; 46",
+     "95; 2825; 43.5",
+     "100; 2974; 42"}
 
     Dim flenzen() As Double = {71, 80, 90, 100, 112, 125, 140, 160, 180, 200, 224, 250, 280, 315, 355, 400, 450, 500, 560, 630, 710, 800, 900, 1000, 1120, 1250, 1400, 1600, 1800, 2000}
     Dim R20() As Double
@@ -267,14 +267,14 @@ Public Class Form1
         ComboBox6.Items.Clear()                     'Note Combobox1 contains"startup" to prevent exceptions
         ComboBox7.Items.Clear()                     'Note Combobox1 contains"startup" to prevent exceptions
 
-        For hh = 0 To (UBound(Tschets) - 1)            'Fill combobox 1, 2 +5 met Fan Types
+        For hh = 0 To (Tschets.Length - 2)            'Fill combobox 1, 2 +5 met Fan Types
             ComboBox1.Items.Add(Tschets(hh).Tname)
             ComboBox2.Items.Add(Tschets(hh).Tname)
             ComboBox7.Items.Add(Tschets(hh).Tname)
         Next hh
 
         '-------Fill combobox3, Steel selection------------------
-        For hh = 0 To (UBound(steel) - 1)            'Fill combobox 3 with steel data
+        For hh = 0 To (steel.Length - 2)            'Fill combobox 3 with steel data
             words = steel(hh).Split(";")
             ComboBox3.Items.Add(words(0))
         Next hh
@@ -282,7 +282,7 @@ Public Class Form1
         Label34.Text = ChrW(963) & " 0.2 @ T bedrijf [N/mm]"
 
         '-------Fill combobox4, Motor selection------------------
-        For hh = 0 To (UBound(emotor))            'Fill combobox 4 electric motor data
+        For hh = 0 To (emotor.Length - 1)            'Fill combobox 4 electric motor data
             words = emotor(hh).Split(";")
             ComboBox4.Items.Add(words(0))
             ComboBox6.Items.Add(words(0))
@@ -760,6 +760,7 @@ Public Class Form1
         Dim length_naaf, gewicht_pulley As Double
         Dim sg_staal As Double
         Dim n_krit As Double
+        Dim back_plate_steel, back_plate_alu As Double
 
         If S_hoek > 90 Then TextBox37.Text = "90"
 
@@ -841,6 +842,14 @@ Public Class Form1
         J_tot = J1 + J2 + J3 + J4 + J_naaf + j_as
 
 
+        '------------ Eigen frequenties bodemplaat ---------------------------
+        '------------ Roarks, 8 edition, pagina 793 ----------------------------
+        back_plate_steel = 4.4 * (NumericUpDown17.Value / 25.4) / (NumericUpDown21.Value / (2 * 25.4)) ^ 2 * 10 ^ 4
+        back_plate_alu = back_plate_steel * 1.04
+        TextBox209.Text = Round(back_plate_steel, 1).ToString           'Bodemplaat eigenfrequentie staal [Hz]
+        TextBox210.Text = Round(back_plate_alu, 1).ToString             'Bodemplaat eigenfrequentie aluminium [Hz]
+        TextBox211.Text = Round(back_plate_steel * 60, 0).ToString      'Bodemplaat eigenfrequentie staal [rpm]
+        TextBox212.Text = Round(back_plate_alu * 60, 0).ToString        'Bodemplaat eigenfrequentie aluminium [rpm]
 
         '--------Present data------------
         TextBox32.Text = Round(sigma_bodemplaat, 0).ToString
@@ -881,6 +890,7 @@ Public Class Form1
         Else
             NumericUpDown19.BackColor = Color.LightGreen
         End If
+
         '-------------- check bodemplaat stress safety-----------------------
         If sigma_bodemplaat > sigma_allowed / 1000 ^ 2 Then
             TextBox32.BackColor = Color.Red
@@ -888,16 +898,24 @@ Public Class Form1
             TextBox32.BackColor = Color.LightGreen
         End If
 
-
         '-------------- kritisch toerental---------------
         Double.TryParse(TextBox47.Text, n_krit)
-
 
         If n_krit < n_actual * 60 * 1.2 Then
             TextBox47.BackColor = Color.Red
         Else
             TextBox47.BackColor = Color.LightGreen
         End If
+
+        '-------------- kritisch toerental bodemschijf-----------
+        If back_plate_steel < n_actual * 1.05 Then
+            TextBox211.BackColor = Color.Red
+            TextBox212.BackColor = Color.Red
+        Else
+            TextBox211.BackColor = Color.LightGreen
+            TextBox212.BackColor = Color.LightGreen
+        End If
+
 
     End Sub
 
@@ -1487,7 +1505,7 @@ Public Class Form1
         Dim hh, jj, pos_counter As Integer
         Dim eff_hi As Double
 
-        For jj = 0 To (UBound(Tschets) - 1)                '30 T schetsen 
+        For jj = 0 To (Tschets.Length - 2)                '30 T schetsen 
             eff_hi = 0
             pos_counter = 0
             For hh = 0 To 11                'Check all Efficiencies to find the highest
@@ -1958,7 +1976,6 @@ Public Class Form1
         TextBox194.Text = Round(J_shaft_c, 2).ToString          'Massa traagheid (0.5*M*R^2)
         TextBox41.Text = Round(J_shaft_total, 2).ToString       'Massa traagheid (0.5*M*R^2)
 
-
         '----------- Present gewicht------------------
         TextBox46.Text = Round(g_shaft_a, 1).ToString
         TextBox48.Text = Round(g_shaft_b, 1).ToString
@@ -1979,7 +1996,8 @@ Public Class Form1
         TextBox101.Text = Round(F_b_combined, 0).ToString   'Force lager B hor+vert combined
         TextBox19.Text = Round(F_axial, 0).ToString         'Force axial
 
-        TextBox111.Text = Round(N_max_doorbuiging * 1000, 3).ToString      'Max doorbuiging in [mm]
+        '----------- eigen frequentie ---------------------
+        TextBox111.Text = Round(N_max_doorbuiging * 1000, 3).ToString   'Max doorbuiging in [mm]
     End Sub
 
 
@@ -2391,10 +2409,45 @@ Public Class Form1
         End If
 
 
+
     End Sub
 
     Private Sub Button9_Click(sender As Object, e As EventArgs) Handles Button9.Click, TabPage12.Enter, NumericUpDown38.ValueChanged, NumericUpDown37.ValueChanged, NumericUpDown34.ValueChanged, NumericUpDown14.ValueChanged, ComboBox6.SelectedIndexChanged, NumericUpDown35.ValueChanged
         calc_emotor()
+        draw_chart3()
     End Sub
+    Private Sub draw_chart3()
+        Dim hh As Integer
+            Dim words() As String
 
+        Try
+            'Clear all series And chart areas so we can re-add them
+            Chart3.Series.Clear()
+            Chart3.ChartAreas.Clear()
+            Chart3.Titles.Clear()
+            Chart3.Series.Add("Series0")        'Koppel
+            Chart3.ChartAreas.Add("ChartArea0")
+            Chart3.Series(0).ChartArea = "ChartArea0"
+            Chart3.Series(0).ChartType = DataVisualization.Charting.SeriesChartType.Line
+            Chart3.Titles.Add("VSD motor koppel")
+            Chart3.Titles(0).Font = New Font("Arial", 16, System.Drawing.FontStyle.Bold)
+            Chart3.Series(0).Name = "Koppel motor [%]"
+            Chart3.Series(0).Color = Color.Blue
+            Chart3.ChartAreas("ChartArea0").AxisX.Minimum = 0
+            Chart3.ChartAreas("ChartArea0").AxisX.MinorTickMark.Enabled = True
+            Chart3.ChartAreas("ChartArea0").AxisY.Title = "Koppel [-]"
+            Chart3.ChartAreas("ChartArea0").AxisX.Title = "[Hz]"
+
+            '------------------- Draw the lines in the chart--------------------
+            For hh = 0 To (EXD_VSD_torque.Length - 1)
+                words = EXD_VSD_torque(hh).Split(";")
+
+                Chart3.Series(0).Points.AddXY(words(0), words(2))
+            Next hh
+            Chart3.Refresh()
+        Catch ex As Exception
+            'MessageBox.Show(ex.Message &"Line 2400")  ' Show the exception's message.
+        End Try
+
+    End Sub
 End Class
