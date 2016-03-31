@@ -241,6 +241,15 @@
         CmIBAACjIBYAADAKYgEAAKMgFgAAMApiAQAAIzTN/wH7ZaqlU9q6NwAAAABJRU5ErkJggg==
 </value>
   </data>
+  <data name="TextBox201.Text" xml:space="preserve">
+    <value>Kennemer selectie programma versie 95.2
+
+Gebruik
+Regel 3 niet standaard vaste diameter
+Regel 13  Normaal conditie invullen  dwz 0 celcius ro2=ro1 * (273+t2)/273, druk wordt niet teruggerekend naar atmosferisch
+
+ </value>
+  </data>
   <data name="TextBox142.Text" xml:space="preserve">
     <value>Efficiency
 

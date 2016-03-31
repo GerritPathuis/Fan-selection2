@@ -949,7 +949,8 @@ Public Class Form1
     Function kin_visco_air(temp As Double)
         Dim visco As Double
 
-        '--------- Kinmatic viscosity air[m2/s]-----------------------
+        '--------- Kinematic viscosity air[m2/s]
+        '-----Kinematic viscosity = dynamic/density------------------
         ' Formula valid from -200 to +400 celcius------------------
         If temp > 400 Then MessageBox.Show("kin_visco_air(temp) too high")
         If temp < -200 Then MessageBox.Show("kin_visco_air(temp) too low")
@@ -1316,7 +1317,7 @@ Public Class Form1
                 Chart1.ChartAreas.Clear()
                 Chart1.Titles.Clear()
 
-                Chart1.Series.Add("Series0")    'Pressure totaal
+                Chart1.Series.Add("Series0")    'Total Pressure 
                 Chart1.Series.Add("Series1")    'Efficiency
                 Chart1.Series.Add("Series2")    'Power
                 Chart1.Series.Add("Series3")    'Market dot
@@ -1345,10 +1346,12 @@ Public Class Form1
                 Chart1.Series(4).Name = "Marker"
                 Chart1.Series(5).Name = "P static [mBar]"
 
-                Chart1.Series(0).Color = Color.Blue
-                Chart1.Series(1).Color = Color.Red
-                Chart1.Series(2).Color = Color.Green
-                Chart1.Series(3).Color = Color.Blue
+                Chart1.Series(0).Color = Color.Blue         'Total pressure
+                Chart1.Series(1).Color = Color.Red          'Efficiency
+                Chart1.Series(2).Color = Color.Green        'Power
+                Chart1.Series(3).Color = Color.Blue         'marker
+                Chart1.Series(4).Color = Color.LightBlue    'Line resistance
+                Chart1.Series(5).Color = Color.Blue         'Static pressure
 
                 '----------- labels on-off ------------------
                 Chart1.Series(0).IsValueShownAsLabel = True
@@ -1360,9 +1363,10 @@ Public Class Form1
                     Chart1.Series(5).IsValueShownAsLabel = True
                 End If
 
-                Chart1.Series(0).BorderWidth = 4
+                Chart1.Series(0).BorderWidth = 4    'Total pressure
                 Chart1.Series(1).BorderWidth = 3
-                Chart1.Series(2).BorderWidth = 4
+                Chart1.Series(2).BorderWidth = 3
+                Chart1.Series(5).BorderWidth = 4    'Static pressure
 
                 Chart1.ChartAreas("ChartArea0").AxisX.Minimum = 0
                 Chart1.ChartAreas("ChartArea0").AxisX.MinorTickMark.Enabled = True
@@ -1407,23 +1411,31 @@ Public Class Form1
                         If CheckBox2.Checked Then               '========Per uur=========
                             debiet = Round(debiet * 3600, 1)
                         End If
+                        If CheckBox7.Checked Then
+                            Chart1.Series(1).Points.AddXY(debiet, Round(Tschets(Tschets_no).Teff_scaled_poly(hh), 1))
+                        End If
                         Chart1.Series(0).Points.AddXY(debiet, Round(Tschets(Tschets_no).TPtot_scaled_poly(hh), 1))
-                        Chart1.Series(1).Points.AddXY(debiet, Round(Tschets(Tschets_no).Teff_scaled_poly(hh), 1))
-                        Chart1.Series(2).Points.AddXY(debiet, Round(Tschets(Tschets_no).Tverm_scaled_poly(hh), 1))
+                        If CheckBox8.Checked Then
+                            Chart1.Series(2).Points.AddXY(debiet, Round(Tschets(Tschets_no).Tverm_scaled_poly(hh), 1))
+                        End If
                         Chart1.Series(5).Points.AddXY(debiet, Round(Tschets(Tschets_no).TPstat_scaled_poly(hh), 1))
-                    Else
-                        debiet = Tschets(Tschets_no).TFlow_scaled(hh)
+                        Else
+                            debiet = Tschets(Tschets_no).TFlow_scaled(hh)
                         If CheckBox2.Checked Then          '========Per uur=========
                             debiet = Round(debiet * 3600, 1)
                         End If
+                        If CheckBox7.Checked Then
+                            Chart1.Series(1).Points.AddXY(debiet, Round(Tschets(Tschets_no).Teff_scaled(hh), 1))
+                        End If
                         Chart1.Series(0).Points.AddXY(debiet, Round(Tschets(Tschets_no).TPtot_scaled(hh), 1))
-                        Chart1.Series(1).Points.AddXY(debiet, Round(Tschets(Tschets_no).Teff_scaled(hh), 1))
-                        Chart1.Series(2).Points.AddXY(debiet, Round(Tschets(Tschets_no).Tverm_scaled(hh), 1))
+                        If CheckBox8.Checked Then
+                            Chart1.Series(2).Points.AddXY(debiet, Round(Tschets(Tschets_no).Tverm_scaled(hh), 1))
+                        End If
                         Chart1.Series(5).Points.AddXY(debiet, Round(Tschets(Tschets_no).TPstat_scaled(hh), 1))
-                    End If
+                        End If
 
-                    '-------------------Target dot ---------------------
-                    If CheckBox3.Checked = True Then
+                        '-------------------Target dot ---------------------
+                        If CheckBox3.Checked = True Then
                         Chart1.Series(3).YAxisType = AxisType.Primary
                         Chart1.Series(3).Points.AddXY(Q_target, P_target)
                         Chart1.Series(3).Points(0).MarkerStyle = DataVisualization.Charting.MarkerStyle.Star10
@@ -2090,7 +2102,7 @@ Public Class Form1
         TextBox145.Text = Round(spalt_loss, 1).ToString     '[kg/hr]
     End Sub
 
-    Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click, CheckBox6.CheckedChanged, CheckBox3.CheckedChanged, CheckBox2.CheckedChanged, CheckBox1.CheckedChanged, TabPage3.Enter, NumericUpDown9.ValueChanged, NumericUpDown10.ValueChanged, RadioButton9.CheckedChanged, RadioButton11.CheckedChanged, RadioButton10.CheckedChanged
+    Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click, CheckBox6.CheckedChanged, CheckBox3.CheckedChanged, CheckBox2.CheckedChanged, CheckBox1.CheckedChanged, TabPage3.Enter, NumericUpDown9.ValueChanged, NumericUpDown10.ValueChanged, RadioButton9.CheckedChanged, RadioButton11.CheckedChanged, RadioButton10.CheckedChanged, CheckBox7.CheckedChanged, CheckBox8.CheckedChanged
         Scale_rules_applied(ComboBox1.SelectedIndex, NumericUpDown9.Value, NumericUpDown10.Value, NumericUpDown12.Value)
         draw_chart1(ComboBox1.SelectedIndex)
     End Sub
@@ -2442,4 +2454,5 @@ Public Class Form1
         End Try
 
     End Sub
+
 End Class
