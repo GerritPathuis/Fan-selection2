@@ -195,6 +195,7 @@ Public Class Form1
     Public T_air_temp As Double         'Lucht temperatuur inlet [celcius]
     Public T_spec_labour As Double      'Specifieke arbeid [J/kg]
     Public T_Totaaldruckzahl As Double  'Kental [-]
+    Public T_Staticdruckzahl As Double  'Kental [-]
     Public T_Volumezahl As Double       'Kental [-]
     Public T_laufzahl As Double         'Laufzahl kengetal [-]
     Public T_Drehzahl As Double         'Drehzahl kengetal [-]
@@ -315,9 +316,10 @@ Public Class Form1
         Dim nrq As Integer
         Dim Rel_humidity As Double
         Dim P_systeem_Pa As Double          'Ring syteem onder druk Pressure abs in [Pa]
-        Dim P_ambient_Pa As Double          'Pressure abs in [Pa]
-        Dim P_zuig_Pa As Double             'Pressure abs in [Pa]
-        Dim P_pers_Pa As Double             'Pressure abs in [Pa]
+        Dim P_ambient_Pa As Double          'Pressure abs in [Pa] static
+        Dim P_zuig_Pa_static As Double      'Pressure abs in [Pa] static
+        Dim P_pers_Pa_static As Double      'Pressure abs in [Pa] static
+        Dim P_pers_Pa_total As Double       'Pressure abs in [Pa] total
         Dim visco_temp As Double
         Dim site_altitude As Double
         Dim Ttype As Int16                  'Waaier type
@@ -402,6 +404,9 @@ Public Class Form1
                 '--------------- Totaldruckzahl (Zie hoofdstuk 4.2,  pagina 130 )---------------------------------
                 T_Totaaldruckzahl = 2 * T_Ptot_Pa / (T_sg_gewicht * T_omtrek_s ^ 2)
 
+                '--------------- Staicdruckzahl (Zie hoofdstuk 4.2,  pagina 130 )---------------------------------
+                T_Staticdruckzahl = 2 * T_PStat_Pa / (T_sg_gewicht * T_omtrek_s ^ 2)
+
                 '----------- Volume zahl----------------------------------------------------------------------------
                 T_Volumezahl = 4 * T_Debiet_sec / (Pow(PI, 2) * Pow(T_diaw_m, 3) * T_Toerental_sec)
 
@@ -427,10 +432,8 @@ Public Class Form1
                 TextBox123.Text = Round(T_Drehzahl * 60, 0).ToString       'Spez Drehzahl [rpm]
                 TextBox124.Text = Round(T_spec_labour, 0).ToString         'Spez. Arbeid [j/Kg]
 
-
                 '--------------------------- gewenste gegevens------------------------------------------
-                G_Ptot_mBar = NumericUpDown2.Value          'Gewenst Pressure totaal [mbar]
-                G_Ptot_Pa = G_Ptot_mBar * 100               'Gewenst Pressure totaal [Pa]
+                G_Pstat_Pa = NumericUpDown37.Value * 100    'Gewenst Pressure totaal [mbar]->[Pa]
                 G_air_temp = NumericUpDown4.Value           'Gewenste arbeids temperatuur in [c]
 
                 '------------ Gas mol Weight vochtigheid ---------------
@@ -452,17 +455,16 @@ Public Class Form1
                 P_ambient_Pa = Round(1013.15 * Pow(E, -Gas_mol_weight * 9.81 * site_altitude / (8.3144621 * (G_air_temp + 273.15))), 0) * 100
 
                 '----------- Zuigdruk ----------------
-                P_zuig_Pa = P_ambient_Pa - (NumericUpDown6.Value * 100) 'Inlet resctrictions reduce the pressure inside the fan
+                P_zuig_Pa_static = P_ambient_Pa - (NumericUpDown6.Value * 100) 'Inlet resctrictions reduce the pressure inside the fan
 
-                P_zuig_Pa += P_systeem_Pa
-                TextBox91.Text = Round(P_zuig_Pa.ToString / 100, 0)
-                P_pers_Pa = P_zuig_Pa + G_Ptot_Pa
-
+                P_zuig_Pa_static += P_systeem_Pa
+                TextBox91.Text = Round(P_zuig_Pa_static.ToString / 100, 0)
+                P_pers_Pa_static = P_zuig_Pa_static + G_Pstat_Pa
 
                 '---------------Density berekenen of invullen----------------
                 If RadioButton3.Checked = True Then     'Density berekenen
                     NumericUpDown12.Enabled = False
-                    G_density_act_zuig = calc_sg_air(P_zuig_Pa, G_air_temp, Rel_humidity, Gas_mol_weight)       'Actual conditions zuig
+                    G_density_act_zuig = calc_sg_air(P_zuig_Pa_static, G_air_temp, Rel_humidity, Gas_mol_weight)       'Actual conditions zuig
                     G_density_N_zuig = calc_sg_air(101325, 0, Rel_humidity, Gas_mol_weight)                     'Normal conditions zuig
                     NumericUpDown12.Text = Round(G_density_act_zuig, 3).ToString                                'Density zuig
                     NumericUpDown12.BackColor = Color.White         'Density invullen
@@ -493,8 +495,8 @@ Public Class Form1
                 G_Debiet_z_N_hr = G_Debiet_kg_s / G_density_N_zuig * 3600   'Gewenst Debiet [Nm3/hr]
                 G_Debiet_p = G_Debiet_kg_s / G_density_act_pers             'Pers Debiet [Am3/hr]
 
-                '----------- de gewenste waaier---------------
-                G_omtrek_s = Pow(2 * G_Ptot_Pa / (G_density_act_zuig * T_Totaaldruckzahl), 0.5)
+                '----------- calc diameter and rpm gewenste waaier---------------
+                G_omtrek_s = Pow(2 * G_Pstat_Pa / (G_density_act_zuig * T_Staticdruckzahl), 0.5)
                 G_diaw_m = Pow(4 * (G_Debiet_z_act_sec) / (PI * T_Volumezahl * G_omtrek_s), 0.5)
                 G_Toerental_rpm = (G_omtrek_s / (PI * G_diaw_m)) * 60
 
@@ -505,9 +507,10 @@ Public Class Form1
                 G_temp_uit_c = G_air_temp + (G_as_kw / (cp_air * G_Debiet_kg_s))
 
                 '----------------- Actual conditions at discharge ----------------------------
-                G_density_act_pers = calc_density(G_density_act_zuig, P_zuig_Pa, P_pers_Pa, G_air_temp, G_temp_uit_c)
+                G_density_act_pers = calc_density(G_density_act_zuig, P_zuig_Pa_static, P_pers_Pa_static, G_air_temp, G_temp_uit_c)
 
-                '---------- Static Pressure -----------------------
+
+                '---------- Calc Static + total Pressure -----------------------
                 Ttype = ComboBox1.SelectedIndex
                 diam1 = Tschets(Ttype).Tdata(0) / 1000      'waaier diameter [m]
                 diam2 = G_diaw_m
@@ -515,22 +518,25 @@ Public Class Form1
                 nn2 = G_Toerental_rpm
                 roo1 = Tschets(Ttype).Tdata(2)              'density [kg/m3]
                 roo2 = NumericUpDown12.Value
-                G_Pstat_Pa = Round(Scale_rule_Pressure(Tschets(Ttype).werkp_opT(2), diam1, diam2, nn1, nn2, roo1, roo2), 0)
 
+                G_Pstat_Pa = Round(Scale_rule_Pressure(Tschets(Ttype).werkp_opT(2), diam1, diam2, nn1, nn2, roo1, roo2), 0)
+                G_Ptot_Pa = Round(Scale_rule_Pressure(Tschets(Ttype).werkp_opT(1), diam1, diam2, nn1, nn2, roo1, roo2), 0)
+                P_pers_Pa_total = P_zuig_Pa_static + G_Ptot_Pa
 
                 '---------- presenteren-----------------------
                 TextBox16.Text = Round(G_temp_uit_c, 0).ToString            'Temp uit
-                TextBox23.Text = Round(P_pers_Pa / 100, 3).ToString         'Pers druk in mbar abs
+                TextBox23.Text = Round(P_pers_Pa_static / 100, 0).ToString  'Static Pers druk in mbar abs
+                TextBox152.Text = Round(P_pers_Pa_total / 100, 0).ToString  'Total druk in mbar abs
                 TextBox24.Text = Round(G_density_N_zuig, 3).ToString
                 TextBox25.Text = Round(G_density_act_pers, 3).ToString
-                TextBox26.Text = Round(G_omtrek_s, 2).ToString              'Omtrek snelheid
+                TextBox26.Text = Round(G_omtrek_s, 0).ToString              'Omtrek snelheid
                 TextBox28.Text = Round(G_Debiet_p * 3600, 0).ToString       'Pers debiet is kleiner dan zuig debiet door drukverhoging
                 TextBox27.Text = Round(G_diaw_m * 1000, 0).ToString         'Diameter waaier [mm]
                 TextBox29.Text = Round(G_Toerental_rpm, 0).ToString
                 TextBox58.Text = Round(G_as_kw, 1).ToString
                 TextBox20.Text = Round(G_Debiet_z_N_hr, 0).ToString         'Debiet [Nm3/hr]  
                 TextBox22.Text = Round(G_Debiet_z_act_hr, 0).ToString       'Debiet [Am3/hr]  
-                TextBox152.Text = Round(G_Pstat_Pa / 100, 1).ToString       'Pstatic [mBar]  
+                TextBox203.Text = Round(G_Ptot_Pa / 100, 1).ToString        'Ptotal [mBar]  
 
                 '==================================================================================================
                 '----------------------------- Renard R20 reeks voor de waaier ------------------------------------
@@ -594,8 +600,8 @@ Public Class Form1
                 cond(1).Qkg = NumericUpDown3.Value                  '[kg/hr]
 
                 cond(1).Ro1 = NumericUpDown12.Value                 'density [kg/m3] inlet flange
-                cond(1).Pt1 = P_zuig_Pa - 101300                    '[PaG] inlet flange waaier #1           
-                cond(1).Ps1 = P_zuig_Pa - 101300                    '[PaG] inlet flange waaier #1
+                cond(1).Pt1 = P_zuig_Pa_static - 101300                    '[PaG] inlet flange waaier #1           
+                cond(1).Ps1 = P_zuig_Pa_static - 101300                    '[PaG] inlet flange waaier #1
                 cond(1).Power0 = Tschets(cond(1).Typ).werkp_opT(3)  '[Am3/s] Tschets
 
                 Calc_stage(cond(1))             'Bereken de waaier #1  
@@ -1346,7 +1352,7 @@ Public Class Form1
                 Chart1.Series(4).Name = "Marker"
                 Chart1.Series(5).Name = "P static [mBar]"
 
-                Chart1.Series(0).Color = Color.Blue         'Total pressure
+                Chart1.Series(0).Color = Color.Green        'Total pressure
                 Chart1.Series(1).Color = Color.Red          'Efficiency
                 Chart1.Series(2).Color = Color.Green        'Power
                 Chart1.Series(3).Color = Color.Blue         'marker
@@ -1354,19 +1360,17 @@ Public Class Form1
                 Chart1.Series(5).Color = Color.Blue         'Static pressure
 
                 '----------- labels on-off ------------------
-                Chart1.Series(0).IsValueShownAsLabel = True
+                Chart1.Series(5).IsValueShownAsLabel = True
                 If CheckBox6.Checked Then   'Labels on
                     Chart1.Series(1).IsValueShownAsLabel = True
                     Chart1.Series(2).IsValueShownAsLabel = True
-                    'Chart1.Series(3).IsValueShownAsLabel = True
-                    'Chart1.Series(4).IsValueShownAsLabel = True
                     Chart1.Series(5).IsValueShownAsLabel = True
                 End If
 
-                Chart1.Series(0).BorderWidth = 4    'Total pressure
-                Chart1.Series(1).BorderWidth = 3
-                Chart1.Series(2).BorderWidth = 3
-                Chart1.Series(5).BorderWidth = 4    'Static pressure
+                Chart1.Series(0).BorderWidth = 1    'Total pressure
+                Chart1.Series(1).BorderWidth = 1
+                Chart1.Series(2).BorderWidth = 1
+                Chart1.Series(5).BorderWidth = 3    'Static pressure
 
                 Chart1.ChartAreas("ChartArea0").AxisX.Minimum = 0
                 Chart1.ChartAreas("ChartArea0").AxisX.MinorTickMark.Enabled = True
@@ -1375,7 +1379,7 @@ Public Class Form1
 
                 '---------------- fan target info---------------------
                 TextBox149.Text = Round(G_Debiet_z_act_hr, 0).ToString  'Debiet [Am3/hr]
-                TextBox148.Text = NumericUpDown2.Value.ToString         'Ptotal [mbar]
+                TextBox148.Text = NumericUpDown37.Value.ToString        'Pstatic [mbar]
                 TextBox156.Text = NumericUpDown12.Value.ToString        'Density [kg/m3]
 
                 Chart1.ChartAreas("ChartArea0").AxisY.Title = "Ptotaal [mBar]"
@@ -1391,11 +1395,11 @@ Public Class Form1
                 '------------------ Grafiek tekst en target ---------------------
                 If CheckBox2.Checked Then               '========Per uur=========
                     Q_target = G_Debiet_z_act_hr                                            '[Am3/hr]
-                    P_target = NumericUpDown2.Value                                         '[mBar] Gewenste fan  gegevens
+                    P_target = NumericUpDown37.Value                                        '[mBar] Gewenste fan  gegevens
                     Chart1.ChartAreas("ChartArea0").AxisX.Title = "Debiet [Am3/hr]"
                 Else                                    '========Per seconde=========
                     Q_target = G_Debiet_z_act_hr / 3600                                     '[Am3/sec]
-                    P_target = NumericUpDown2.Value                                         '[mBar] Gewenste fan  gegevens
+                    P_target = NumericUpDown37.Value                                        '[mBar] Gewenste fan  gegevens
                     Chart1.ChartAreas("ChartArea0").AxisX.Title = "Debiet [Am3/sec]"
                 End If
 
@@ -1470,12 +1474,15 @@ Public Class Form1
     Private Function calc_sg_air(P As Double, T As Double, RH As Double, MG As Double)
         Dim p1, p2, sg1, sg2 As Double
 
-        If RadioButton1.Checked = True Then 'Medium is Lucht
-            NumericUpDown8.Value = 28.96    'According ISO6972 for dry air
-            NumericUpDown8.BackColor = Color.White
-        Else
-            NumericUpDown8.BackColor = Color.Yellow 'Medium is gas
-        End If
+        Select Case True
+            Case RadioButton1.Checked                       'Medium is Lucht
+                NumericUpDown8.Value = 28.96                'According ISO6972 for dry air
+                Label96.Text = "Air"
+                NumericUpDown8.BackColor = Color.White
+            Case RadioButton2.Checked
+                Label96.Text = "Enter mol whgt"
+                NumericUpDown8.BackColor = Color.Yellow     'Medium is gas
+        End Select
 
         '---------------- We assume that above the 100c the air is dry ----------------------------
         '--------------- otherwise unpredictable results-------------------------------------------
@@ -1492,11 +1499,8 @@ Public Class Form1
             p1 = Pow(10, (8.14019 - (1810.94 / (244.485 + T)))) * 133.322368
         End If
 
-
         p1 = p1 * RH / 100
         p2 = P - p1
-
-        'MessageBox.Show("p1=" & p1.ToString &" p2=" & p2.ToString)
 
         '-------------------------------- soortelijk gewicht---------------------------
         'gecontroleerd tegen http://www.denysschen.com/catalogue/density.aspx --------
@@ -1978,7 +1982,7 @@ Public Class Form1
         If ComboBox1.SelectedIndex > -1 Then '------- schoepgewicht berekenen-----------
             Waaier_dia = NumericUpDown21.Value / 1000 '[m]
             Voorplaat_keel = Tschets(ComboBox1.SelectedIndex).Tdata(16) / 1000 * (Waaier_dia / 1.0)     '[m]
-            F_axial = PI / 4 * Voorplaat_keel ^ 2 * NumericUpDown2.Value * 100
+            F_axial = PI / 4 * Voorplaat_keel ^ 2 * NumericUpDown37.Value * 100
         End If
         ' MessageBox.Show("Voorplaat_keel=" & Voorplaat_keel.ToString &"  F_b_hor =" & F_b_hor.ToString)
 
@@ -2013,7 +2017,7 @@ Public Class Form1
     End Sub
 
 
-    Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click, NumericUpDown8.ValueChanged, NumericUpDown7.ValueChanged, NumericUpDown6.ValueChanged, NumericUpDown5.ValueChanged, NumericUpDown4.ValueChanged, NumericUpDown3.ValueChanged, NumericUpDown2.ValueChanged, NumericUpDown13.ValueChanged, NumericUpDown12.ValueChanged, NumericUpDown1.ValueChanged, ComboBox1.SelectedIndexChanged, RadioButton4.CheckedChanged, RadioButton3.CheckedChanged, CheckBox4.CheckedChanged, CheckBox5.CheckedChanged, NumericUpDown33.ValueChanged, ComboBox7.SelectedIndexChanged, TabPage1.Enter, RadioButton14.CheckedChanged, RadioButton13.CheckedChanged, RadioButton12.CheckedChanged, NumericUpDown58.ValueChanged
+    Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click, NumericUpDown8.ValueChanged, NumericUpDown7.ValueChanged, NumericUpDown6.ValueChanged, NumericUpDown5.ValueChanged, NumericUpDown4.ValueChanged, NumericUpDown3.ValueChanged, NumericUpDown13.ValueChanged, NumericUpDown12.ValueChanged, NumericUpDown1.ValueChanged, ComboBox1.SelectedIndexChanged, RadioButton4.CheckedChanged, RadioButton3.CheckedChanged, CheckBox4.CheckedChanged, CheckBox5.CheckedChanged, NumericUpDown33.ValueChanged, ComboBox7.SelectedIndexChanged, TabPage1.Enter, RadioButton14.CheckedChanged, RadioButton13.CheckedChanged, RadioButton12.CheckedChanged, NumericUpDown58.ValueChanged, NumericUpDown37.ValueChanged
         If TabControl1.SelectedTab.Name = "TabPage1" Then
             ComboBox7.SelectedIndex = ComboBox1.SelectedIndex       'type selectie
         End If
@@ -2025,7 +2029,7 @@ Public Class Form1
 
 
         Double.TryParse(TextBox123.Text, spez_drehz)
-        p_tot = NumericUpDown2.Value * 100                              '[Pa]
+        p_tot = NumericUpDown37.Value * 100                             '[Pa] static  ??????????????? static or total
         Double.TryParse(TextBox22.Text, Act_flow)                       '[m3/hr]        
         Label152.Text = "Waaier type" & Tschets(ComboBox1.SelectedIndex).Tname
 
