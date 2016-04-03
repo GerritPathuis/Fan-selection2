@@ -96,7 +96,7 @@ Public Class Form1
    "Corten - A / B;EN10155 UNS;S355J2G1W;1.8962/63;1.29;0.28;7850;192;490-630;240;355;340;255;240;226;206;166;0;0;--;Max 300c",
    "Dillimax 690T;Dill.HuttWerke;DSE690V;1.8928;1.29;0.28;7850;192;790-940;717;690;790;740;717;698;697;687;659;638;A517-GrA;--",
    "Domex 690XPD(E);EN10149-2 UNS;S700MCD(E);1.8974;1.29;0.28;7850;192;810;675;740;765;690;675;660;640;620;580;540;--;--",
-   "Duplex(Avesta-2205);EN 10088-1 UfllW;X2CrNiMoN22-5-3 saisna;1.4462;1.4;0.28;7800;200;640-950;335;460;385;360;335;315;300;0;0;0;A240-S31803;Max 300c",
+   "Duplex (Avesta-2205);EN 10088-1 UfllW;X2CrNiMoN22-5-3 saisna;1.4462;1.4;0.28;7800;200;640-950;335;460;385;360;335;315;300;0;0;0;A240-S31803;Max 300c",
    "Hastelloy-C22;DIN Nr: ASTM UNS;NiCr21Mo14W 2277 B575 N06022;2.4602;1.25;0.29;9000;205;786-800;310;370;354;338;310;283;260;248;244;241;--;--",
    "Inconel- 600;DIN Nicrofer7216 ASTM SO ;NiCr15Fe Alloy 600 B168 NiCr15Fe8 Npsepo;2.4816;1.44;0.29;8400;214;550;170;240;185;180;170;165;160;155;152;150;--;--",
    "Naxtra 70;Thyssen/DIN UNS;TSTE690V;1.8928;1.29;0.28;7850;192;790-940;635;690;700;660;635;605;585;570;550;530;A517-GrA;--",
@@ -422,15 +422,16 @@ Public Class Form1
                 TextBox13.Text = T_Debiet_sec.ToString
                 TextBox56.Text = T_Debiet_hr.ToString
                 TextBox30.Text = Round(T_omtrek_s, 1).ToString
+                TextBox216.Text = Round(T_omtrek_s / 333, 2).ToString       'Top speed Mach number
                 TextBox71.Text = T_air_temp.ToString
-                TextBox17.Text = Round(T_Totaaldruckzahl, 3).ToString      'Totaldruckzahl
-                TextBox18.Text = Round(T_Volumezahl, 3).ToString           'Volume zahl
-                TextBox85.Text = Round(T_spec_labour, 1).ToString          'Specifieke arbeid [-]
-                TextBox86.Text = Round(T_laufzahl, 3).ToString             'Laufzahl [-]
-                TextBox87.Text = Round(T_Debiet_kg_sec, 2).ToString        'Debiet [kg/hr]
-                TextBox88.Text = Round(T_durchmesser_zahl, 2).ToString     'Diameter kengetal [-]
-                TextBox123.Text = Round(T_Drehzahl * 60, 0).ToString       'Spez Drehzahl [rpm]
-                TextBox124.Text = Round(T_spec_labour, 0).ToString         'Spez. Arbeid [j/Kg]
+                TextBox17.Text = Round(T_Totaaldruckzahl, 3).ToString       'Totaldruckzahl
+                TextBox18.Text = Round(T_Volumezahl, 3).ToString            'Volume zahl
+                TextBox85.Text = Round(T_spec_labour, 1).ToString           'Specifieke arbeid [-]
+                TextBox86.Text = Round(T_laufzahl, 3).ToString              'Laufzahl [-]
+                TextBox87.Text = Round(T_Debiet_kg_sec, 2).ToString         'Debiet [kg/hr]
+                TextBox88.Text = Round(T_durchmesser_zahl, 2).ToString      'Diameter kengetal [-]
+                TextBox123.Text = Round(T_Drehzahl * 60, 0).ToString        'Spez Drehzahl [rpm]
+                TextBox124.Text = Round(T_spec_labour, 0).ToString          'Spez. Arbeid [j/Kg]
 
                 '--------------------------- gewenste gegevens------------------------------------------
                 G_Pstat_Pa = NumericUpDown37.Value * 100    'Gewenst Pressure totaal [mbar]->[Pa]
@@ -529,7 +530,8 @@ Public Class Form1
                 TextBox152.Text = Round(P_pers_Pa_total / 100, 0).ToString  'Total druk in mbar abs
                 TextBox24.Text = Round(G_density_N_zuig, 3).ToString
                 TextBox25.Text = Round(G_density_act_pers, 3).ToString
-                TextBox26.Text = Round(G_omtrek_s, 0).ToString              'Omtrek snelheid
+                TextBox26.Text = Round(G_omtrek_s, 0).ToString              'Omtrek snelheid [m/s]
+                TextBox217.Text = Round(G_omtrek_s / 333, 2).ToString       'Omtrek snelheid [M]
                 TextBox28.Text = Round(G_Debiet_p * 3600, 0).ToString       'Pers debiet is kleiner dan zuig debiet door drukverhoging
                 TextBox27.Text = Round(G_diaw_m * 1000, 0).ToString         'Diameter waaier [mm]
                 TextBox29.Text = Round(G_Toerental_rpm, 0).ToString
@@ -575,7 +577,8 @@ Public Class Form1
                 '---------- presenteren-----------------------
                 TextBox72.Text = Round((Renard_reynolds * 10 ^ -6), 2).ToString
                 TextBox57.Text = Round(Renard_temp_uit_c, 0).ToString       'Temp uit
-                TextBox73.Text = Round(Renard_omtrek_s, 1)                  'Omtrek snelheid [m/s]
+                TextBox73.Text = Round(Renard_omtrek_s, 0)                  'Omtrek snelheid [m/s]
+                TextBox219.Text = Round(Renard_omtrek_s / 333, 2)           'Omtrek snelheid [M]
                 TextBox70.Text = visco_temp.ToString                        'Visco T_schets
                 TextBox74.Text = Round(Renard_eff, 3).ToString              'Efficiency
                 TextBox65.Text = Renard_diaw_m_R20.ToString                 'diameter
@@ -650,6 +653,7 @@ Public Class Form1
                 TextBox83.Text = Round(cond(1).Q1 * 3600.0, 0).ToString                     'Debiet inlet [m3/hr]
                 TextBox157.Text = Round(cond(1).Qkg, 0).ToString                            'Debiet [kg/hr]
                 TextBox76.Text = Round(cond(1).velos, 0).ToString                           'Omtrek snelheid [m/s]
+                TextBox218.Text = Round(cond(1).velos / 333, 2).ToString                    'Omtrek snelheid [M]
                 TextBox77.Text = Round((cond(1).Reynolds * 10 ^ -6), 2).ToString
                 TextBox159.Text = Round(cond(1).zuig_dia, 0).ToString                       'Zuigmond diameter.
                 TextBox160.Text = Round(cond(1).uitlaat_h, 0).ToString                      'Uitlaat hoogte inw.[mm]
@@ -760,7 +764,7 @@ Public Class Form1
         Dim sigma_bodemplaat As Double
         Dim V_omtrek As Double
         Dim n_actual As Double
-        Dim Voorplaat_keel, gewicht_naaf As Double
+        Dim Voorplaat_keel, inw_schoep_dia, gewicht_naaf As Double
         Dim J1, J2, J3, J4, J_naaf, J_tot, j_as As Double
         Dim dia_naaf, gewicht_as As Double
         Dim length_naaf, gewicht_pulley As Double
@@ -789,8 +793,9 @@ Public Class Form1
             Label47.Text = "Waaier type" & Tschets(T_type).Tname
             Label152.Text = "Waaier type" & Tschets(T_type).Tname
             aantal_schoep = Tschets(T_type).Tdata(13)
-            Voorplaat_keel = Tschets(T_type).Tdata(16) / 1000 * (Waaier_dia / 1.0)     '[m]
-            S_hoek = Tschets(T_type).Tdata(19)                                        'Uittrede hoek in graden
+            Voorplaat_keel = Tschets(T_type).Tdata(16) / 1000 * (Waaier_dia / 1.0)      'Keel diam [m]
+            inw_schoep_dia = Tschets(T_type).Tdata(17) / 1000 * (Waaier_dia / 1.0)      'inwendige schoep diameter [m]
+            S_hoek = Tschets(T_type).Tdata(19)                                          'Uittrede hoek in graden
             S_dik = NumericUpDown20.Value / 1000 '[m]
             S_lengte = Tschets(T_type).Tdata(12) / 1000 * (Waaier_dia / 1.0)
             S_breed = Tschets(T_type).Tdata(15) / 1000 * (Waaier_dia / 1.0)            'Schoep breed uittrede [m]
@@ -850,7 +855,7 @@ Public Class Form1
 
         '------------ Eigen frequenties bodemplaat ---------------------------
         '------------ Roarks, 8 edition, pagina 793 ----------------------------
-        back_plate_steel = 4.4 * (NumericUpDown17.Value / 25.4) / (NumericUpDown21.Value / (2 * 25.4)) ^ 2 * 10 ^ 4
+        back_plate_steel = 4.4 * (NumericUpDown17.Value / 25.4) / (inw_schoep_dia * 1000 / (2 * 25.4)) ^ 2 * 10 ^ 4
         back_plate_alu = back_plate_steel * 1.04
         TextBox209.Text = Round(back_plate_steel, 1).ToString           'Bodemplaat eigenfrequentie staal [Hz]
         TextBox210.Text = Round(back_plate_alu, 1).ToString             'Bodemplaat eigenfrequentie aluminium [Hz]
@@ -859,8 +864,8 @@ Public Class Form1
 
         '--------Present data------------
         TextBox32.Text = Round(sigma_bodemplaat, 0).ToString
-        TextBox36.Text = Round(S_breed * 1000, 1).ToString          'Breedte schoep
-        TextBox37.Text = Round(S_hoek, 1).ToString                  'Uittrede hoek in graden
+        TextBox36.Text = Round(S_breed * 1000, 1).ToString              'Breedte schoep
+        TextBox37.Text = Round(S_hoek, 1).ToString                      'Uittrede hoek in graden
         TextBox42.Text = Round(schoep_gewicht, 1).ToString
         TextBox49.Text = Round(maxV, 0).ToString
         TextBox50.Text = Round(aantal_schoep, 0).ToString
@@ -875,6 +880,7 @@ Public Class Form1
         TextBox96.Text = Round(Waaier_gewicht, 1).ToString
         TextBox103.Text = Round(Voorplaat_keel * 1000, 0).ToString
         TextBox104.Text = Round(S_lengte * 1000, 0).ToString
+        TextBox204.Text = Round(inw_schoep_dia * 1000, 0).ToString      'inwendige schpeo diameter
 
         TextBox105.Text = Round(J1, 1).ToString
         TextBox106.Text = Round(J2, 1).ToString
