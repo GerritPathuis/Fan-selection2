@@ -740,7 +740,7 @@ Public Class Form1
         End If
     End Sub
 
-    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click, NumericUpDown19.ValueChanged, NumericUpDown17.ValueChanged, TextBox34.TextChanged, TabPage2.Enter, NumericUpDown20.ValueChanged, NumericUpDown21.ValueChanged, NumericUpDown32.ValueChanged, NumericUpDown31.ValueChanged, NumericUpDown30.ValueChanged, NumericUpDown29.ValueChanged, NumericUpDown28.ValueChanged, NumericUpDown11.ValueChanged
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click, NumericUpDown19.ValueChanged, NumericUpDown17.ValueChanged, TextBox34.TextChanged, TabPage2.Enter, NumericUpDown20.ValueChanged, NumericUpDown21.ValueChanged, NumericUpDown32.ValueChanged, NumericUpDown31.ValueChanged, NumericUpDown30.ValueChanged, NumericUpDown29.ValueChanged, NumericUpDown28.ValueChanged, NumericUpDown11.ValueChanged, NumericUpDown41.ValueChanged, NumericUpDown40.ValueChanged, NumericUpDown39.ValueChanged, NumericUpDown2.ValueChanged
         Calc_stress_impeller()
     End Sub
 
@@ -777,12 +777,12 @@ Public Class Form1
         Double.TryParse(TextBox34.Text, sigma_allowed)
         sigma_allowed *= 0.7                        'Max 70% van sigma 0.2 (info Peter de Wildt)
         TextBox40.Text = Round(sigma_allowed, 0).ToString
-        sigma_allowed *= 1000 ^ 2                 '[N/m2] niet [N/mm2] 
+        sigma_allowed *= 1000 ^ 2                       '[N/m2] niet [N/mm2] 
 
-        Double.TryParse(TextBox33.Text, sg_staal)
+        Double.TryParse(TextBox33.Text, sg_staal)       '[kg/m3]
 
-        Waaier_dia = NumericUpDown21.Value / 1000 '[m]
-        Waaier_dik = NumericUpDown17.Value / 1000 '[m]
+        Waaier_dia = NumericUpDown21.Value / 1000       '[m]
+        Waaier_dik = NumericUpDown17.Value / 1000       '[m]
         Voorplaat_dik = NumericUpDown31.Value / 1000
         '--------Selected type------------
         T_type = ComboBox1.SelectedIndex
@@ -861,6 +861,46 @@ Public Class Form1
         TextBox210.Text = Round(back_plate_alu, 1).ToString             'Bodemplaat eigenfrequentie aluminium [Hz]
         TextBox211.Text = Round(back_plate_steel * 60, 0).ToString      'Bodemplaat eigenfrequentie staal [rpm]
         TextBox212.Text = Round(back_plate_alu * 60, 0).ToString        'Bodemplaat eigenfrequentie aluminium [rpm]
+
+        '------------ airfoil----------
+        Dim airf_hoog, airf_plaat As Double
+        Dim rib_plaat, rib_afstand As Double
+        Dim airf_weerstandmoment, airf_buiten, airf_binnen, airf_gewicht As Double
+        Dim airf_breed_inw, airf_hoog_inw, airf_force, airf_max_bend, airf_Q_load, airf_sigma_bend As Double
+
+        airf_hoog = NumericUpDown2.Value / 1000             '[m] uitwendige maat
+        airf_plaat = NumericUpDown39.Value / 1000           '[m] uitwendige plaat dikte
+
+        rib_afstand = NumericUpDown40.Value / 1000          '[m] CL-CL ribben = segment breedte
+        rib_plaat = NumericUpDown41.Value / 1000            '[m] rib plaat dikte
+
+        airf_breed_inw = rib_afstand - rib_plaat            '[m] inwendige maat
+        airf_hoog_inw = airf_hoog - 2 * airf_plaat          '[m] inwendige maat
+
+        ' MessageBox.Show("inw breed=" & airf_breed_inw.ToString & " inw hoog= " & airf_hoog_inw.ToString & " airf_plaat= " & airf_plaat.ToString)
+
+
+        airf_gewicht = (airf_hoog * rib_afstand - airf_breed_inw * airf_hoog_inw) * S_breed * sg_staal    'Gewicht [kg]
+        airf_force = airf_gewicht * V_omtrek ^ 2 / (Waaier_dia / 2) * Cos(S_hoek * PI / 180)             'Centrifugal Force [N]  F=m.v^2/r
+        airf_Q_load = airf_force / S_breed                                                               'Centrifugal load [N/mm] 
+
+        '---------- weerstandmoment--------------------------
+        airf_buiten = 1 / 6 * rib_afstand * airf_hoog ^ 2            '[m3]
+        airf_binnen = 1 / 6 * airf_breed_inw * airf_hoog_inw ^ 2    '[m3]
+        airf_weerstandmoment = airf_buiten - airf_binnen            '[m3]
+
+        '-----------simple beam uniform loading-(dus opgelegd) ------
+        '-------------- Mmax in het midden Mx=Q.L^2/8 ---------------
+        airf_max_bend = 1 / 8 * airf_Q_load * S_breed ^ 2           '[n.m]
+        airf_sigma_bend = airf_max_bend / airf_weerstandmoment / 1000 ^ 2     '[N/mm2]
+
+
+
+        TextBox220.Text = Round(airf_weerstandmoment, 8).ToString   '[m3]
+        TextBox221.Text = Round(airf_gewicht, 2).ToString           '[kg]
+        TextBox222.Text = Round(airf_Q_load, 0).ToString            '[N/m]  
+        TextBox223.Text = Round(airf_max_bend, 0).ToString          '[N.mm]  
+        TextBox224.Text = Round(airf_sigma_bend, 0).ToString        '[N.mm^2]  
 
         '--------Present data------------
         TextBox32.Text = Round(sigma_bodemplaat, 0).ToString
