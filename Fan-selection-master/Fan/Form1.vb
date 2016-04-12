@@ -846,11 +846,13 @@ Public Class Form1
         TextBox211.Text = Round(back_plate_steel * 60, 0).ToString      'Bodemplaat eigenfrequentie staal [rpm]
         TextBox212.Text = Round(back_plate_alu * 60, 0).ToString        'Bodemplaat eigenfrequentie aluminium [rpm]
 
-        '------------ airfoil----------
+        '------------------------------------ airfoil------------------------------------
+        '--------------------------------------------------------------------------------
         Dim airf_hoog_uitw, airf_skin_plaat_dikte As Double
         Dim rib_plaat_dikte, rib_afstand As Double
         Dim airf_weerstandmoment, airf_buiten, airf_binnen, airf_gewicht As Double
         Dim airf_breed_inw, airf_hoog_uitw_inw, airf_force, airf_max_bend, airf_Q_load, airf_sigma_bend As Double
+        Dim airf_area, airf_load, airf_tau, airf_hh As Double
 
         airf_hoog_uitw = NumericUpDown2.Value / 1000            '[m] uitwendige maat
         airf_skin_plaat_dikte = NumericUpDown39.Value / 1000    '[m] uitwendige plaat dikte
@@ -859,8 +861,6 @@ Public Class Form1
 
         airf_breed_inw = rib_afstand - rib_plaat_dikte          '[m] inwendige maat
         airf_hoog_uitw_inw = airf_hoog_uitw - 2 * airf_skin_plaat_dikte   '[m] inwendige maat
-
-        ' MessageBox.Show("inw breed=" & airf_breed_inw.ToString & " inw hoog= " & airf_hoog_uitw_inw.ToString & " airf_plaat= " & airf_plaat.ToString)
 
         airf_gewicht = (airf_hoog_uitw * rib_afstand - airf_breed_inw * airf_hoog_uitw_inw) * Sch_breed * sg_staal  'Gewicht [kg]
         airf_force = airf_gewicht * V_omtrek ^ 2 / (Waaier_dia / 2) * Cos(Sch_hoek * PI / 180)                      'Centrifugal Force [N]  F=m.v^2/r
@@ -876,13 +876,40 @@ Public Class Form1
         airf_max_bend = 1 / 8 * airf_Q_load * Sch_breed ^ 2                 '[N.m]
         airf_sigma_bend = airf_max_bend / airf_weerstandmoment / 1000 ^ 2   '[N/mm2]
 
+        '-------------- airfoilschuifspanning-------------------------------
+        airf_area = rib_afstand * airf_skin_plaat_dikte * 2 * 1000 ^ 2      '[mm2]
+        airf_load = airf_force / 2                                          '[N]
+        airf_tau = airf_load / airf_area                                    '[N/mm2]
 
+        '----------------------- airfoil Huber + Hencky ---------------------------------
+        airf_hh = Sqrt(airf_sigma_bend ^ 2 + 3 * airf_tau ^ 2)
 
-        TextBox220.Text = Round(airf_weerstandmoment, 8).ToString   '[m3]
-        TextBox221.Text = Round(airf_gewicht, 2).ToString           '[kg]
-        TextBox222.Text = Round(airf_Q_load, 0).ToString            '[N/m]  
-        TextBox223.Text = Round(airf_max_bend, 0).ToString          '[N.m]  
-        TextBox224.Text = Round(airf_sigma_bend, 0).ToString        '[N.mm^2]  
+        TextBox67.Text = Round(airf_hh, 0).ToString                         '[N/mm2]
+
+        '----------------------------- airfoil skin -------------------------------------
+        '--------------------------------------------------------------------------------
+        Dim airf_skin_weerstan, airf_skin_gewicht, airf_skin_force, airf_skin_Q_load As Double
+        Dim airf_skin_max_bend, airf_skin_sigma_bend, airf_skin_area, airf_skin_load, airf_skin_tau, airf_skin_hh As Double
+
+        airf_skin_weerstan = 1 / 6 * rib_afstand * airf_skin_plaat_dikte ^ 2                                '[m3] weerstandmoment
+        airf_skin_gewicht = rib_afstand * airf_skin_plaat_dikte * Sch_breed * sg_staal                      '[kg]
+        airf_skin_force = airf_skin_gewicht * V_omtrek ^ 2 / (Waaier_dia / 2) * Cos(Sch_hoek * PI / 180)    '[N]
+        airf_skin_Q_load = airf_skin_force / Sch_breed
+
+        '-----------Fixed beam uniform loading-(dus ingeklemd) ------
+        '-------------- Mmax in het midden Mx=Q.L^2/12 ---------------
+        airf_skin_max_bend = 1 / 12 * airf_skin_Q_load * rib_afstand ^ 2               '[N.m]
+        airf_skin_sigma_bend = airf_skin_max_bend / airf_skin_weerstan / 1000 ^ 2   '[N/mm2]
+
+        '-------------- airfoil skin schuifspanning-------------------------------
+        airf_skin_area = rib_afstand * airf_skin_plaat_dikte * 1000 ^ 2             '[mm2]
+        airf_skin_load = airf_skin_force / 2                                        '[N]
+        airf_skin_tau = airf_skin_load / airf_skin_area                             '[N/mm2]
+
+        '----------------------- airfoil skin Huber + Hencky ---------------------------------
+        airf_skin_hh = Sqrt(airf_skin_sigma_bend ^ 2 + 3 * airf_skin_tau ^ 2)   '[N/mm2]
+        TextBox73.Text = Round(airf_skin_hh, 0).ToString                        '[N/mm2]
+
 
         '--------Present data------------
         TextBox32.Text = Round(sigma_bodemplaat, 0).ToString
