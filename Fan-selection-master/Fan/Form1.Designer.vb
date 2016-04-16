@@ -22,21 +22,21 @@ Partial Class Form1
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Dim ChartArea14 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend14 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Series20 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim Series21 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim Series22 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim ChartArea15 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend15 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Series23 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
-        Dim ChartArea13 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend13 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Series19 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim ChartArea25 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend25 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Series37 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim Series38 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim Series39 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim ChartArea26 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend26 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Series40 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim ChartArea27 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend27 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Series41 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
-        Dim ChartArea16 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend16 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Series24 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim ChartArea28 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend28 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Series42 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPage1 = New System.Windows.Forms.TabPage()
         Me.Label156 = New System.Windows.Forms.Label()
@@ -401,6 +401,8 @@ Partial Class Form1
         Me.Chart4 = New System.Windows.Forms.DataVisualization.Charting.Chart()
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.GroupBox22 = New System.Windows.Forms.GroupBox()
+        Me.Label280 = New System.Windows.Forms.Label()
+        Me.TextBox219 = New System.Windows.Forms.TextBox()
         Me.Label277 = New System.Windows.Forms.Label()
         Me.NumericUpDown16 = New System.Windows.Forms.NumericUpDown()
         Me.Label134 = New System.Windows.Forms.Label()
@@ -717,8 +719,6 @@ Partial Class Form1
         Me.Label194 = New System.Windows.Forms.Label()
         Me.TextBox202 = New System.Windows.Forms.TextBox()
         Me.Label192 = New System.Windows.Forms.Label()
-        Me.TextBox219 = New System.Windows.Forms.TextBox()
-        Me.Label280 = New System.Windows.Forms.Label()
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.GroupBox24.SuspendLayout()
@@ -3349,33 +3349,33 @@ Partial Class Form1
         '
         'Chart1
         '
-        ChartArea14.CursorX.Interval = 10.0R
-        ChartArea14.Name = "ChartArea1"
-        Me.Chart1.ChartAreas.Add(ChartArea14)
+        ChartArea25.CursorX.Interval = 10.0R
+        ChartArea25.Name = "ChartArea1"
+        Me.Chart1.ChartAreas.Add(ChartArea25)
         Me.Chart1.Dock = System.Windows.Forms.DockStyle.Fill
-        Legend14.Name = "Legend1"
-        Me.Chart1.Legends.Add(Legend14)
+        Legend25.Name = "Legend1"
+        Me.Chart1.Legends.Add(Legend25)
         Me.Chart1.Location = New System.Drawing.Point(3, 3)
         Me.Chart1.Name = "Chart1"
-        Series20.ChartArea = "ChartArea1"
-        Series20.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline
-        Series20.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Series20.IsValueShownAsLabel = True
-        Series20.Legend = "Legend1"
-        Series20.Name = "Series1"
-        Series21.ChartArea = "ChartArea1"
-        Series21.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline
-        Series21.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Series21.Legend = "Legend1"
-        Series21.Name = "Series2"
-        Series22.ChartArea = "ChartArea1"
-        Series22.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline
-        Series22.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Series22.Legend = "Legend1"
-        Series22.Name = "Series3"
-        Me.Chart1.Series.Add(Series20)
-        Me.Chart1.Series.Add(Series21)
-        Me.Chart1.Series.Add(Series22)
+        Series37.ChartArea = "ChartArea1"
+        Series37.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline
+        Series37.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Series37.IsValueShownAsLabel = True
+        Series37.Legend = "Legend1"
+        Series37.Name = "Series1"
+        Series38.ChartArea = "ChartArea1"
+        Series38.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline
+        Series38.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Series38.Legend = "Legend1"
+        Series38.Name = "Series2"
+        Series39.ChartArea = "ChartArea1"
+        Series39.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline
+        Series39.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Series39.Legend = "Legend1"
+        Series39.Name = "Series3"
+        Me.Chart1.Series.Add(Series37)
+        Me.Chart1.Series.Add(Series38)
+        Me.Chart1.Series.Add(Series39)
         Me.Chart1.Size = New System.Drawing.Size(1302, 668)
         Me.Chart1.TabIndex = 2
         Me.Chart1.Text = "Chart1"
@@ -3403,17 +3403,17 @@ Partial Class Form1
         '
         'Chart2
         '
-        ChartArea15.Name = "ChartArea1"
-        Me.Chart2.ChartAreas.Add(ChartArea15)
+        ChartArea26.Name = "ChartArea1"
+        Me.Chart2.ChartAreas.Add(ChartArea26)
         Me.Chart2.Dock = System.Windows.Forms.DockStyle.Fill
-        Legend15.Name = "Legend1"
-        Me.Chart2.Legends.Add(Legend15)
+        Legend26.Name = "Legend1"
+        Me.Chart2.Legends.Add(Legend26)
         Me.Chart2.Location = New System.Drawing.Point(3, 3)
         Me.Chart2.Name = "Chart2"
-        Series23.ChartArea = "ChartArea1"
-        Series23.Legend = "Legend1"
-        Series23.Name = "Series1"
-        Me.Chart2.Series.Add(Series23)
+        Series40.ChartArea = "ChartArea1"
+        Series40.Legend = "Legend1"
+        Series40.Name = "Series1"
+        Me.Chart2.Series.Add(Series40)
         Me.Chart2.Size = New System.Drawing.Size(1302, 668)
         Me.Chart2.TabIndex = 0
         Me.Chart2.Text = "Chart2"
@@ -4881,7 +4881,7 @@ Partial Class Form1
         'TextBox84
         '
         Me.TextBox84.Enabled = False
-        Me.TextBox84.Location = New System.Drawing.Point(233, 187)
+        Me.TextBox84.Location = New System.Drawing.Point(247, 187)
         Me.TextBox84.Name = "TextBox84"
         Me.TextBox84.Size = New System.Drawing.Size(64, 20)
         Me.TextBox84.TabIndex = 41
@@ -4902,14 +4902,14 @@ Partial Class Form1
         Me.NumericUpDown48.BackColor = System.Drawing.Color.Yellow
         Me.NumericUpDown48.DecimalPlaces = 2
         Me.NumericUpDown48.Increment = New Decimal(New Integer() {1, 0, 0, 131072})
-        Me.NumericUpDown48.Location = New System.Drawing.Point(233, 158)
+        Me.NumericUpDown48.Location = New System.Drawing.Point(247, 158)
         Me.NumericUpDown48.Maximum = New Decimal(New Integer() {5, 0, 0, 0})
         Me.NumericUpDown48.Minimum = New Decimal(New Integer() {2, 0, 0, 65536})
         Me.NumericUpDown48.Name = "NumericUpDown48"
         Me.NumericUpDown48.Size = New System.Drawing.Size(64, 20)
         Me.NumericUpDown48.TabIndex = 54
         Me.NumericUpDown48.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        Me.NumericUpDown48.Value = New Decimal(New Integer() {15, 0, 0, 65536})
+        Me.NumericUpDown48.Value = New Decimal(New Integer() {16, 0, 0, 65536})
         '
         'Label271
         '
@@ -4924,7 +4924,7 @@ Partial Class Form1
         'NumericUpDown47
         '
         Me.NumericUpDown47.BackColor = System.Drawing.SystemColors.Window
-        Me.NumericUpDown47.Location = New System.Drawing.Point(233, 101)
+        Me.NumericUpDown47.Location = New System.Drawing.Point(247, 101)
         Me.NumericUpDown47.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
         Me.NumericUpDown47.Name = "NumericUpDown47"
         Me.NumericUpDown47.Size = New System.Drawing.Size(64, 20)
@@ -4936,7 +4936,7 @@ Partial Class Form1
         '
         Me.NumericUpDown46.BackColor = System.Drawing.SystemColors.Window
         Me.NumericUpDown46.DecimalPlaces = 1
-        Me.NumericUpDown46.Location = New System.Drawing.Point(233, 73)
+        Me.NumericUpDown46.Location = New System.Drawing.Point(247, 73)
         Me.NumericUpDown46.Maximum = New Decimal(New Integer() {200, 0, 0, 0})
         Me.NumericUpDown46.Name = "NumericUpDown46"
         Me.NumericUpDown46.Size = New System.Drawing.Size(64, 20)
@@ -4948,7 +4948,7 @@ Partial Class Form1
         '
         Me.NumericUpDown45.BackColor = System.Drawing.SystemColors.Window
         Me.NumericUpDown45.DecimalPlaces = 1
-        Me.NumericUpDown45.Location = New System.Drawing.Point(233, 19)
+        Me.NumericUpDown45.Location = New System.Drawing.Point(247, 19)
         Me.NumericUpDown45.Maximum = New Decimal(New Integer() {400, 0, 0, 0})
         Me.NumericUpDown45.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.NumericUpDown45.Name = "NumericUpDown45"
@@ -4960,14 +4960,13 @@ Partial Class Form1
         'NumericUpDown44
         '
         Me.NumericUpDown44.BackColor = System.Drawing.Color.Yellow
-        Me.NumericUpDown44.Location = New System.Drawing.Point(233, 130)
-        Me.NumericUpDown44.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
-        Me.NumericUpDown44.Minimum = New Decimal(New Integer() {50, 0, 0, 0})
+        Me.NumericUpDown44.Location = New System.Drawing.Point(247, 130)
+        Me.NumericUpDown44.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.NumericUpDown44.Name = "NumericUpDown44"
         Me.NumericUpDown44.Size = New System.Drawing.Size(64, 20)
         Me.NumericUpDown44.TabIndex = 49
         Me.NumericUpDown44.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        Me.NumericUpDown44.Value = New Decimal(New Integer() {100, 0, 0, 0})
+        Me.NumericUpDown44.Value = New Decimal(New Integer() {40, 0, 0, 0})
         '
         'Label268
         '
@@ -4982,15 +4981,16 @@ Partial Class Form1
         'NumericUpDown43
         '
         Me.NumericUpDown43.BackColor = System.Drawing.Color.Yellow
-        Me.NumericUpDown43.DecimalPlaces = 1
-        Me.NumericUpDown43.Location = New System.Drawing.Point(233, 46)
-        Me.NumericUpDown43.Maximum = New Decimal(New Integer() {6, 0, 0, 0})
-        Me.NumericUpDown43.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.NumericUpDown43.DecimalPlaces = 4
+        Me.NumericUpDown43.Increment = New Decimal(New Integer() {1, 0, 0, 262144})
+        Me.NumericUpDown43.Location = New System.Drawing.Point(247, 46)
+        Me.NumericUpDown43.Maximum = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.NumericUpDown43.Minimum = New Decimal(New Integer() {2, 0, 0, 262144})
         Me.NumericUpDown43.Name = "NumericUpDown43"
         Me.NumericUpDown43.Size = New System.Drawing.Size(64, 20)
         Me.NumericUpDown43.TabIndex = 7
         Me.NumericUpDown43.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        Me.NumericUpDown43.Value = New Decimal(New Integer() {3, 0, 0, 0})
+        Me.NumericUpDown43.Value = New Decimal(New Integer() {3, 0, 0, 262144})
         '
         'Label266
         '
@@ -5008,9 +5008,9 @@ Partial Class Form1
         Me.Label270.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label270.Location = New System.Drawing.Point(23, 131)
         Me.Label270.Name = "Label270"
-        Me.Label270.Size = New System.Drawing.Size(187, 16)
+        Me.Label270.Size = New System.Drawing.Size(191, 16)
         Me.Label270.TabIndex = 47
-        Me.Label270.Text = "Stijfheid koppeling [k.N.m/rad]"
+        Me.Label270.Text = "Stijfheid koppeling [M.N.m/rad]"
         '
         'Label267
         '
@@ -5034,17 +5034,17 @@ Partial Class Form1
         '
         'Chart4
         '
-        ChartArea13.Name = "ChartArea1"
-        Me.Chart4.ChartAreas.Add(ChartArea13)
+        ChartArea27.Name = "ChartArea1"
+        Me.Chart4.ChartAreas.Add(ChartArea27)
         Me.Chart4.Dock = System.Windows.Forms.DockStyle.Fill
-        Legend13.Name = "Legend1"
-        Me.Chart4.Legends.Add(Legend13)
+        Legend27.Name = "Legend1"
+        Me.Chart4.Legends.Add(Legend27)
         Me.Chart4.Location = New System.Drawing.Point(0, 0)
         Me.Chart4.Name = "Chart4"
-        Series19.ChartArea = "ChartArea1"
-        Series19.Legend = "Legend1"
-        Series19.Name = "Series1"
-        Me.Chart4.Series.Add(Series19)
+        Series41.ChartArea = "ChartArea1"
+        Series41.Legend = "Legend1"
+        Series41.Name = "Series1"
+        Me.Chart4.Series.Add(Series41)
         Me.Chart4.Size = New System.Drawing.Size(409, 365)
         Me.Chart4.TabIndex = 50
         Me.Chart4.Text = "Chart4"
@@ -5075,6 +5075,25 @@ Partial Class Form1
         Me.GroupBox22.TabIndex = 89
         Me.GroupBox22.TabStop = False
         Me.GroupBox22.Text = "Aandrijving"
+        '
+        'Label280
+        '
+        Me.Label280.AutoSize = True
+        Me.Label280.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label280.Location = New System.Drawing.Point(8, 46)
+        Me.Label280.Name = "Label280"
+        Me.Label280.Size = New System.Drawing.Size(128, 16)
+        Me.Label280.TabIndex = 92
+        Me.Label280.Text = "Inertia motor [kg.m2]"
+        '
+        'TextBox219
+        '
+        Me.TextBox219.Enabled = False
+        Me.TextBox219.Location = New System.Drawing.Point(275, 43)
+        Me.TextBox219.Name = "TextBox219"
+        Me.TextBox219.Size = New System.Drawing.Size(54, 20)
+        Me.TextBox219.TabIndex = 56
+        Me.TextBox219.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'Label277
         '
@@ -5491,7 +5510,7 @@ Partial Class Form1
         Me.NumericUpDown27.Size = New System.Drawing.Size(64, 20)
         Me.NumericUpDown27.TabIndex = 11
         Me.NumericUpDown27.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        Me.NumericUpDown27.Value = New Decimal(New Integer() {60, 0, 0, 0})
+        Me.NumericUpDown27.Value = New Decimal(New Integer() {80, 0, 0, 0})
         '
         'NumericUpDown26
         '
@@ -5503,7 +5522,7 @@ Partial Class Form1
         Me.NumericUpDown26.Size = New System.Drawing.Size(64, 20)
         Me.NumericUpDown26.TabIndex = 10
         Me.NumericUpDown26.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        Me.NumericUpDown26.Value = New Decimal(New Integer() {145, 0, 0, 0})
+        Me.NumericUpDown26.Value = New Decimal(New Integer() {180, 0, 0, 0})
         '
         'NumericUpDown25
         '
@@ -7926,17 +7945,17 @@ Partial Class Form1
         '
         'Chart3
         '
-        ChartArea16.Name = "ChartArea1"
-        Me.Chart3.ChartAreas.Add(ChartArea16)
+        ChartArea28.Name = "ChartArea1"
+        Me.Chart3.ChartAreas.Add(ChartArea28)
         Me.Chart3.Dock = System.Windows.Forms.DockStyle.Fill
-        Legend16.Name = "Legend1"
-        Me.Chart3.Legends.Add(Legend16)
+        Legend28.Name = "Legend1"
+        Me.Chart3.Legends.Add(Legend28)
         Me.Chart3.Location = New System.Drawing.Point(3, 16)
         Me.Chart3.Name = "Chart3"
-        Series24.ChartArea = "ChartArea1"
-        Series24.Legend = "Legend1"
-        Series24.Name = "Series1"
-        Me.Chart3.Series.Add(Series24)
+        Series42.ChartArea = "ChartArea1"
+        Series42.Legend = "Legend1"
+        Series42.Name = "Series1"
+        Me.Chart3.Series.Add(Series42)
         Me.Chart3.Size = New System.Drawing.Size(396, 254)
         Me.Chart3.TabIndex = 147
         Me.Chart3.Text = "Chart3"
@@ -8529,25 +8548,6 @@ Partial Class Form1
         Me.Label192.Size = New System.Drawing.Size(195, 18)
         Me.Label192.TabIndex = 134
         Me.Label192.Text = "Inertia impellar (JL) [kg.m2] *"
-        '
-        'TextBox219
-        '
-        Me.TextBox219.Enabled = False
-        Me.TextBox219.Location = New System.Drawing.Point(275, 43)
-        Me.TextBox219.Name = "TextBox219"
-        Me.TextBox219.Size = New System.Drawing.Size(54, 20)
-        Me.TextBox219.TabIndex = 56
-        Me.TextBox219.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'Label280
-        '
-        Me.Label280.AutoSize = True
-        Me.Label280.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label280.Location = New System.Drawing.Point(8, 46)
-        Me.Label280.Name = "Label280"
-        Me.Label280.Size = New System.Drawing.Size(128, 16)
-        Me.Label280.TabIndex = 92
-        Me.Label280.Text = "Inertia motor [kg.m2]"
         '
         'Form1
         '

@@ -315,16 +315,16 @@ Public Class Form1
             ComboBox3.SelectedIndex = 5                 'Select Domex
         End If
 
-        If ComboBox4.Items.Count > 0 Then               'Selecteer de motor
-            ComboBox4.SelectedIndex = 3
+        If ComboBox4.Items.Count > 0 Then
+            ComboBox4.SelectedIndex = 12                'Selecteer de motor 90kW
         End If
 
         If ComboBox5.Items.Count > 0 Then
             ComboBox5.SelectedIndex = 1                 'Select diameter duct
         End If
 
-        If ComboBox6.Items.Count > 0 Then               'Selecteer de motor
-            ComboBox6.SelectedIndex = 1
+        If ComboBox6.Items.Count > 0 Then
+            ComboBox6.SelectedIndex = 12                'Selecteer de motor 90kW
         End If
 
         If ComboBox7.Items.Count > 0 Then
@@ -1984,12 +1984,12 @@ Public Class Form1
         Dim Inertia_1, Inertia_2, Inertia_3, Springstiff_1, Springstiff_2, theta_1, theta_2, theta_3, Torsion_1, Torsion_2, Torsion_3, ii As Double
         Dim omega As Double 'hoeksnelheid
         Try
-            Inertia_1 = NumericUpDown45.Value                   'Waaier [kg.m2]
-            Inertia_2 = NumericUpDown43.Value                   'Koppeling [kg.m2]
-            Inertia_3 = NumericUpDown46.Value                   'Motor [kg.m2]
-            Springstiff_1 = NumericUpDown47.Value * 1000        'stijfheid as [Nm/rad]
-            Springstiff_2 = NumericUpDown44.Value * 1000        'stijfheid koppeling[Nm/rad]
-            theta_1 = 1                                         'Versterking
+            Inertia_1 = NumericUpDown45.Value                       'Waaier [kg.m2]
+            Inertia_2 = NumericUpDown43.Value                       'Koppeling [kg.m2]
+            Inertia_3 = NumericUpDown46.Value                       'Motor [kg.m2]
+            Springstiff_1 = NumericUpDown47.Value * 1000            'stijfheid as [kilo.Nm/rad]
+            Springstiff_2 = NumericUpDown44.Value * 1000 * 1000     'stijfheid koppeling[Mega.Nm/rad]
+            theta_1 = 1                                             'Versterking
             For ii = 0 To 250
                 omega = ii * NumericUpDown48.Value                              'Hoeksnelheid step-range
                 Torsion_1 = (omega ^ 2) * Inertia_1 * theta_1
