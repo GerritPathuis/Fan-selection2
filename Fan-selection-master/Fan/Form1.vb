@@ -88,7 +88,7 @@ Public Class Form1
     Public cond(10) As Stage                'Process conditions
     Public PZ(10) As PPOINT                 'Raw data, Polynomial regression
     Public BZ(5, 5) As Double               'Poly Coefficients, Polynomial regression
-
+    Dim Torsional_point(250, 2) As Double
 
     '-----"Oude benaming;Norm:;EN10027-1;Werkstof;[mm/m1/100°C];Poisson ;kg/m3;E [Gpa];Rm (20c);Rp0.2(0c);Rp0.2(20c);Rp(50c);Rp(100c);Rp(150c);Rp(200c);Rp(250c);Rp(300c);Rp(350c);Rp(400c);Equiv-ASTM;Opmerking",
     Public Shared steel() As String =
@@ -935,8 +935,9 @@ Public Class Form1
         TextBox106.Text = Round(J2, 1).ToString
         TextBox107.Text = Round(J3, 1).ToString
         TextBox108.Text = Round(J4, 1).ToString
-        TextBox92.Text = Round(J_naaf, 2).ToString      'Massa traagheid (0.5*M*R^2)
-        TextBox109.Text = Round(J_tot, 1).ToString      'Massa traagheid Totaal
+        TextBox92.Text = Round(J_naaf, 2).ToString          'Massa traagheid (0.5*M*R^2)
+        TextBox109.Text = Round(J_tot, 1).ToString          'Massa traagheid Totaal
+        NumericUpDown45.Value = Round(J_tot, 1).ToString
 
         '-------------- check schoep stress safety-----------------------
         If sigma_schoep > sigma_allowed / 1000 ^ 2 Then
@@ -1868,7 +1869,7 @@ Public Class Form1
     Private Sub do_Chart2()
         Dim schets_no As Integer
 
-        'Clear all series And chart areas so we can re-add them
+
         Chart2.Series.Clear()
         Chart2.ChartAreas.Clear()
         Chart2.Titles.Clear()
@@ -1939,10 +1940,74 @@ Public Class Form1
         End If
     End Sub
 
-    Private Sub Button6_Click(sender As Object, e As EventArgs) Handles Button6.Click, NumericUpDown27.ValueChanged, NumericUpDown26.ValueChanged, NumericUpDown25.ValueChanged, NumericUpDown24.ValueChanged, NumericUpDown23.ValueChanged, NumericUpDown22.ValueChanged, TabPage5.Enter, NumericUpDown16.ValueChanged, ComboBox4.SelectedIndexChanged, RadioButton7.CheckedChanged, NumericUpDown15.ValueChanged
+    Private Sub Button6_Click(sender As Object, e As EventArgs) Handles Button6.Click, NumericUpDown27.ValueChanged, NumericUpDown26.ValueChanged, NumericUpDown25.ValueChanged, NumericUpDown24.ValueChanged, NumericUpDown23.ValueChanged, NumericUpDown22.ValueChanged, TabPage5.Enter, NumericUpDown16.ValueChanged, ComboBox4.SelectedIndexChanged, RadioButton7.CheckedChanged, NumericUpDown15.ValueChanged, NumericUpDown47.ValueChanged, NumericUpDown46.ValueChanged, NumericUpDown45.ValueChanged, NumericUpDown44.ValueChanged, NumericUpDown43.ValueChanged, NumericUpDown48.ValueChanged
         calc_bearing_belts()
 
     End Sub
+    Private Sub Torsional_analyses()
+        Dim Inertia_1, Inertia_2, Inertia_3, Springstiff_1, Springstiff_2, theta_1, theta_2, theta_3, Torsion_1, Torsion_2, Torsion_3, ii As Double
+        Dim omega As Double 'hoeksnelheid
+
+        Inertia_1 = NumericUpDown45.Value       'Waaier [kg.m2]
+        Inertia_2 = NumericUpDown43.Value       'Koppeling [kg.m2]
+        Inertia_3 = NumericUpDown46.Value       'Motor [kg.m2]
+        Springstiff_1 = NumericUpDown47.Value   'stijfheid as [Nm/rad]
+        Springstiff_2 = NumericUpDown44.Value   'stijfheid koppeling[Nm/rad]
+        theta_1 = 1                             'Versterking
+        For ii = 0 To 250
+            omega = ii * NumericUpDown48.Value                              'Hoeksnelheid step-range
+            Torsion_1 = (omega ^ 2) * Inertia_1 * theta_1
+            theta_2 = 1 - Torsion_1 / Springstiff_1                         'theta_1 - (((ii ^ 2) / Springstiff_1) * Inertia_1 * theta_1)
+            Torsion_2 = Torsion_1 + (omega ^ 2) * Inertia_2 * theta_2
+            theta_3 = theta_2 - Torsion_2 / Springstiff_2                   'theta_2 - ((ii ^ 2) / Springstiff_2) * (Inertia_1 * theta_1 + Inertia_2 * theta_2)
+            Torsion_3 = Torsion_2 + (omega ^ 2) * Inertia_3 * theta_3
+
+            Torsional_point(ii, 0) = Round(omega * 60 / (2 * PI), 0)        '[rad/s --> rpm]
+            Torsional_point(ii, 1) = Torsion_3 / 10 ^ 6                     '[Nm]
+
+            'If Abs(Torsion_3) < 100 And omega > 1 Then
+            '    TextBox84.Text = Torsional_point(ii, 0).ToString
+            '    MessageBox.Show(omega.ToString & "  " & Torsion_3.ToString)
+            'End If
+        Next
+        draw_chart4()
+
+    End Sub
+    Private Sub draw_chart4()
+        Dim hh As Integer
+        Try
+            Chart4.Series.Clear()
+            Chart4.ChartAreas.Clear()
+            Chart4.Titles.Clear()
+
+            Chart4.Series.Add("Torque")
+
+            Chart4.ChartAreas.Add("ChartArea0")
+            Chart4.Series(0).ChartArea = "ChartArea0"
+
+            Chart4.Series(0).ChartType = DataVisualization.Charting.SeriesChartType.Line
+
+            Chart4.Titles.Add("Torsie eigenfrequentie analyse")
+            Chart4.Titles(0).Font = New Font("Arial", 16, System.Drawing.FontStyle.Bold)
+
+            Chart4.Series(0).Name = "Torque"
+            Chart4.Series(0).Color = Color.Green
+            Chart4.Series(0).BorderWidth = 1
+
+            Chart4.ChartAreas("ChartArea0").AxisX.Title = "[rpm]"
+            Chart4.ChartAreas("ChartArea0").AxisY.Title = "Torsion_3 [Nm] * 10^6"
+            Chart4.ChartAreas("ChartArea0").AxisX.Minimum = 0
+            Chart4.ChartAreas("ChartArea0").AlignmentOrientation = DataVisualization.Charting.AreaAlignmentOrientations.Vertical
+            Chart4.Series(0).YAxisType = AxisType.Primary
+
+            For hh = 0 To 250
+                Chart4.Series(0).Points.AddXY(Torsional_point(hh, 0), Torsional_point(hh, 1))
+            Next
+        Catch ex As Exception
+            MessageBox.Show("nnnnnn")
+        End Try
+    End Sub
+
     Private Sub calc_bearing_belts()
         Dim length_a, length_b, length_c, length_naaf As Double
         Dim dia_a, dia_b, dia_c, dia_naaf As Double
@@ -2077,6 +2142,8 @@ Public Class Form1
 
         '----------- eigen frequentie ---------------------
         TextBox111.Text = Round(N_max_doorbuiging * 1000, 3).ToString   'Max doorbuiging in [mm]
+
+        Torsional_analyses()
     End Sub
 
     Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click, NumericUpDown8.ValueChanged, NumericUpDown7.ValueChanged, NumericUpDown6.ValueChanged, NumericUpDown5.ValueChanged, NumericUpDown4.ValueChanged, NumericUpDown3.ValueChanged, NumericUpDown13.ValueChanged, NumericUpDown12.ValueChanged, NumericUpDown1.ValueChanged, ComboBox1.SelectedIndexChanged, RadioButton4.CheckedChanged, RadioButton3.CheckedChanged, CheckBox4.CheckedChanged, NumericUpDown33.ValueChanged, ComboBox7.SelectedIndexChanged, TabPage1.Enter, RadioButton14.CheckedChanged, RadioButton13.CheckedChanged, RadioButton12.CheckedChanged, NumericUpDown58.ValueChanged, NumericUpDown37.ValueChanged
@@ -2556,6 +2623,7 @@ Public Class Form1
 
         TextBox202.Text = Round(impellar_inertia, 1).ToString       'impellar inertia [kg.m2]
         TextBox207.Text = Round(motor_inertia, 1).ToString          'motor inertia [kg.m2]
+        NumericUpDown46.Value = Round(motor_inertia, 1).ToString    'motor inertia [kg.m2]
         TextBox213.Text = Round(total_inertia, 1).ToString          'Total inertia[kg.m2]
 
         TextBox206.Text = Round(m_torque_average, 0).ToString       'Torque average [kg.m2]
