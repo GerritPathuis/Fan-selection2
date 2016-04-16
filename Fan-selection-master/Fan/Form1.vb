@@ -82,8 +82,16 @@ Public Structure PPOINT         'Polynomial regression
     Public y As Double
 End Structure
 
+Public Structure Shaft_section  'Section of the ompeller shaft
+    Public dia As Double            '[m]
+    Public length As Double         '[m]
+    Public k_stiffness As Double    '[N.m/rad]
+End Structure
+
+
 Public Class Form1
     Public Tschets(31) As Tmodel            'was 31
+    Public section(3) As Shaft_section      'Impeller shaft section
     Public cp_air As Double = 1.005         'Specific heat air
     Public cond(10) As Stage                'Process conditions
     Public PZ(10) As PPOINT                 'Raw data, Polynomial regression
@@ -307,15 +315,15 @@ Public Class Form1
             ComboBox3.SelectedIndex = 5                 'Select Domex
         End If
 
-        If ComboBox4.Items.Count > 0 Then
-            ComboBox4.SelectedIndex = 1
+        If ComboBox4.Items.Count > 0 Then               'Selecteer de motor
+            ComboBox4.SelectedIndex = 3
         End If
 
         If ComboBox5.Items.Count > 0 Then
             ComboBox5.SelectedIndex = 1                 'Select diameter duct
         End If
 
-        If ComboBox6.Items.Count > 0 Then
+        If ComboBox6.Items.Count > 0 Then               'Selecteer de motor
             ComboBox6.SelectedIndex = 1
         End If
 
@@ -1942,36 +1950,62 @@ Public Class Form1
 
     Private Sub Button6_Click(sender As Object, e As EventArgs) Handles Button6.Click, NumericUpDown27.ValueChanged, NumericUpDown26.ValueChanged, NumericUpDown25.ValueChanged, NumericUpDown24.ValueChanged, NumericUpDown23.ValueChanged, NumericUpDown22.ValueChanged, TabPage5.Enter, NumericUpDown16.ValueChanged, ComboBox4.SelectedIndexChanged, RadioButton7.CheckedChanged, NumericUpDown15.ValueChanged, NumericUpDown47.ValueChanged, NumericUpDown46.ValueChanged, NumericUpDown45.ValueChanged, NumericUpDown44.ValueChanged, NumericUpDown43.ValueChanged, NumericUpDown48.ValueChanged
         calc_bearing_belts()
-
+        Torsional_stiffness()
+        Torsional_analyses()
     End Sub
+    'Stiffness calculation of the impellear shaft
+    Private Sub Torsional_stiffness()
+        Dim g_modulus As Double             'modulus Of elasticity In shear
+        Dim k_total As Double               'modulus Of elasticity In shear
+
+        g_modulus = 79.3 * 10 ^ 9           '[Pa] (kilo, mega, giga)
+
+        section(0).dia = NumericUpDown25.Value / 1000
+        section(0).length = NumericUpDown22.Value / 1000
+        section(0).k_stiffness = PI * g_modulus * section(0).dia ^ 4 / (32 * section(0).length)     '[Nm/rad]
+
+        section(1).dia = NumericUpDown26.Value / 1000
+        section(1).length = NumericUpDown23.Value / 1000
+        section(1).k_stiffness = PI * g_modulus * section(1).dia ^ 4 / (32 * section(1).length)
+
+        section(2).dia = NumericUpDown27.Value / 1000
+        section(2).length = NumericUpDown24.Value / 1000
+        section(2).k_stiffness = PI * g_modulus * section(2).dia ^ 4 / (32 * section(2).length)
+
+        k_total = 1 / (1 / section(0).k_stiffness + 1 / section(1).k_stiffness + 1 / section(2).k_stiffness)
+
+        If Not Double.IsNaN(k_total) And Not Double.IsInfinity(k_total) Then   'preventing NaN problem and infinity problems
+            TextBox66.Text = Round(k_total / 1000, 0).ToString
+            NumericUpDown47.Value = Round(k_total / 1000, 0).ToString
+        End If
+    End Sub
+
     Private Sub Torsional_analyses()
         Dim Inertia_1, Inertia_2, Inertia_3, Springstiff_1, Springstiff_2, theta_1, theta_2, theta_3, Torsion_1, Torsion_2, Torsion_3, ii As Double
         Dim omega As Double 'hoeksnelheid
+        Try
+            Inertia_1 = NumericUpDown45.Value                   'Waaier [kg.m2]
+            Inertia_2 = NumericUpDown43.Value                   'Koppeling [kg.m2]
+            Inertia_3 = NumericUpDown46.Value                   'Motor [kg.m2]
+            Springstiff_1 = NumericUpDown47.Value * 1000        'stijfheid as [Nm/rad]
+            Springstiff_2 = NumericUpDown44.Value * 1000        'stijfheid koppeling[Nm/rad]
+            theta_1 = 1                                         'Versterking
+            For ii = 0 To 250
+                omega = ii * NumericUpDown48.Value                              'Hoeksnelheid step-range
+                Torsion_1 = (omega ^ 2) * Inertia_1 * theta_1
+                theta_2 = 1 - Torsion_1 / Springstiff_1                         'theta_1 - (((ii ^ 2) / Springstiff_1) * Inertia_1 * theta_1)
+                Torsion_2 = Torsion_1 + (omega ^ 2) * Inertia_2 * theta_2
+                theta_3 = theta_2 - Torsion_2 / Springstiff_2                   'theta_2 - ((ii ^ 2) / Springstiff_2) * (Inertia_1 * theta_1 + Inertia_2 * theta_2)
+                Torsion_3 = Torsion_2 + (omega ^ 2) * Inertia_3 * theta_3
 
-        Inertia_1 = NumericUpDown45.Value       'Waaier [kg.m2]
-        Inertia_2 = NumericUpDown43.Value       'Koppeling [kg.m2]
-        Inertia_3 = NumericUpDown46.Value       'Motor [kg.m2]
-        Springstiff_1 = NumericUpDown47.Value   'stijfheid as [Nm/rad]
-        Springstiff_2 = NumericUpDown44.Value   'stijfheid koppeling[Nm/rad]
-        theta_1 = 1                             'Versterking
-        For ii = 0 To 250
-            omega = ii * NumericUpDown48.Value                              'Hoeksnelheid step-range
-            Torsion_1 = (omega ^ 2) * Inertia_1 * theta_1
-            theta_2 = 1 - Torsion_1 / Springstiff_1                         'theta_1 - (((ii ^ 2) / Springstiff_1) * Inertia_1 * theta_1)
-            Torsion_2 = Torsion_1 + (omega ^ 2) * Inertia_2 * theta_2
-            theta_3 = theta_2 - Torsion_2 / Springstiff_2                   'theta_2 - ((ii ^ 2) / Springstiff_2) * (Inertia_1 * theta_1 + Inertia_2 * theta_2)
-            Torsion_3 = Torsion_2 + (omega ^ 2) * Inertia_3 * theta_3
+                Torsional_point(ii, 0) = Round(omega * 60 / (2 * PI), 0)        '[rad/s --> rpm]
+                Torsional_point(ii, 1) = Torsion_3 / 10 ^ 6                     '[Nm]
+            Next
 
-            Torsional_point(ii, 0) = Round(omega * 60 / (2 * PI), 0)        '[rad/s --> rpm]
-            Torsional_point(ii, 1) = Torsion_3 / 10 ^ 6                     '[Nm]
-
-            'If Abs(Torsion_3) < 100 And omega > 1 Then
-            '    TextBox84.Text = Torsional_point(ii, 0).ToString
-            '    MessageBox.Show(omega.ToString & "  " & Torsion_3.ToString)
-            'End If
-        Next
-        draw_chart4()
-
+            draw_chart4()
+        Catch ex As Exception
+            MessageBox.Show("Problem torsional calculation")
+        End Try
     End Sub
     Private Sub draw_chart4()
         Dim hh As Integer
@@ -2018,7 +2052,9 @@ Public Class Form1
         Dim Force_combi1, Force_combi2, Force_combi3 As Double
         Dim N_kritisch_as As Double
         Dim N_max_doorbuiging As Double
+        Dim n_actual As Double
         Dim Elasticiteitsm As Double
+        Dim motor_inertia As Double
         Dim W_rpm As Double
         Dim F_onbalans, V_onbalans, hoeksnelheid As Double
         Dim F_a_hor, F_a_vert, F_a_combined As Double       'Bearing next impellar
@@ -2071,15 +2107,32 @@ Public Class Form1
         F_onbalans = V_onbalans * hoeksnelheid * (gewicht_waaier + gewicht_naaf + g_shaft_a)
 
         '--------- Kracht door V_snaren----------
-        If (ComboBox4.SelectedIndex > -1) Then      'Prevent exceptions
+        If (ComboBox4.SelectedIndex > -1) Then                                  'Prevent exceptions
             Dim words() As String = emotor(ComboBox4.SelectedIndex).Split(";")
-            S_power = words(0)      'Motor vermogen
+            S_power = words(0) * 1000                                           'Motor vermogen
+            n_actual = words(1)                                                 'Toerental motor [rpm]
             dia_pulley = NumericUpDown16.Value / 1000
-            F_snaar = 975 * S_power * 20 / (W_rpm * dia_pulley * 0.5)
+            F_snaar = 0.975 * S_power * 20 / (W_rpm * dia_pulley * 0.5)
+
+            '------------- inertia motor--------------------
+            Select Case True
+                Case n_actual = 3000
+                    motor_inertia = 0.04 * (S_power / 1000) ^ 0.9 * 1 ^ 2.5    '2 poles (1 pair) (3000 rpm) [kg.m2]
+                Case n_actual = 1500
+                    motor_inertia = 0.04 * (S_power / 1000) ^ 0.9 * 2 ^ 2.5    '4 poles (2 pair) (1500 rpm) [kg.m2]
+                Case n_actual = 1000
+                    motor_inertia = 0.04 * (S_power / 1000) ^ 0.9 * 3 ^ 2.5    '6 poles (3 pair) (1000 rpm) [kg.m2]
+                Case n_actual = 750
+                    motor_inertia = 0.04 * (S_power / 1000) ^ 0.9 * 4 ^ 2.5    '8 poles (4 pair) (750 rpm) [kg.m2]
+                Case Else
+                    MessageBox.Show("Error occured in Motor Inertia calculation ")
+            End Select
+            TextBox219.Text = Round(motor_inertia, 1).ToString
+            NumericUpDown46.Value = Round(motor_inertia, 1).ToString
         End If
 
         '--------- Scheefstelling koppeling ---------------
-        F_scheef = 5700 * Sqrt(S_power / W_rpm)
+        F_scheef = 5.7 * Sqrt(S_power / W_rpm)                         '?????????????????????????????
 
         '----------- Forces bearing vertical-------------
         Force_combi1 = (gewicht_waaier + gewicht_naaf) * 9.81 + F_onbalans
@@ -2143,7 +2196,7 @@ Public Class Form1
         '----------- eigen frequentie ---------------------
         TextBox111.Text = Round(N_max_doorbuiging * 1000, 3).ToString   'Max doorbuiging in [mm]
 
-        Torsional_analyses()
+
     End Sub
 
     Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click, NumericUpDown8.ValueChanged, NumericUpDown7.ValueChanged, NumericUpDown6.ValueChanged, NumericUpDown5.ValueChanged, NumericUpDown4.ValueChanged, NumericUpDown3.ValueChanged, NumericUpDown13.ValueChanged, NumericUpDown12.ValueChanged, NumericUpDown1.ValueChanged, ComboBox1.SelectedIndexChanged, RadioButton4.CheckedChanged, RadioButton3.CheckedChanged, CheckBox4.CheckedChanged, NumericUpDown33.ValueChanged, ComboBox7.SelectedIndexChanged, TabPage1.Enter, RadioButton14.CheckedChanged, RadioButton13.CheckedChanged, RadioButton12.CheckedChanged, NumericUpDown58.ValueChanged, NumericUpDown37.ValueChanged
