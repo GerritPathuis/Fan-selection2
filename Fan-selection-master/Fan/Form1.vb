@@ -96,7 +96,7 @@ Public Class Form1
     Public cond(10) As Stage                'Process conditions
     Public PZ(10) As PPOINT                 'Raw data, Polynomial regression
     Public BZ(5, 5) As Double               'Poly Coefficients, Polynomial regression
-    Dim Torsional_point(250, 2) As Double
+    Dim Torsional_point(100, 2) As Double   'For calculation on torsional frequency
 
     '-----"Oude benaming;Norm:;EN10027-1;Werkstof;[mm/m1/100°C];Poisson ;kg/m3;E [Gpa];Rm (20c);Rp0.2(0c);Rp0.2(20c);Rp(50c);Rp(100c);Rp(150c);Rp(200c);Rp(250c);Rp(300c);Rp(350c);Rp(400c);Equiv-ASTM;Opmerking",
     Public Shared steel() As String =
@@ -1958,7 +1958,7 @@ Public Class Form1
         Dim g_modulus As Double             'modulus Of elasticity In shear
         Dim k_total As Double               'modulus Of elasticity In shear
 
-        g_modulus = 79.3 * 10 ^ 9           '[Pa] (kilo, mega, giga)
+        g_modulus = 79.3 * 10 ^ 9           '[Pa] (kilo, mega, giga) steel shear modulus !
 
         section(0).dia = NumericUpDown25.Value / 1000
         section(0).length = NumericUpDown22.Value / 1000
@@ -1990,7 +1990,7 @@ Public Class Form1
             Springstiff_1 = NumericUpDown47.Value * 1000            'stijfheid as [kilo.Nm/rad]
             Springstiff_2 = NumericUpDown44.Value * 1000 * 1000     'stijfheid koppeling[Mega.Nm/rad]
             theta_1 = 1                                             'Versterking
-            For ii = 0 To 250
+            For ii = 0 To 100
                 omega = ii * NumericUpDown48.Value                              'Hoeksnelheid step-range
                 Torsion_1 = (omega ^ 2) * Inertia_1 * theta_1
                 theta_2 = 1 - Torsion_1 / Springstiff_1                         'theta_1 - (((ii ^ 2) / Springstiff_1) * Inertia_1 * theta_1)
@@ -2034,7 +2034,7 @@ Public Class Form1
             Chart4.ChartAreas("ChartArea0").AlignmentOrientation = DataVisualization.Charting.AreaAlignmentOrientations.Vertical
             Chart4.Series(0).YAxisType = AxisType.Primary
 
-            For hh = 0 To 250
+            For hh = 0 To 100
                 Chart4.Series(0).Points.AddXY(Torsional_point(hh, 0), Torsional_point(hh, 1))
             Next
         Catch ex As Exception
@@ -2096,7 +2096,7 @@ Public Class Form1
         J_shaft_total = J_shaft_a + J_shaft_b + J_shaft_c     'MassaTraagheid As
 
         '---------- Kritisch toerental formule 6.41 pagina 213--------------
-        Elasticiteitsm = 210 * 1000 ^ 3                                 'in Pascal [N/m2]
+        Elasticiteitsm = 210 * 1000 ^ 3                                             'in Pascal [N/m2]
         N_max_doorbuiging = ((length_a ^ 3 / I_shaft_a) + (length_a ^ 2 * length_b / I_shaft_b)) / (3 * Elasticiteitsm)
         N_max_doorbuiging *= (gewicht_waaier + gewicht_naaf + g_shaft_a) * 9.81
         N_kritisch_as = Sqrt(9.81 / N_max_doorbuiging) * 60 / (2 * PI)
@@ -2115,18 +2115,7 @@ Public Class Form1
             F_snaar = 0.975 * S_power * 20 / (W_rpm * dia_pulley * 0.5)
 
             '------------- inertia motor--------------------
-            Select Case True
-                Case n_actual = 3000
-                    motor_inertia = 0.04 * (S_power / 1000) ^ 0.9 * 1 ^ 2.5    '2 poles (1 pair) (3000 rpm) [kg.m2]
-                Case n_actual = 1500
-                    motor_inertia = 0.04 * (S_power / 1000) ^ 0.9 * 2 ^ 2.5    '4 poles (2 pair) (1500 rpm) [kg.m2]
-                Case n_actual = 1000
-                    motor_inertia = 0.04 * (S_power / 1000) ^ 0.9 * 3 ^ 2.5    '6 poles (3 pair) (1000 rpm) [kg.m2]
-                Case n_actual = 750
-                    motor_inertia = 0.04 * (S_power / 1000) ^ 0.9 * 4 ^ 2.5    '8 poles (4 pair) (750 rpm) [kg.m2]
-                Case Else
-                    MessageBox.Show("Error occured in Motor Inertia calculation ")
-            End Select
+            motor_inertia = emotor_inert(n_actual, S_power)
             TextBox219.Text = Round(motor_inertia, 1).ToString
             NumericUpDown46.Value = Round(motor_inertia, 1).ToString
         End If
@@ -2646,18 +2635,7 @@ Public Class Form1
             impellar_inertia = impellar_inertia * NumericUpDown35.Value ^ 2         'in case speed ratio impeller/motor 
 
             '------------- inertia motor--------------------
-            Select Case True
-                Case n_actual = 3000
-                    motor_inertia = 0.04 * (Ins_power / 1000) ^ 0.9 * 1 ^ 2.5    '2 poles (1 pair) (3000 rpm) [kg.m2]
-                Case n_actual = 1500
-                    motor_inertia = 0.04 * (Ins_power / 1000) ^ 0.9 * 2 ^ 2.5    '4 poles (2 pair) (1500 rpm) [kg.m2]
-                Case n_actual = 1000
-                    motor_inertia = 0.04 * (Ins_power / 1000) ^ 0.9 * 3 ^ 2.5    '6 poles (3 pair) (1000 rpm) [kg.m2]
-                Case n_actual = 750
-                    motor_inertia = 0.04 * (Ins_power / 1000) ^ 0.9 * 4 ^ 2.5    '8 poles (4 pair) (750 rpm) [kg.m2]
-                Case Else
-                    MessageBox.Show("Error occured in Motor Inertia calculation ")
-            End Select
+            motor_inertia = emotor_inert(n_actual, Ins_power)
 
             total_inertia = impellar_inertia + motor_inertia    '[kg.m2]
             inertia_torque = total_inertia * ang_acceleration     '[N.m]
@@ -2741,6 +2719,22 @@ Public Class Form1
         End Try
 
     End Sub
-
+    ' see http://ecatalog.weg.net/files/wegnet/WEG-specification-of-electric-motors-50039409-manual-english.pdf
+    Function emotor_inert(rpm As Double, kw As Double)
+        Dim motor_inertia As Double
+        Select Case True
+            Case rpm = 3000
+                motor_inertia = 0.04 * (kw / 1000) ^ 0.9 * 1 ^ 2.5    '2 poles (1 pair) (3000 rpm) [kg.m2]
+            Case rpm = 1500
+                motor_inertia = 0.04 * (kw / 1000) ^ 0.9 * 2 ^ 2.5    '4 poles (2 pair) (1500 rpm) [kg.m2]
+            Case rpm = 1000
+                motor_inertia = 0.04 * (kw / 1000) ^ 0.9 * 3 ^ 2.5    '6 poles (3 pair) (1000 rpm) [kg.m2]
+            Case rpm = 750
+                motor_inertia = 0.04 * (kw / 1000) ^ 0.9 * 4 ^ 2.5    '8 poles (4 pair) (750 rpm) [kg.m2]
+            Case Else
+                MessageBox.Show("Error occured in Motor Inertia calculation ")
+        End Select
+        Return (motor_inertia)
+    End Function
 
 End Class
