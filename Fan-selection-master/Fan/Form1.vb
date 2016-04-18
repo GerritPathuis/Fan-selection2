@@ -91,7 +91,7 @@ End Structure
 
 Public Class Form1
     Public Tschets(31) As Tmodel            'was 31
-    Public section(3) As Shaft_section      'Impeller shaft section
+    Public section(4) As Shaft_section      'Impeller shaft section
     Public cp_air As Double = 1.005         'Specific heat air
     Public cond(10) As Stage                'Process conditions
     Public PZ(10) As PPOINT                 'Raw data, Polynomial regression
@@ -1948,7 +1948,7 @@ Public Class Form1
         End If
     End Sub
 
-    Private Sub Button6_Click(sender As Object, e As EventArgs) Handles Button6.Click, NumericUpDown27.ValueChanged, NumericUpDown26.ValueChanged, NumericUpDown25.ValueChanged, NumericUpDown24.ValueChanged, NumericUpDown23.ValueChanged, NumericUpDown22.ValueChanged, TabPage5.Enter, NumericUpDown16.ValueChanged, ComboBox4.SelectedIndexChanged, RadioButton7.CheckedChanged, NumericUpDown15.ValueChanged, NumericUpDown47.ValueChanged, NumericUpDown46.ValueChanged, NumericUpDown45.ValueChanged, NumericUpDown44.ValueChanged, NumericUpDown43.ValueChanged, NumericUpDown48.ValueChanged
+    Private Sub Button6_Click(sender As Object, e As EventArgs) Handles Button6.Click, NumericUpDown27.ValueChanged, NumericUpDown26.ValueChanged, NumericUpDown25.ValueChanged, NumericUpDown24.ValueChanged, NumericUpDown23.ValueChanged, NumericUpDown22.ValueChanged, TabPage5.Enter, NumericUpDown16.ValueChanged, ComboBox4.SelectedIndexChanged, RadioButton7.CheckedChanged, NumericUpDown15.ValueChanged, NumericUpDown47.ValueChanged, NumericUpDown46.ValueChanged, NumericUpDown45.ValueChanged, NumericUpDown44.ValueChanged, NumericUpDown43.ValueChanged, NumericUpDown48.ValueChanged, NumericUpDown56.ValueChanged, NumericUpDown49.ValueChanged, RadioButton15.CheckedChanged
         calc_bearing_belts()
         Torsional_stiffness()
         Torsional_analyses()
@@ -1956,7 +1956,7 @@ Public Class Form1
     'Stiffness calculation of the impellear shaft
     Private Sub Torsional_stiffness()
         Dim g_modulus As Double             'modulus Of elasticity In shear
-        Dim k_total As Double               'modulus Of elasticity In shear
+        Dim k_total, k2 As Double               'modulus Of elasticity In shear
 
         g_modulus = 79.3 * 10 ^ 9           '[Pa] (kilo, mega, giga) steel shear modulus !
 
@@ -1972,23 +1972,39 @@ Public Class Form1
         section(2).length = NumericUpDown24.Value / 1000
         section(2).k_stiffness = PI * g_modulus * section(2).dia ^ 4 / (32 * section(2).length)
 
+        section(3).dia = NumericUpDown49.Value / 1000
+        section(3).length = NumericUpDown56.Value / 1000
+        section(3).k_stiffness = PI * g_modulus * section(3).dia ^ 4 / (32 * section(3).length)
+
         k_total = 1 / (1 / section(0).k_stiffness + 1 / section(1).k_stiffness + 1 / section(2).k_stiffness)
 
         If Not Double.IsNaN(k_total) And Not Double.IsInfinity(k_total) Then   'preventing NaN problem and infinity problems
             TextBox66.Text = Round(k_total / 1000, 0).ToString
             NumericUpDown47.Value = Round(k_total / 1000, 0).ToString
         End If
+        'De as tussen de waaiers bij meerstrappers
+        k2 = section(3).k_stiffness
+        If Not Double.IsNaN(k2) And Not Double.IsInfinity(k2) Then   'preventing NaN problem and infinity problems
+            TextBox220.Text = Round(k2 / 1000, 0).ToString
+        End If
     End Sub
 
     Private Sub Torsional_analyses()
-        Dim Inertia_1, Inertia_2, Inertia_3, Springstiff_1, Springstiff_2, theta_1, theta_2, theta_3, Torsion_1, Torsion_2, Torsion_3, ii As Double
-        Dim omega As Double 'hoeksnelheid
+        Dim Inertia_1, Inertia_2, Inertia_3, Inertia_4 As Double    'Traagheid
+        Dim Springstiff_1, Springstiff_2, Springstiff_3 As Double   'Stijfheid
+        Dim theta_1, theta_2, theta_3, theta_4 As Double            'Hoekverdraaiing
+        Dim Torsion_1, Torsion_2, Torsion_3, Torsion_4 As Double    'Torsie
+        Dim omega, ii As Double                                     'hoeksnelheid
         Try
-            Inertia_1 = NumericUpDown45.Value                       'Waaier [kg.m2]
+            Inertia_1 = NumericUpDown45.Value                       'Waaier #1 [kg.m2]
             Inertia_2 = NumericUpDown43.Value                       'Koppeling [kg.m2]
             Inertia_3 = NumericUpDown46.Value                       'Motor [kg.m2]
+            Inertia_4 = NumericUpDown45.Value                       'Waaier #2 [kg.m2]
+
             Springstiff_1 = NumericUpDown47.Value * 1000            'stijfheid as [kilo.Nm/rad]
-            Springstiff_2 = NumericUpDown44.Value * 1000 * 1000     'stijfheid koppeling[Mega.Nm/rad]
+            Springstiff_2 = NumericUpDown44.Value * 1000            'stijfheid koppeling[kilo.Nm/rad]
+            Springstiff_3 = section(3).k_stiffness
+
             theta_1 = 1                                             'Versterking
             For ii = 0 To 100
                 omega = ii * NumericUpDown48.Value                              'Hoeksnelheid step-range
@@ -1997,9 +2013,15 @@ Public Class Form1
                 Torsion_2 = Torsion_1 + (omega ^ 2) * Inertia_2 * theta_2
                 theta_3 = theta_2 - Torsion_2 / Springstiff_2                   'theta_2 - ((ii ^ 2) / Springstiff_2) * (Inertia_1 * theta_1 + Inertia_2 * theta_2)
                 Torsion_3 = Torsion_2 + (omega ^ 2) * Inertia_3 * theta_3
-
+                theta_4 = theta_3 - Torsion_3 / Springstiff_3
+                Torsion_4 = Torsion_3 + (omega ^ 2) * Inertia_4 * theta_4
                 Torsional_point(ii, 0) = Round(omega * 60 / (2 * PI), 0)        '[rad/s --> rpm]
-                Torsional_point(ii, 1) = Torsion_3 / 10 ^ 6                     '[Nm]
+
+                If (RadioButton15.Checked) Then
+                    Torsional_point(ii, 1) = Torsion_3 / 10 ^ 6                 '[Nm] enkel trapper
+                Else
+                    Torsional_point(ii, 1) = Torsion_4 / 10 ^ 6                 '[Nm] meer trapper
+                End If
             Next
 
             draw_chart4()
@@ -2736,5 +2758,6 @@ Public Class Form1
         End Select
         Return (motor_inertia)
     End Function
+
 
 End Class
