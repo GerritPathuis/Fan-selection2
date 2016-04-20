@@ -6,6 +6,7 @@ Imports System.Collections.Generic
 Imports System.Windows.Forms.DataVisualization.Charting
 Imports System.Globalization
 Imports System.Threading
+Imports Word = Microsoft.Office.Interop.Word
 
 Public Structure Tmodel
     Public Tname As String              'Name
@@ -258,6 +259,9 @@ Public Class Form1
     Public Direct_eff As Double              'Efficiency max [-]
     Public Direct_Debiet_z_sec As Double     'Debiet zuig [m3/sec]
     Public Direct_temp_uit_c As Double       'Lucht temperatuur uit [c].
+
+    Dim Inertia_1, Inertia_2, Inertia_3, Inertia_4 As Double    'Torsional analyses
+    Dim Springstiff_1, Springstiff_2, Springstiff_3 As Double   'Torsional analyses
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Dim hh As Integer
@@ -625,9 +629,9 @@ Public Class Form1
                 Calc_stage(cond(3))                                 'Bereken de waaier #3   
 
 
-                Label154.Text = "Waaier #1, Ro1=" & Round(cond(1).Ro1, 03).ToString & " [kg/m3], Ro2=" & Round(cond(1).Ro2, 3).ToString & " [kg/m3], P2t=" & Round(cond(1).Pt2, 0).ToString & " [Pa]"
-                Label155.Text = "Waaier #2, Ro1=" & Round(cond(2).Ro1, 03).ToString & " [kg/m3], Ro2=" & Round(cond(2).Ro2, 3).ToString & " [kg/m3], Pt2=" & Round(cond(2).Pt2, 0).ToString & " [Pa]"
-                Label156.Text = "Waaier #3, Ro1=" & Round(cond(3).Ro1, 03).ToString & " [kg/m3], Ro2=" & Round(cond(3).Ro2, 3).ToString & " [kg/m3], Pt2=" & Round(cond(3).Pt2, 0).ToString & " [Pa]"
+                Label154.Text = "Waaier #1, Ro1=" & Round(cond(1).Ro1, 3).ToString & " [kg/m3], Ro2=" & Round(cond(1).Ro2, 3).ToString & " [kg/m3], P2t=" & Round(cond(1).Pt2, 0).ToString & " [Pa]"
+                Label155.Text = "Waaier #2, Ro1=" & Round(cond(2).Ro1, 3).ToString & " [kg/m3], Ro2=" & Round(cond(2).Ro2, 3).ToString & " [kg/m3], Pt2=" & Round(cond(2).Pt2, 0).ToString & " [Pa]"
+                Label156.Text = "Waaier #3, Ro1=" & Round(cond(3).Ro1, 3).ToString & " [kg/m3], Ro2=" & Round(cond(3).Ro2, 3).ToString & " [kg/m3], Pt2=" & Round(cond(3).Pt2, 0).ToString & " [Pa]"
 
 
                 '------------ Rendement Waaier (Ackeret) --------------
@@ -1005,7 +1009,7 @@ Public Class Form1
             End If
         Next hh
 
-        Return (00) 'Return zero when somethings goes wrong
+        Return (0) 'Return zero when somethings goes wrong
     End Function
     'Renard R20 reeks
     Function Renard_R20(getal As Double)
@@ -1495,8 +1499,8 @@ Public Class Form1
                             Chart1.Series(2).Points.AddXY(debiet, Round(Tschets(Tschets_no).Tverm_scaled_poly(hh), 1))
                         End If
                         Chart1.Series(5).Points.AddXY(debiet, Round(Tschets(Tschets_no).TPstat_scaled_poly(hh), 1))
-                        Else
-                            debiet = Tschets(Tschets_no).TFlow_scaled(hh)
+                    Else
+                        debiet = Tschets(Tschets_no).TFlow_scaled(hh)
                         If CheckBox2.Checked Then          '========Per uur=========
                             debiet = Round(debiet * 3600, 1)
                         End If
@@ -1508,10 +1512,10 @@ Public Class Form1
                             Chart1.Series(2).Points.AddXY(debiet, Round(Tschets(Tschets_no).Tverm_scaled(hh), 1))
                         End If
                         Chart1.Series(5).Points.AddXY(debiet, Round(Tschets(Tschets_no).TPstat_scaled(hh), 1))
-                        End If
+                    End If
 
-                        '-------------------Target dot ---------------------
-                        If CheckBox3.Checked = True Then
+                    '-------------------Target dot ---------------------
+                    If CheckBox3.Checked = True Then
                         Chart1.Series(3).YAxisType = AxisType.Primary
                         Chart1.Series(3).Points.AddXY(Q_target, P_target)
                         Chart1.Series(3).Points(0).MarkerStyle = DataVisualization.Charting.MarkerStyle.Star10
@@ -1990,11 +1994,8 @@ Public Class Form1
     End Sub
 
     Private Sub Torsional_analyses()
-        Dim Inertia_1, Inertia_2, Inertia_3, Inertia_4 As Double    'Traagheid
-        Dim Springstiff_1, Springstiff_2, Springstiff_3 As Double   'Stijfheid
-        Dim theta_1, theta_2, theta_3, theta_4 As Double            'Hoekverdraaiing
-        Dim Torsion_1, Torsion_2, Torsion_3, Torsion_4 As Double    'Torsie
-        Dim omega, ii As Double                                     'hoeksnelheid
+        Dim omega, ii As Double
+
         Try
             Inertia_1 = NumericUpDown45.Value                       'Waaier #1 [kg.m2]
             Inertia_2 = NumericUpDown43.Value                       'Koppeling [kg.m2]
@@ -2005,30 +2006,68 @@ Public Class Form1
             Springstiff_2 = NumericUpDown44.Value * 1000            'stijfheid koppeling[kilo.Nm/rad]
             Springstiff_3 = section(3).k_stiffness
 
-            theta_1 = 1                                             'Versterking
             For ii = 0 To 100
                 omega = ii * NumericUpDown48.Value                              'Hoeksnelheid step-range
-                Torsion_1 = (omega ^ 2) * Inertia_1 * theta_1
-                theta_2 = 1 - Torsion_1 / Springstiff_1                         'theta_1 - (((ii ^ 2) / Springstiff_1) * Inertia_1 * theta_1)
-                Torsion_2 = Torsion_1 + (omega ^ 2) * Inertia_2 * theta_2
-                theta_3 = theta_2 - Torsion_2 / Springstiff_2                   'theta_2 - ((ii ^ 2) / Springstiff_2) * (Inertia_1 * theta_1 + Inertia_2 * theta_2)
-                Torsion_3 = Torsion_2 + (omega ^ 2) * Inertia_3 * theta_3
-                theta_4 = theta_3 - Torsion_3 / Springstiff_3
-                Torsion_4 = Torsion_3 + (omega ^ 2) * Inertia_4 * theta_4
                 Torsional_point(ii, 0) = Round(omega * 60 / (2 * PI), 0)        '[rad/s --> rpm]
-
-                If (RadioButton15.Checked) Then
-                    Torsional_point(ii, 1) = Torsion_3 / 10 ^ 6                 '[Nm] enkel trapper
-                Else
-                    Torsional_point(ii, 1) = Torsion_4 / 10 ^ 6                 '[Nm] meer trapper
-                End If
+                Torsional_point(ii, 1) = calc_zeroTorsion_4(omega)              'Residual torque
             Next
 
             draw_chart4()
+            find_zero_torque()
+
         Catch ex As Exception
             MessageBox.Show("Problem torsional calculation")
         End Try
     End Sub
+
+    Private Sub find_zero_torque()
+        Dim T1, T2, T3, omg1, omg2, omg3 As Double
+        Dim jj As Integer
+
+        omg1 = 1        'Start lower limit
+        omg2 = 600      'Start upper limit
+        omg3 = 300      'In the middle
+
+        '-------------Iteratie 30x halveren moet voldoende zijn ---------------
+        For jj = 0 To 30
+            If T1 * T3 < 0 Then
+                omg2 = omg3
+            Else
+                omg1 = omg3
+            End If
+            omg3 = (omg1 + omg2) / 2
+            T1 = calc_zeroTorsion_4(omg1)
+            T2 = calc_zeroTorsion_4(omg2)
+            T3 = calc_zeroTorsion_4(omg3)
+        Next
+        TextBox84.Text = Round(omg3 * 60 / (2 * PI), 0)        '[rad/s --> rpm]
+    End Sub
+
+
+
+    'Holzer residual torqu analyses
+    Private Function calc_zeroTorsion_4(omega As Double)
+        Dim theta_1, theta_2, theta_3, theta_4 As Double
+        Dim Torsion_1, Torsion_2, Torsion_3, Torsion_4 As Double
+
+        theta_1 = 1                                             'Initial hoek verdraaiiing
+        Torsion_1 = (omega ^ 2) * Inertia_1 * theta_1
+        theta_2 = 1 - Torsion_1 / Springstiff_1                 'theta_1 - (((omega ^ 2) / Springstiff_1) * Inertia_1 * theta_1)
+        Torsion_2 = Torsion_1 + (omega ^ 2) * Inertia_2 * theta_2
+        theta_3 = theta_2 - Torsion_2 / Springstiff_2           'theta_2 - ((omega ^ 2) / Springstiff_2) * (Inertia_1 * theta_1 + Inertia_2 * theta_2)
+        Torsion_3 = Torsion_2 + (omega ^ 2) * Inertia_3 * theta_3
+        theta_4 = theta_3 - Torsion_3 / Springstiff_3
+        Torsion_4 = Torsion_3 + (omega ^ 2) * Inertia_4 * theta_4
+
+        If (RadioButton15.Checked) Then
+            Return (Torsion_3 / 10 ^ 6)                 '[Nm] enkel trapper
+        Else
+            Return (Torsion_4 / 10 ^ 6)                 '[Nm] meer trapper
+        End If
+
+    End Function
+
+
     Private Sub draw_chart4()
         Dim hh As Integer
         Try
@@ -2154,8 +2193,8 @@ Public Class Form1
         F_b_vert = Abs(Force_combi1 * length_a - Force_combi2 * length_b * 0.5 - Force_combi3 * (length_b + length_c)) / length_b
 
         '----------- Forces bearing horizontal-------------
-        Force_combi1 = 00   ' 
-        Force_combi2 = 00   ' 
+        Force_combi1 = 0   ' 
+        Force_combi2 = 0   ' 
         If RadioButton7.Checked Then    'direct drive
             Force_combi3 = F_scheef
             F_snaar = 0
@@ -2593,6 +2632,61 @@ Public Class Form1
 
         MxInverse = Ret
     End Function
+
+    Private Sub Button12_Click(sender As Object, e As EventArgs) Handles Button12.Click
+        Dim oWord As Word.Application
+        Dim oDoc As Word.Document
+        Dim oPara1 As Word.Paragraph, oPara2 As Word.Paragraph
+        Dim oPara3 As Word.Paragraph, oPara4 As Word.Paragraph
+
+        'Start Word and open the document template. 
+        oWord = CreateObject("Word.Application")
+        oWord.Visible = True
+        oDoc = oWord.Documents.Add
+
+        'Insert a paragraph at the beginning of the document. 
+        oPara1 = oDoc.Content.Paragraphs.Add
+        oPara1.Range.Text = "Engineering department" & ChrW(11) &
+        "Auther GP" & ChrW(11) &
+        "Date ..." & ChrW(11) &
+        "Project Name..." & ChrW(11) &
+        "Project number ..."
+        oPara1.Range.Font.Bold = True
+        oPara1.Format.SpaceAfter = 24    '24 pt spacing after paragraph. 
+        oPara1.Range.InsertParagraphAfter()
+        oPara2 = oDoc.Content.Paragraphs.Add(oDoc.Bookmarks.Item("\endofdoc").Range)
+        oPara2.Range.Text = "Inertia Data " & vbCrLf
+        oPara2.Format.SpaceAfter = 1
+        oPara2.Range.InsertParagraphAfter()
+
+        'Insert another paragraph. 
+        oPara3 = oDoc.Content.Paragraphs.Add(oDoc.Bookmarks.Item("\endofdoc").Range)
+        oPara3.Range.Text =
+        Label266.Text & ChrW(9) & ChrW(9) & NumericUpDown45.Value & ChrW(11) &
+        Label267.Text & ChrW(9) & ChrW(9) & NumericUpDown43.Value & ChrW(11) &
+        Label268.Text & ChrW(9) & ChrW(9) & NumericUpDown46.Value & ChrW(11) &
+        Label269.Text & ChrW(9) & ChrW(9) & NumericUpDown47.Value & ChrW(11) &
+        Label270.Text & ChrW(9) & ChrW(9) & NumericUpDown44.Value & ChrW(11) &
+        Label279.Text & ChrW(9) & ChrW(9) & TextBox84.Text
+
+        oPara3.Range.Font.Name = "Arial"
+        oPara3.Range.Font.Size = 11
+        oPara3.Range.Font.Bold = False
+        oPara3.Format.SpaceAfter = 12
+        oPara3.Range.InsertParagraphAfter()
+
+        '------------------save picture ---------------- 
+        Chart4.SaveImage("c:\Temp\MainChart.gif", System.Drawing.Imaging.ImageFormat.Gif)
+        oPara4 = oDoc.Content.Paragraphs.Add
+        oPara4.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter
+        oPara4.Range.InlineShapes.AddPicture("c:\Temp\MainChart.gif")
+        oPara4.Range.InsertParagraphAfter()
+
+    End Sub
+
+    Private Sub Label267_Click(sender As Object, e As EventArgs) Handles Label267.Click
+
+    End Sub
 
     Public Sub MxGaussJordan(Matrix(,) As Double)
 
