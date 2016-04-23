@@ -335,6 +335,7 @@ Public Class Form1
             ComboBox7.SelectedIndex = 6                 'Select T17B
         End If
 
+        ComboBox8.SelectedIndex = 2                     'SKF a1 factor
 
     End Sub
 
@@ -2472,6 +2473,7 @@ Public Class Form1
         y.Ro2 = calc_density(y.Ro1, (y.Pt1 + 101300), (y.Pt2 + 101300), y.T1, y.T2) 'Ro outlet flange fan
     End Sub
 
+
     Private Sub calc_loop_loss(ByRef x As Stage)
         Dim phi, area_omloop As Double
 
@@ -2647,8 +2649,8 @@ Public Class Form1
         'Insert a paragraph at the beginning of the document. 
         oPara1 = oDoc.Content.Paragraphs.Add
         oPara1.Range.Text = "Engineering department" & ChrW(11) &
-        "Auther GP" & ChrW(11) &
-        "Date ..." & ChrW(11) &
+        "Auther " & Environment.UserName & ChrW(11) &
+        "Date " & DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") & ChrW(11) &
         "Project Name..." & ChrW(11) &
         "Project number ..."
         oPara1.Range.Font.Bold = True
@@ -2680,13 +2682,95 @@ Public Class Form1
         oPara4 = oDoc.Content.Paragraphs.Add
         oPara4.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter
         oPara4.Range.InlineShapes.AddPicture("c:\Temp\MainChart.gif")
+        oPara4.Range.InlineShapes.Item(1).LockAspectRatio = True
+        'oPara4.Range.InlineShapes.Item(1).Width = 400
         oPara4.Range.InsertParagraphAfter()
 
     End Sub
 
-    Private Sub Label267_Click(sender As Object, e As EventArgs) Handles Label267.Click
+    'Bearing calculation
+    Private Sub Button13_Click(sender As Object, e As EventArgs) Handles Button13.Click, RadioButton24.CheckedChanged, RadioButton22.CheckedChanged, RadioButton19.CheckedChanged, RadioButton17.Click, NumericUpDown69.ValueChanged, TabPage13.Enter, NumericUpDown62.ValueChanged, NumericUpDown61.ValueChanged, ComboBox8.SelectedIndexChanged, NumericUpDown63.ValueChanged, NumericUpDown60.ValueChanged, NumericUpDown59.ValueChanged
+        Dim plain_bearing_area, plain_stress_no1, plain_stress_no2, force_no1, force_no2, max_press As Double
 
+        Try
+            Select Case True                                            'Select bearing material
+                Case RadioButton17.Checked
+                    NumericUpDown68.Value = 25
+                Case RadioButton19.Checked
+                    NumericUpDown68.Value = 40
+                Case RadioButton22.Checked
+                    NumericUpDown68.Value = 120
+                Case RadioButton24.Checked
+                    NumericUpDown68.Value = 140
+            End Select
+            max_press = NumericUpDown68.Value * NumericUpDown69.Value   'Safety factor
+            NumericUpDown68.Value = max_press
+
+            'Get the force data from the other tab
+            Double.TryParse(TextBox100.Text, force_no1)
+            Double.TryParse(TextBox101.Text, force_no2)
+
+            TextBox221.Text = force_no1.ToString
+            TextBox222.Text = force_no2.ToString
+            TextBox223.Text = "--"
+
+            plain_bearing_area = NumericUpDown61.Value * NumericUpDown62.Value
+
+            plain_stress_no1 = Round(force_no1 / plain_bearing_area, 1)
+            plain_stress_no2 = Round(force_no2 / plain_bearing_area, 1)
+
+            TextBox247.Text = plain_bearing_area.ToString   'Plain bearing area
+            TextBox224.Text = plain_stress_no1.ToString            'Actual load on Bearing #1
+            TextBox239.Text = plain_stress_no2.ToString            'Actual load on Bearing #2
+
+            If plain_stress_no1 > max_press Or plain_stress_no2 > max_press Then
+                TextBox224.BackColor = Color.Red
+                TextBox239.BackColor = Color.Red
+            Else
+                TextBox224.BackColor = Color.LightGreen
+                TextBox239.BackColor = Color.LightGreen
+            End If
+
+            '-------------------- bearing life ---------------------
+            Dim a1_fact, aSKF_fact, p_fact, Exp_life, C_load, Equi_load, n_rpm As Double
+
+            '-------------- type of bearing-------------
+            p_fact = 1
+            If RadioButton18.Checked Then p_fact = 3        'Ball bearing
+            If RadioButton23.Checked Then p_fact = 3.3      'Roller bearing
+
+            Select Case ComboBox8.SelectedIndex
+                Case 0
+                    a1_fact = 1         '90%
+                Case 1
+                    a1_fact = 0.64      '95%
+                Case 2
+                    a1_fact = 0.55      '96%
+                Case 3
+                    a1_fact = 0.47      '97%
+                Case 4
+                    a1_fact = 0.37      '98%
+                Case 5
+                    a1_fact = 0.25      '99%
+            End Select
+            TextBox250.Text = a1_fact.ToString
+            aSKF_fact = 1
+
+            '------------- expected life---------
+
+            C_load = NumericUpDown57.Value                                  'Data from manufacturer [kN]
+            Equi_load = force_no1 / 1000 * NumericUpDown59.Value            '[kN]
+            n_rpm = NumericUpDown63.Value                                   '[rpm]
+            Exp_life = a1_fact * aSKF_fact * (C_load / Equi_load) ^ p_fact
+
+            Exp_life *= 10 ^ 6 / (n_rpm * 60)
+
+            TextBox249.Text = Round(Equi_load, 1).ToString              'Equivalent Load [k.N]
+            TextBox248.Text = Round(Exp_life / 1000, 0).ToString        'Expected life [kilo.hr]
+        Catch ex As Exception
+        End Try
     End Sub
+
 
     Public Sub MxGaussJordan(Matrix(,) As Double)
 
