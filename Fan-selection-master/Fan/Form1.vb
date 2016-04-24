@@ -2689,79 +2689,73 @@ Public Class Form1
     End Sub
 
     'Bearing calculation
-    Private Sub Button13_Click(sender As Object, e As EventArgs) Handles Button13.Click, RadioButton24.CheckedChanged, RadioButton22.CheckedChanged, RadioButton19.CheckedChanged, RadioButton17.Click, NumericUpDown69.ValueChanged, TabPage13.Enter, NumericUpDown62.ValueChanged, NumericUpDown61.ValueChanged, ComboBox8.SelectedIndexChanged, NumericUpDown63.ValueChanged, NumericUpDown59.ValueChanged, RadioButton23.CheckedChanged, RadioButton18.CheckedChanged, NumericUpDown57.ValueChanged, RadioButton25.Click
+    Private Sub Button13_Click(sender As Object, e As EventArgs) Handles Button13.Click, RadioButton24.CheckedChanged, RadioButton22.CheckedChanged, RadioButton19.CheckedChanged, RadioButton17.Click, NumericUpDown69.ValueChanged, TabPage13.Enter, NumericUpDown62.ValueChanged, NumericUpDown61.ValueChanged, ComboBox8.SelectedIndexChanged, NumericUpDown63.ValueChanged, NumericUpDown59.ValueChanged, RadioButton23.CheckedChanged, RadioButton18.CheckedChanged, NumericUpDown57.ValueChanged, RadioButton25.Click, RadioButton26.CheckedChanged, RadioButton27.CheckedChanged, RadioButton28.CheckedChanged
         Dim plain_bearing_area, plain_stress_no1, plain_stress_no2, plain_sliding_speed As Double
-        Dim force_no1, force_no2, max_dyn_press, max_temp, max_speed, n_rpm, shaft_dia As Double
+        Dim force_no1, force_no2, max_dyn_press, max_temp, max_speed, max_pv, actual_pv, n_rpm, shaft_dia As Double
         Dim visco, dia_at_center_ball As Double
+        Dim a1_fact, aSKF_fact, p_fact, Exp_life, C_load, Equi_load As Double
+
         Try
-            Select Case True                                            'Select bearing material
+            Select Case True                'Select bearing material
                 Case RadioButton17.Checked  'Bronze bush
-                    max_dyn_press = 25
-                    max_temp = 250
-                    max_speed = 0.5
+                    max_dyn_press = 25      'N/mm2
+                    max_temp = 250          '[celsius]
+                    max_speed = 0.5         '[m/s]
+                    max_pv = 0              '[Mega.N.m2.m/s ==> N.mm2.m/s]
                 Case RadioButton25.Checked  'Sintered bronze
                     max_dyn_press = 10
                     max_temp = 90
                     max_speed = 5
+                    max_pv = 0
                 Case RadioButton19.Checked  'Wrapped bronze
                     max_dyn_press = 40
                     max_temp = 150
                     max_speed = 1
+                    max_pv = 0
                 Case RadioButton22.Checked  'POM composite
                     max_dyn_press = 120
                     max_temp = 110
                     max_speed = 2.5
+                    max_pv = 0
+                Case RadioButton26.Checked  'PTFE composite
+                    max_dyn_press = 80
+                    max_temp = 250
+                    max_speed = 2.0
+                    max_pv = 0
                 Case RadioButton24.Checked  'Filement wound
                     max_dyn_press = 140
                     max_temp = 140
                     max_speed = 0.5
+                    max_pv = 0
+                Case RadioButton27.Checked  'Bronze SAE 841
+                    max_dyn_press = 14
+                    max_temp = 104
+                    max_speed = 6.5
+                    max_pv = 1.75
+                Case RadioButton28.Checked  'Vespel SP-21
+                    max_dyn_press = 46.4
+                    max_temp = 393
+                    max_speed = 15.2
+                    max_pv = 10.7
             End Select
 
             max_dyn_press = max_dyn_press * NumericUpDown69.Value   'Safety factor
-            n_rpm = NumericUpDown63.Value                                   '[rpm]
+            n_rpm = NumericUpDown63.Value                           '[rpm]
             shaft_dia = NumericUpDown61.Value
 
             'Get the force data from the other tab
             Double.TryParse(TextBox100.Text, force_no1)
             Double.TryParse(TextBox101.Text, force_no2)
 
-            TextBox221.Text = force_no1.ToString
-            TextBox222.Text = force_no2.ToString
-            TextBox223.Text = "--"
-            TextBox252.Text = max_speed.ToString
-            TextBox253.Text = max_temp.ToString
-            TextBox254.Text = max_dyn_press.ToString
-
             plain_bearing_area = shaft_dia * NumericUpDown62.Value
-
             plain_stress_no1 = Round(force_no1 / plain_bearing_area, 1)
             plain_stress_no2 = Round(force_no2 / plain_bearing_area, 1)
 
-            TextBox247.Text = plain_bearing_area.ToString   'Plain bearing area
-            TextBox224.Text = plain_stress_no1.ToString            'Actual load on Bearing #1
-            TextBox239.Text = plain_stress_no2.ToString            'Actual load on Bearing #2
-
-            If plain_stress_no1 > max_dyn_press Or plain_stress_no2 > max_dyn_press Then
-                TextBox224.BackColor = Color.Red
-                TextBox239.BackColor = Color.Red
-            Else
-                TextBox224.BackColor = Color.LightGreen
-                TextBox239.BackColor = Color.LightGreen
-            End If
-
             '--------------------plain bearing sliding_speed ---------------------
             plain_sliding_speed = n_rpm / 60 * shaft_dia / 1000     '[m/s]
-            If plain_sliding_speed > max_speed Then
-                TextBox252.BackColor = Color.Red
-            Else
-                TextBox252.BackColor = Color.LightGreen
-            End If
+            actual_pv = plain_sliding_speed * plain_stress_no1
 
             '-------------------- bearing life ---------------------
-            Dim a1_fact, aSKF_fact, p_fact, Exp_life, C_load, Equi_load As Double
-
-
-            '-------------- type of bearing-------------
             p_fact = 1
             If RadioButton18.Checked Then p_fact = 3        'Ball bearing
             If RadioButton23.Checked Then p_fact = 3.3      'Roller bearing
@@ -2780,25 +2774,14 @@ Public Class Form1
                 Case 5
                     a1_fact = 0.25      '99%
             End Select
-            TextBox250.Text = a1_fact.ToString
+
             aSKF_fact = 1
 
             '------------- expected life---------
             C_load = NumericUpDown57.Value                             'Data from manufacturer [kN]
             Equi_load = force_no1 / 1000 * NumericUpDown59.Value       '[kN]
-
             Exp_life = a1_fact * aSKF_fact * (C_load / Equi_load) ^ p_fact
-
             Exp_life *= 10 ^ 6 / (n_rpm * 60)
-
-            TextBox249.Text = Round(Equi_load, 1).ToString              'Equivalent Load [k.N]
-            TextBox248.Text = Round(Exp_life / 1000, 0).ToString        'Expected life [kilo.hr]
-
-            If Exp_life < 50000 Then
-                TextBox248.BackColor = Color.Red
-            Else
-                TextBox248.BackColor = Color.LightGreen
-            End If
 
             '------------- reference viscosity---------
             dia_at_center_ball = shaft_dia * 1.5                        'is niet exact moet zijn (d_binnen+d_buiten)/2
@@ -2807,7 +2790,47 @@ Public Class Form1
             Else
                 visco = 4500 * n_rpm ^ -0.5 * dia_at_center_ball ^ -0.5
             End If
+
+            '--------- presenting ------------------
+            TextBox221.Text = force_no1.ToString
+            TextBox222.Text = force_no2.ToString
+            TextBox223.Text = "--"
+            TextBox252.Text = max_speed.ToString
+            TextBox253.Text = max_temp.ToString
+            TextBox254.Text = max_dyn_press.ToString
+            TextBox256.Text = max_pv.ToString                       'Max P.V #1 
+
             TextBox251.Text = Round(Equi_load, 1).ToString
+            TextBox249.Text = Round(Equi_load, 1).ToString          'Equivalent Load [k.N]
+            TextBox248.Text = Round(Exp_life / 1000, 0).ToString    'Expected life [kilo.hr]
+            TextBox247.Text = plain_bearing_area.ToString           'Plain bearing area
+            TextBox224.Text = plain_stress_no1.ToString             'Actual load on Bearing #1
+            TextBox239.Text = plain_stress_no2.ToString             'Actual load on Bearing #2
+            TextBox255.Text = actual_pv.ToString                    'Actual P.V #1 
+
+            TextBox250.Text = a1_fact.ToString
+
+            '--------- red or green  ------------------
+            If Exp_life < 50000 Then
+                TextBox248.BackColor = Color.Red
+            Else
+                TextBox248.BackColor = Color.LightGreen
+            End If
+
+            If plain_sliding_speed > max_speed Then
+                TextBox252.BackColor = Color.Red
+            Else
+                TextBox252.BackColor = Color.LightGreen
+            End If
+
+            If plain_stress_no1 > max_dyn_press Or plain_stress_no2 > max_dyn_press Then
+                TextBox224.BackColor = Color.Red
+                TextBox239.BackColor = Color.Red
+            Else
+                TextBox224.BackColor = Color.LightGreen
+                TextBox239.BackColor = Color.LightGreen
+            End If
+
         Catch ex As Exception
         End Try
     End Sub
