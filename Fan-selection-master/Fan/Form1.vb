@@ -7,6 +7,7 @@ Imports System.Windows.Forms.DataVisualization.Charting
 Imports System.Globalization
 Imports System.Threading
 Imports Word = Microsoft.Office.Interop.Word
+Imports System.Runtime.InteropServices
 
 Public Structure Tmodel
     Public Tname As String              'Name
@@ -1953,7 +1954,7 @@ Public Class Form1
         End If
     End Sub
 
-    Private Sub Button6_Click(sender As Object, e As EventArgs) Handles Button6.Click, NumericUpDown27.ValueChanged, NumericUpDown26.ValueChanged, NumericUpDown25.ValueChanged, NumericUpDown24.ValueChanged, NumericUpDown23.ValueChanged, NumericUpDown22.ValueChanged, TabPage5.Enter, NumericUpDown16.ValueChanged, ComboBox4.SelectedIndexChanged, RadioButton7.CheckedChanged, NumericUpDown15.ValueChanged, NumericUpDown47.ValueChanged, NumericUpDown46.ValueChanged, NumericUpDown45.ValueChanged, NumericUpDown44.ValueChanged, NumericUpDown43.ValueChanged, NumericUpDown48.ValueChanged, NumericUpDown56.ValueChanged, NumericUpDown49.ValueChanged, RadioButton15.CheckedChanged
+    Private Sub Button6_Click(sender As Object, e As EventArgs) Handles Button6.Click, NumericUpDown27.ValueChanged, NumericUpDown26.ValueChanged, NumericUpDown25.ValueChanged, NumericUpDown24.ValueChanged, NumericUpDown23.ValueChanged, NumericUpDown22.ValueChanged, TabPage5.Enter, NumericUpDown16.ValueChanged, ComboBox4.SelectedIndexChanged, RadioButton7.CheckedChanged, NumericUpDown15.ValueChanged, NumericUpDown46.ValueChanged, NumericUpDown45.ValueChanged, NumericUpDown44.ValueChanged, NumericUpDown43.ValueChanged, NumericUpDown48.ValueChanged, NumericUpDown56.ValueChanged, NumericUpDown49.ValueChanged, RadioButton15.CheckedChanged
         calc_bearing_belts()
         Torsional_stiffness()
         Torsional_analyses()
@@ -1961,7 +1962,10 @@ Public Class Form1
     'Stiffness calculation of the impellear shaft
     Private Sub Torsional_stiffness()
         Dim g_modulus As Double             'modulus Of elasticity In shear
-        Dim k_total, k2 As Double               'modulus Of elasticity In shear
+        Dim k_total, k2 As Double           'modulus Of elasticity In shear
+
+        TextBox257.Text = Round(NumericUpDown44.Value * PI / 180, 3).ToString       'Coupling, Convert rad to degree
+
 
         g_modulus = 79.3 * 10 ^ 9           '[Pa] (kilo, mega, giga) steel shear modulus !
 
@@ -1985,7 +1989,8 @@ Public Class Form1
 
         If Not Double.IsNaN(k_total) And Not Double.IsInfinity(k_total) Then   'preventing NaN problem and infinity problems
             TextBox66.Text = Round(k_total / 1000, 0).ToString
-            NumericUpDown47.Value = Round(k_total / 1000, 0).ToString
+            TextBox259.Text = Round(k_total / 1000, 0).ToString
+            TextBox258.Text = Round(k_total / 1000 * PI / 180, 0).ToString       'Drive shaft, Convert rad to degree
         End If
         'De as tussen de waaiers bij meerstrappers
         k2 = section(3).k_stiffness
@@ -2003,8 +2008,9 @@ Public Class Form1
             Inertia_3 = NumericUpDown46.Value                       'Motor [kg.m2]
             Inertia_4 = NumericUpDown45.Value                       'Waaier #2 [kg.m2]
 
-            Springstiff_1 = NumericUpDown47.Value * 1000            'stijfheid as [kilo.Nm/rad]
-            Springstiff_2 = NumericUpDown44.Value * 1000            'stijfheid koppeling[kilo.Nm/rad]
+            Double.TryParse(TextBox259.Text, Springstiff_1)         'stijfheid as [K.Nm/rad]
+            Springstiff_1 *= 1000                                   '[Nm/rad]
+            Springstiff_2 = NumericUpDown44.Value * 1000            'stijfheid koppeling[Nm/rad]
             Springstiff_3 = section(3).k_stiffness
 
             For ii = 0 To 100
@@ -2025,12 +2031,18 @@ Public Class Form1
         Dim T1, T2, T3, omg1, omg2, omg3 As Double
         Dim jj As Integer
 
-        omg1 = 1        'Start lower limit
-        omg2 = 600      'Start upper limit
-        omg3 = 300      'In the middle
+        'TextBox158.Clear()
+
+        omg1 = 1        'Start lower limit [rad/sec]
+        omg2 = 600      'Start upper limit [rad/sec]
+        omg3 = 300      'In the middle [rad/sec]
 
         '-------------Iteratie 30x halveren moet voldoende zijn ---------------
         For jj = 0 To 30
+            T1 = calc_zeroTorsion_4(omg1)
+            T2 = calc_zeroTorsion_4(omg2)
+            T3 = calc_zeroTorsion_4(omg3)
+
             If T1 * T3 < 0 Then
                 omg2 = omg3
             Else
@@ -2040,6 +2052,7 @@ Public Class Form1
             T1 = calc_zeroTorsion_4(omg1)
             T2 = calc_zeroTorsion_4(omg2)
             T3 = calc_zeroTorsion_4(omg3)
+            'TextBox158.Text &= "omg1, T1=  " & omg1.ToString & ", " & T1.ToString & " omg2,T2=  " & omg2.ToString & ", " & T2.ToString & " omg3,T3=" & omg3.ToString & ", " & T3.ToString & vbCrLf
         Next
         TextBox84.Text = Round(omg3 * 60 / (2 * PI), 0)        '[rad/s --> rpm]
     End Sub
@@ -2157,7 +2170,7 @@ Public Class Form1
         J_shaft_c = 0.5 * g_shaft_c * (dia_c / 2) ^ 2         'MassaTraagheid [kg.m2]
         J_shaft_total = J_shaft_a + J_shaft_b + J_shaft_c     'MassaTraagheid As
 
-        '---------- Kritisch toerental formule 6.41 pagina 213--------------
+        '--Willi Bohl, Ventilatoren, Kritisch toerental formule 6.41 pagina 213--------------
         Elasticiteitsm = 210 * 1000 ^ 3                                             'in Pascal [N/m2]
         N_max_doorbuiging = ((length_a ^ 3 / I_shaft_a) + (length_a ^ 2 * length_b / I_shaft_b)) / (3 * Elasticiteitsm)
         N_max_doorbuiging *= (gewicht_waaier + gewicht_naaf + g_shaft_a) * 9.81
@@ -2634,12 +2647,12 @@ Public Class Form1
 
         MxInverse = Ret
     End Function
-
+    ' https://social.msdn.microsoft.com/Forums/en-US/4b08ad2f-9ce7-4dd1-9e70-46d001549ffd/automating-microsoft-word-using-vbnet?forum=vblanguage
     Private Sub Button12_Click(sender As Object, e As EventArgs) Handles Button12.Click
         Dim oWord As Word.Application
         Dim oDoc As Word.Document
-        Dim oPara1 As Word.Paragraph, oPara2 As Word.Paragraph
-        Dim oPara3 As Word.Paragraph, oPara4 As Word.Paragraph
+        Dim oTable As Word.Table
+        Dim oPara1, oPara2, oPara4 As Word.Paragraph
 
         'Start Word and open the document template. 
         oWord = CreateObject("Word.Application")
@@ -2648,34 +2661,81 @@ Public Class Form1
 
         'Insert a paragraph at the beginning of the document. 
         oPara1 = oDoc.Content.Paragraphs.Add
-        oPara1.Range.Text = "Engineering department" & ChrW(11) &
-        "Auther " & Environment.UserName & ChrW(11) &
-        "Date " & DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") & ChrW(11) &
-        "Project Name..." & ChrW(11) &
-        "Project number ..."
+        oPara1.Range.Text = "VTK Engineering department"
+        oPara1.Range.Font.Name = "Arial"
+        oPara1.Range.Font.Size = 16
         oPara1.Range.Font.Bold = True
-        oPara1.Format.SpaceAfter = 24    '24 pt spacing after paragraph. 
+        oPara1.Format.SpaceAfter = 4                '24 pt spacing after paragraph. 
         oPara1.Range.InsertParagraphAfter()
+
         oPara2 = oDoc.Content.Paragraphs.Add(oDoc.Bookmarks.Item("\endofdoc").Range)
-        oPara2.Range.Text = "Inertia Data " & vbCrLf
-        oPara2.Format.SpaceAfter = 1
+        oPara2.Range.Font.Size = 11
+        oPara2.Format.SpaceAfter = 2
+        oPara2.Range.Font.Bold = False
+        oPara2.Range.Text = "This torsional analyses is based on the Holzer method" & vbCrLf
         oPara2.Range.InsertParagraphAfter()
 
-        'Insert another paragraph. 
-        oPara3 = oDoc.Content.Paragraphs.Add(oDoc.Bookmarks.Item("\endofdoc").Range)
-        oPara3.Range.Text =
-        Label266.Text & ChrW(9) & ChrW(9) & NumericUpDown45.Value & ChrW(11) &
-        Label267.Text & ChrW(9) & ChrW(9) & NumericUpDown43.Value & ChrW(11) &
-        Label268.Text & ChrW(9) & ChrW(9) & NumericUpDown46.Value & ChrW(11) &
-        Label269.Text & ChrW(9) & ChrW(9) & NumericUpDown47.Value & ChrW(11) &
-        Label270.Text & ChrW(9) & ChrW(9) & NumericUpDown44.Value & ChrW(11) &
-        Label279.Text & ChrW(9) & ChrW(9) & TextBox84.Text
+        '----------------------------------------------
+        'Insert a table, fill it with data and change the column widths.
+        oTable = oDoc.Tables.Add(oDoc.Bookmarks.Item("\endofdoc").Range, 4, 2)
+        oTable.Range.ParagraphFormat.SpaceAfter = 1
+        oTable.Range.Font.Size = 11
+        oTable.Range.Font.Bold = False
+        oTable.Rows.Item(1).Range.Font.Bold = True
 
-        oPara3.Range.Font.Name = "Arial"
-        oPara3.Range.Font.Size = 11
-        oPara3.Range.Font.Bold = False
-        oPara3.Format.SpaceAfter = 12
-        oPara3.Range.InsertParagraphAfter()
+        oTable.Cell(1, 1).Range.Text = "Project Name"
+        oTable.Cell(1, 2).Range.Text = "."
+        oTable.Cell(2, 1).Range.Text = "Project number "
+        oTable.Cell(2, 2).Range.Text = "."
+        oTable.Cell(3, 1).Range.Text = "Auther "
+        oTable.Cell(3, 2).Range.Text = Environment.UserName
+        oTable.Cell(4, 1).Range.Text = "Date "
+        oTable.Cell(4, 2).Range.Text = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+
+        oTable.Columns.Item(1).Width = oWord.InchesToPoints(2.5)   'Change width of columns 1 & 2.
+        oTable.Columns.Item(2).Width = oWord.InchesToPoints(2)
+        oTable.Rows.Item(1).Range.Font.Bold = True
+        oDoc.Bookmarks.Item("\endofdoc").Range.InsertParagraphAfter()
+
+        '----------------------------------------------
+        'Insert a 6 x 3 table, fill it with data and change the column widths.
+        oTable = oDoc.Tables.Add(oDoc.Bookmarks.Item("\endofdoc").Range, 7, 3)
+        oTable.Range.ParagraphFormat.SpaceAfter = 1
+        oTable.Range.Font.Size = 11
+        oTable.Range.Font.Bold = False
+        oTable.Rows.Item(1).Range.Font.Bold = True
+
+        oTable.Cell(1, 1).Range.Text = "Equipment Data"
+        oTable.Cell(1, 2).Range.Text = ""
+        oTable.Cell(1, 3).Range.Text = ""
+
+        oTable.Cell(2, 1).Range.Text = "Inertia impeller"
+        oTable.Cell(2, 2).Range.Text = NumericUpDown45.Value
+        oTable.Cell(2, 3).Range.Text = "[kg.m2]"
+
+        oTable.Cell(3, 1).Range.Text = "Inertia coupling"
+        oTable.Cell(3, 2).Range.Text = NumericUpDown43.Value
+        oTable.Cell(3, 3).Range.Text = "[kg.m2]"
+
+        oTable.Cell(4, 1).Range.Text = "Inertia motor"
+        oTable.Cell(4, 2).Range.Text = NumericUpDown46.Value
+        oTable.Cell(4, 3).Range.Text = "[kg.m2]"
+
+        oTable.Cell(5, 1).Range.Text = "Shaft stiffness"
+        oTable.Cell(5, 2).Range.Text = TextBox258.Text
+        oTable.Cell(5, 3).Range.Text = "[k.N.m/°]"
+
+        oTable.Cell(6, 1).Range.Text = "Coupling stiffness"
+        oTable.Cell(6, 2).Range.Text = TextBox257.Text
+        oTable.Cell(6, 3).Range.Text = "[k.N.m/°]"
+
+        oTable.Cell(7, 1).Range.Text = "First natural speed"
+        oTable.Cell(7, 2).Range.Text = TextBox84.Text
+        oTable.Cell(7, 3).Range.Text = "[rpm]"
+
+        oTable.Columns.Item(1).Width = oWord.InchesToPoints(2.5)   'Change width of columns 1 & 2.
+        oTable.Columns.Item(2).Width = oWord.InchesToPoints(1)
+        oDoc.Bookmarks.Item("\endofdoc").Range.InsertParagraphAfter()
 
         '------------------save picture ---------------- 
         Chart4.SaveImage("c:\Temp\MainChart.gif", System.Drawing.Imaging.ImageFormat.Gif)
@@ -2800,7 +2860,7 @@ Public Class Form1
             TextBox254.Text = max_dyn_press.ToString
             TextBox256.Text = max_pv.ToString                       'Max P.V #1 
 
-            TextBox251.Text = Round(Equi_load, 1).ToString
+            TextBox251.Text = Round(visco, 1).ToString              'Required visco
             TextBox249.Text = Round(Equi_load, 1).ToString          'Equivalent Load [k.N]
             TextBox248.Text = Round(Exp_life / 1000, 0).ToString    'Expected life [kilo.hr]
             TextBox247.Text = plain_bearing_area.ToString           'Plain bearing area
