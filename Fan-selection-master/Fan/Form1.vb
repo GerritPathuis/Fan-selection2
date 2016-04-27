@@ -96,7 +96,7 @@ Public Class Form1
     Public section(4) As Shaft_section      'Impeller shaft section
     Public cp_air As Double = 1.005         'Specific heat air
     Public cond(10) As Stage                'Process conditions
-    Public PZ(10) As PPOINT                 'Raw data, Polynomial regression
+    Public PZ(12) As PPOINT                 'Raw data, Polynomial regression
     Public BZ(5, 5) As Double               'Poly Coefficients, Polynomial regression
     Dim Torsional_point(100, 2) As Double   'For calculation on torsional frequency
 
@@ -912,7 +912,7 @@ Public Class Form1
 
         '-----------Fixed beam uniform loading-(dus ingeklemd) ------
         '-------------- Mmax in het midden Mx=Q.L^2/12 ---------------
-        airf_skin_max_bend = 1 / 12 * airf_skin_Q_load * rib_afstand ^ 2               '[N.m]
+        airf_skin_max_bend = 1 / 12 * airf_skin_Q_load * rib_afstand ^ 2            '[N.m]
         airf_skin_sigma_bend = airf_skin_max_bend / airf_skin_weerstan / 1000 ^ 2   '[N/mm2]
 
         '-------------- airfoil skin schuifspanning-------------------------------
@@ -921,14 +921,14 @@ Public Class Form1
         airf_skin_tau = airf_skin_load / airf_skin_area                             '[N/mm2]
 
         '----------------------- airfoil skin Huber + Hencky ---------------------------------
-        airf_skin_hh = Sqrt(airf_skin_sigma_bend ^ 2 + 3 * airf_skin_tau ^ 2)   '[N/mm2]
-        TextBox73.Text = Round(airf_skin_hh, 0).ToString                        '[N/mm2]
+        airf_skin_hh = Sqrt(airf_skin_sigma_bend ^ 2 + 3 * airf_skin_tau ^ 2)       '[N/mm2]
+        TextBox73.Text = Round(airf_skin_hh, 0).ToString                            '[N/mm2]
 
 
         '--------Present data------------
         TextBox32.Text = Round(sigma_bodemplaat, 0).ToString
-        TextBox36.Text = Round(Sch_breed * 1000, 1).ToString              'Breedte schoep
-        TextBox37.Text = Round(Sch_hoek, 1).ToString                      'Uittrede hoek in graden
+        TextBox36.Text = Round(Sch_breed * 1000, 1).ToString                'Breedte schoep
+        TextBox37.Text = Round(Sch_hoek, 1).ToString                        'Uittrede hoek in graden
         TextBox42.Text = Round(Sch_gewicht, 1).ToString
         TextBox49.Text = Round(maxV, 0).ToString
         TextBox50.Text = Round(aantal_schoep, 0).ToString
@@ -943,7 +943,7 @@ Public Class Form1
         TextBox96.Text = Round(Waaier_gewicht, 1).ToString
         TextBox103.Text = Round(Voorplaat_keel * 1000, 0).ToString
         TextBox104.Text = Round(Sch_lengte * 1000, 0).ToString
-        TextBox204.Text = Round(inw_schoep_dia * 1000, 0).ToString      'inwendige schpeo diameter
+        TextBox204.Text = Round(inw_schoep_dia * 1000, 0).ToString          'inwendige schpeo diameter
 
         TextBox105.Text = Round(J1, 1).ToString
         TextBox106.Text = Round(J2, 1).ToString
@@ -1057,16 +1057,16 @@ Public Class Form1
         Tschets(0).TFlow = {0, 0.255, 0.51, 0.67, 0.766, 1.021, 0, 0, 0, 0, 0, 0}   '[Am3/s]
         Tschets(0).werkp_opT = {81.0, 7428, 0, 6.144, 0.67}                         'rendement, P_totaal [Pa], P_statisch [Pa], as_vermogen [kW], debiet[m3/sec]
         Tschets(0).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
-        Tschets(0).TFlow_scaled = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}        '[Am3/s]
-        Tschets(0).TPstat_scaled = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}       'Statische druk
-        Tschets(0).TPtot_scaled = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}        'Totale druk
-        Tschets(0).Tverm_scaled = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}        'Rendement[%]
-        Tschets(0).Teff_scaled = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}         'Vermogen[kW]
-        Tschets(0).TFlow_scaled_poly = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}        '[Am3/s]
-        Tschets(0).TPstat_scaled_poly = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}       'Statische druk
-        Tschets(0).TPtot_scaled_poly = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}        'Totale druk
-        Tschets(0).Tverm_scaled_poly = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}        'Rendement[%]
-        Tschets(0).Teff_scaled_poly = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}         'Vermogen[kW]
+        Tschets(0).TFlow_scaled = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}              '[Am3/s]
+        Tschets(0).TPstat_scaled = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}             'Statische druk
+        Tschets(0).TPtot_scaled = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}              'Totale druk
+        Tschets(0).Tverm_scaled = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}              'Rendement[%]
+        Tschets(0).Teff_scaled = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}               'Vermogen[kW]
+        Tschets(0).TFlow_scaled_poly = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}         '[Am3/s]
+        Tschets(0).TPstat_scaled_poly = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}        'Statische druk
+        Tschets(0).TPtot_scaled_poly = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}         'Totale druk
+        Tschets(0).Tverm_scaled_poly = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}         'Rendement[%]
+        Tschets(0).Teff_scaled_poly = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}          'Vermogen[kW]
 
         Tschets(1).Tname = "T1A"
         Tschets(1).Tdata = {1000, 1480, 1.205, 605.4, 832.4, 373.0, 6075.7, 702.7, 881.1, 1063.8, 878.9, 1295.1, 364.3, 12, 133.0, 133.0, 524.3, 605.4, 30, 30}
@@ -1486,34 +1486,21 @@ Public Class Form1
 
                 For hh = 0 To 10   'Fill chart
                     Weerstand_coefficient = P_target * 2 / (NumericUpDown12.Value * Q_target ^ 2)
-
                     '---------------- add the fan lines-----------------------
-                    If CheckBox1.Checked Then   'Poly lines
+                    If CheckBox1.Checked Then      'Poly lines
                         debiet = Tschets(Tschets_no).TFlow_scaled_poly(hh)
-                        If CheckBox2.Checked Then               '========Per uur=========
-                            debiet = Round(debiet * 3600, 1)
-                        End If
-                        If CheckBox7.Checked Then
-                            Chart1.Series(1).Points.AddXY(debiet, Round(Tschets(Tschets_no).Teff_scaled_poly(hh), 1))
-                        End If
+                        If CheckBox2.Checked Then debiet = Round(debiet * 3600, 1)      'Per uur
                         Chart1.Series(0).Points.AddXY(debiet, Round(Tschets(Tschets_no).TPtot_scaled_poly(hh), 1))
-                        If CheckBox8.Checked Then
-                            Chart1.Series(2).Points.AddXY(debiet, Round(Tschets(Tschets_no).Tverm_scaled_poly(hh), 1))
-                        End If
                         Chart1.Series(5).Points.AddXY(debiet, Round(Tschets(Tschets_no).TPstat_scaled_poly(hh), 1))
+                        If CheckBox7.Checked Then Chart1.Series(1).Points.AddXY(debiet, Round(Tschets(Tschets_no).Teff_scaled_poly(hh), 1)) 'efficiency
+                        If CheckBox8.Checked Then Chart1.Series(2).Points.AddXY(debiet, Round(Tschets(Tschets_no).Tverm_scaled_poly(hh), 1)) 'Power
                     Else
                         debiet = Tschets(Tschets_no).TFlow_scaled(hh)
-                        If CheckBox2.Checked Then          '========Per uur=========
-                            debiet = Round(debiet * 3600, 1)
-                        End If
-                        If CheckBox7.Checked Then
-                            Chart1.Series(1).Points.AddXY(debiet, Round(Tschets(Tschets_no).Teff_scaled(hh), 1))
-                        End If
+                        If CheckBox2.Checked Then debiet = Round(debiet * 3600, 1)      'Per uur
                         Chart1.Series(0).Points.AddXY(debiet, Round(Tschets(Tschets_no).TPtot_scaled(hh), 1))
-                        If CheckBox8.Checked Then
-                            Chart1.Series(2).Points.AddXY(debiet, Round(Tschets(Tschets_no).Tverm_scaled(hh), 1))
-                        End If
                         Chart1.Series(5).Points.AddXY(debiet, Round(Tschets(Tschets_no).TPstat_scaled(hh), 1))
+                        If CheckBox7.Checked Then Chart1.Series(1).Points.AddXY(debiet, Round(Tschets(Tschets_no).Teff_scaled(hh), 1))
+                        If CheckBox8.Checked Then Chart1.Series(2).Points.AddXY(debiet, Round(Tschets(Tschets_no).Tverm_scaled(hh), 1))
                     End If
 
                     '-------------------Target dot ---------------------
@@ -1813,60 +1800,66 @@ Public Class Form1
                 Dim j As Integer
                 Dim t() As PPOINT
                 Dim flow As Double
+                Dim aantal_punten As Integer = 10
 
                 If CheckBox1.Checked Then
 
                     '=============== convert to polynoom, Ptotal ====================
-                    For j = 0 To 10     'Get data
+                    TextBox158.AppendText(Environment.NewLine)
+                    ReDim PZ(aantal_punten)
+                    For j = 0 To aantal_punten     'Get data into PZ()
                         PZ(j).x = Tschets(ty).TFlow_scaled(j)
                         PZ(j).y = Tschets(ty).TPtot_scaled(j)
-                        TextBox158.AppendText("count=" & j.ToString & " X (flow)=" & PZ(j).x.ToString & " Y (P_tot)=" & PZ(j).y.ToString & Environment.NewLine)
+                        TextBox158.AppendText("count schets=" & j.ToString & " X (flow)=" & PZ(j).x.ToString & " Y (P_tot)=" & PZ(j).y.ToString & Environment.NewLine)
                     Next
                     t = Trend(PZ, 5)
-                    For j = 0 To 10     'Calculate new poly data points
-                        flow = j / 10 * Tschets(ty).TFlow_scaled(10)
+                    For j = 0 To aantal_punten     'Calculate new poly data points
+                        flow = j / aantal_punten * Tschets(ty).TFlow_scaled(10)
                         Tschets(ty).TFlow_scaled_poly(j) = flow
                         Tschets(ty).TPtot_scaled_poly(j) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3 + BZ(4, 0) * flow ^ 4 + BZ(5, 0) * flow ^ 5
                         TextBox158.AppendText("count polyt=" & j.ToString & " X (flow)=" & flow.ToString & " Y (P_tot)=" & Tschets(ty).TPtot_scaled_poly(j).ToString & Environment.NewLine)
                     Next
 
                     '=============== convert to polynoom, Pstatic ====================
-                    For j = 0 To 10     'Get data
+                    TextBox158.AppendText(Environment.NewLine)
+                    For j = 0 To aantal_punten     'Get data into PZ()
                         PZ(j).x = Tschets(ty).TFlow_scaled(j)
                         PZ(j).y = Tschets(ty).TPstat_scaled(j)
-                        TextBox158.AppendText("count=" & j.ToString & " X (flow)=" & PZ(j).x.ToString & " Y (Pstat)=" & PZ(j).y.ToString & Environment.NewLine)
+                        TextBox158.AppendText("count schets=" & j.ToString & " X (flow)=" & PZ(j).x.ToString & " Y (Pstat)=" & PZ(j).y.ToString & Environment.NewLine)
                     Next
                     t = Trend(PZ, 5)
-                    For j = 0 To 10     'Calculate new poly data points
-                        flow = j / 10 * Tschets(ty).TFlow_scaled(10)
+                    For j = 0 To aantal_punten     'Calculate new poly data points
+                        flow = j / aantal_punten * Tschets(ty).TFlow_scaled(10)
                         Tschets(ty).TFlow_scaled_poly(j) = flow
                         Tschets(ty).TPstat_scaled_poly(j) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3 + BZ(4, 0) * flow ^ 4 + BZ(5, 0) * flow ^ 5
                         TextBox158.AppendText("count polyt=" & j.ToString & " X (flow)=" & flow.ToString & " Y (P_stat)=" & Tschets(ty).TPstat_scaled_poly(j).ToString & Environment.NewLine)
                     Next
 
                     '=============== convert to polynoom, Power ====================
-                    For j = 0 To 10     'Get data
+                    TextBox158.AppendText(Environment.NewLine)
+                    For j = 0 To aantal_punten     'Get data into PZ()
                         PZ(j).x = Tschets(ty).TFlow_scaled(j)
                         PZ(j).y = Tschets(ty).Tverm_scaled(j)
                         TextBox158.AppendText("count=" & j.ToString & " X (flow)=" & PZ(j).x.ToString & " Y (Vermogen)=" & PZ(j).y.ToString & Environment.NewLine)
                     Next
                     t = Trend(PZ, 5)
-                    For j = 0 To 10     'Calculate new poly data points
-                        flow = j / 10 * Tschets(ty).TFlow_scaled(10)
+                    For j = 0 To aantal_punten     'Calculate new poly data points
+                        flow = j / aantal_punten * Tschets(ty).TFlow_scaled(10)
                         Tschets(ty).TFlow_scaled_poly(j) = flow
                         Tschets(ty).Tverm_scaled_poly(j) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3 + BZ(4, 0) * flow ^ 4 + BZ(5, 0) * flow ^ 5
                         TextBox158.AppendText("count polyt=" & j.ToString & " X (flow)=" & flow.ToString & " Y (Vermogen)=" & Tschets(ty).Tverm_scaled_poly(j).ToString & Environment.NewLine)
                     Next
 
                     '=============== convert to polynoom, Efficiency ====================
-                    For j = 0 To 10     'Get data
+                    TextBox158.AppendText(Environment.NewLine)
+                    For j = 0 To aantal_punten     'Get data into PZ()
                         PZ(j).x = Tschets(ty).TFlow_scaled(j)
                         PZ(j).y = Tschets(ty).Teff_scaled(j)
                         TextBox158.AppendText("count=" & j.ToString & " X (flow)=" & PZ(j).x.ToString & " Y (Efficiency)=" & PZ(j).y.ToString & Environment.NewLine)
                     Next
                     t = Trend(PZ, 5)
-                    For j = 0 To 10     'Calculate new poly data points
-                        flow = j / 10 * Tschets(ty).TFlow_scaled(10)
+                    For j = 0 To aantal_punten     'Calculate new poly data points
+                        flow = j / aantal_punten * Tschets(ty).TFlow_scaled(10)
                         Tschets(ty).TFlow_scaled_poly(j) = flow
                         Tschets(ty).Teff_scaled_poly(j) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3 + BZ(4, 0) * flow ^ 4 + BZ(5, 0) * flow ^ 5
                         TextBox158.AppendText("count polyt=" & j.ToString & " X (flow)=" & flow.ToString & " Y (eff)=" & Tschets(ty).Teff_scaled_poly(j).ToString & Environment.NewLine)
@@ -1875,14 +1868,13 @@ Public Class Form1
 
                 draw_chart1(ty)
             Catch ex As Exception
-                MessageBox.Show(ex.Message & " Problem in Scale_rules_applied")  ' Show the exception's message.
+                MessageBox.Show(ex.Message & " Problem in Scale_rules_applied, line 1878")  ' Show the exception's message.
             End Try
         End If
     End Sub
 
     Private Sub do_Chart2()
         Dim schets_no As Integer
-
 
         Chart2.Series.Clear()
         Chart2.ChartAreas.Clear()
@@ -2037,12 +2029,12 @@ Public Class Form1
         omg2 = 600      'Start upper limit [rad/sec]
         omg3 = 300      'In the middle [rad/sec]
 
+        T1 = calc_zeroTorsion_4(omg1)
+        T2 = calc_zeroTorsion_4(omg2)
+        T3 = calc_zeroTorsion_4(omg3)
+
         '-------------Iteratie 30x halveren moet voldoende zijn ---------------
         For jj = 0 To 30
-            T1 = calc_zeroTorsion_4(omg1)
-            T2 = calc_zeroTorsion_4(omg2)
-            T3 = calc_zeroTorsion_4(omg3)
-
             If T1 * T3 < 0 Then
                 omg2 = omg3
             Else
@@ -2057,9 +2049,7 @@ Public Class Form1
         TextBox84.Text = Round(omg3 * 60 / (2 * PI), 0)        '[rad/s --> rpm]
     End Sub
 
-
-
-    'Holzer residual torqu analyses
+    'Holzer residual torque analyses
     Private Function calc_zeroTorsion_4(omega As Double)
         Dim theta_1, theta_2, theta_3, theta_4 As Double
         Dim Torsion_1, Torsion_2, Torsion_3, Torsion_4 As Double
@@ -2081,7 +2071,6 @@ Public Class Form1
 
     End Function
 
-
     Private Sub draw_chart4()
         Dim hh As Integer
         Try
@@ -2089,7 +2078,7 @@ Public Class Form1
             Chart4.ChartAreas.Clear()
             Chart4.Titles.Clear()
 
-            Chart4.Series.Add("Torque")
+            Chart4.Series.Add("Residual Torque")
 
             Chart4.ChartAreas.Add("ChartArea0")
             Chart4.Series(0).ChartArea = "ChartArea0"
@@ -2161,14 +2150,14 @@ Public Class Form1
         gewicht_pulley = NumericUpDown30.Value
         gewicht_naaf = PI / 4 * dia_naaf ^ 2 * length_naaf * sg_staal
 
-        I_shaft_a = PI * dia_a ^ 4 / 64        'OppervlakTraagheid [m4]
-        I_shaft_b = PI * dia_b ^ 4 / 64        'OppervlakTraagheid [m4]
-        I_shaft_c = PI * dia_c ^ 4 / 64        'OppervlakTraagheid [m4]
+        I_shaft_a = PI * dia_a ^ 4 / 64                     'OppervlakTraagheid [m4]
+        I_shaft_b = PI * dia_b ^ 4 / 64                     'OppervlakTraagheid [m4]
+        I_shaft_c = PI * dia_c ^ 4 / 64                     'OppervlakTraagheid [m4]
 
-        J_shaft_a = 0.5 * g_shaft_a * (dia_a / 2) ^ 2         'MassaTraagheid [kg.m2]
-        J_shaft_b = 0.5 * g_shaft_b * (dia_b / 2) ^ 2         'MassaTraagheid [kg.m2]
-        J_shaft_c = 0.5 * g_shaft_c * (dia_c / 2) ^ 2         'MassaTraagheid [kg.m2]
-        J_shaft_total = J_shaft_a + J_shaft_b + J_shaft_c     'MassaTraagheid As
+        J_shaft_a = 0.5 * g_shaft_a * (dia_a / 2) ^ 2       'MassaTraagheid [kg.m2]
+        J_shaft_b = 0.5 * g_shaft_b * (dia_b / 2) ^ 2       'MassaTraagheid [kg.m2]
+        J_shaft_c = 0.5 * g_shaft_c * (dia_c / 2) ^ 2       'MassaTraagheid [kg.m2]
+        J_shaft_total = J_shaft_a + J_shaft_b + J_shaft_c   'MassaTraagheid As
 
         '--Willi Bohl, Ventilatoren, Kritisch toerental formule 6.41 pagina 213--------------
         Elasticiteitsm = 210 * 1000 ^ 3                                             'in Pascal [N/m2]
@@ -2259,8 +2248,6 @@ Public Class Form1
 
         '----------- eigen frequentie ---------------------
         TextBox111.Text = Round(N_max_doorbuiging * 1000, 3).ToString   'Max doorbuiging in [mm]
-
-
     End Sub
 
     Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click, NumericUpDown8.ValueChanged, NumericUpDown7.ValueChanged, NumericUpDown6.ValueChanged, NumericUpDown5.ValueChanged, NumericUpDown4.ValueChanged, NumericUpDown3.ValueChanged, NumericUpDown13.ValueChanged, NumericUpDown12.ValueChanged, NumericUpDown1.ValueChanged, ComboBox1.SelectedIndexChanged, RadioButton4.CheckedChanged, RadioButton3.CheckedChanged, CheckBox4.CheckedChanged, NumericUpDown33.ValueChanged, ComboBox7.SelectedIndexChanged, TabPage1.Enter, RadioButton14.CheckedChanged, RadioButton13.CheckedChanged, RadioButton12.CheckedChanged, NumericUpDown58.ValueChanged, NumericUpDown37.ValueChanged
@@ -2391,16 +2378,13 @@ Public Class Form1
             TextBox238.Text = Round(duct_in(7), 0).ToString
         End If
     End Sub
-
-
-
+    'Convert Sound power to pressure
     Private Function power_to_pressure(power As Double)
         Dim distance As Double
 
         distance = 1    '[m]
         Return (power - Abs(10 * Log10(1 / (4 * PI * distance ^ 2))))
     End Function
-
 
 
     'Calculate density
@@ -2485,7 +2469,6 @@ Public Class Form1
 
         y.Ro2 = calc_density(y.Ro1, (y.Pt1 + 101300), (y.Pt2 + 101300), y.T1, y.T2) 'Ro outlet flange fan
     End Sub
-
 
     Private Sub calc_loop_loss(ByRef x As Stage)
         Dim phi, area_omloop As Double
@@ -2616,7 +2599,7 @@ Public Class Form1
 
     Public Function MxInverse(Matrix(,) As Double) As Double(,)
         Dim i, j As Integer
-        Dim Rows, Cols As Integer          '1 Dimensional array
+        Dim Rows, Cols As Integer       '1 Dimensional array
         Dim Tmp(,), Ret(,) As Double    '2 Dimensional array
         Dim Degree As Integer
 
