@@ -1956,8 +1956,7 @@ Public Class Form1
         Dim g_modulus As Double             'modulus Of elasticity In shear
         Dim k_total, k2 As Double           'modulus Of elasticity In shear
 
-        TextBox257.Text = Round(NumericUpDown44.Value * PI / 180, 3).ToString       'Coupling, Convert rad to degree
-
+        TextBox257.Text = Round(NumericUpDown44.Value * PI / 180, 0).ToString       'Coupling, Convert rad to degree
 
         g_modulus = 79.3 * 10 ^ 9           '[Pa] (kilo, mega, giga) steel shear modulus !
 
@@ -1980,14 +1979,14 @@ Public Class Form1
         k_total = 1 / (1 / section(0).k_stiffness + 1 / section(1).k_stiffness + 1 / section(2).k_stiffness)
 
         If Not Double.IsNaN(k_total) And Not Double.IsInfinity(k_total) Then   'preventing NaN problem and infinity problems
-            TextBox66.Text = Round(k_total / 1000, 0).ToString
-            TextBox259.Text = Round(k_total / 1000, 0).ToString
-            TextBox258.Text = Round(k_total / 1000 * PI / 180, 0).ToString       'Drive shaft, Convert rad to degree
+            TextBox66.Text = Round(k_total, 0).ToString
+            TextBox259.Text = Round(k_total, 0).ToString
+            TextBox258.Text = Round(k_total * PI / 180, 0).ToString       'Drive shaft, Convert rad to degree
         End If
         'De as tussen de waaiers bij meerstrappers
         k2 = section(3).k_stiffness
         If Not Double.IsNaN(k2) And Not Double.IsInfinity(k2) Then   'preventing NaN problem and infinity problems
-            TextBox220.Text = Round(k2 / 1000, 0).ToString
+            TextBox220.Text = Round(k2, 0).ToString
         End If
     End Sub
 
@@ -2000,9 +1999,8 @@ Public Class Form1
             Inertia_3 = NumericUpDown46.Value                       'Motor [kg.m2]
             Inertia_4 = NumericUpDown45.Value                       'Waaier #2 [kg.m2]
 
-            Double.TryParse(TextBox259.Text, Springstiff_1)         'stijfheid as [K.Nm/rad]
-            Springstiff_1 *= 1000                                   '[Nm/rad]
-            Springstiff_2 = NumericUpDown44.Value * 1000            'stijfheid koppeling[Nm/rad]
+            Double.TryParse(TextBox259.Text, Springstiff_1)         'stijfheid as [Nm/rad]
+            Springstiff_2 = NumericUpDown44.Value                   'stijfheid koppeling[Nm/rad]
             Springstiff_3 = section(3).k_stiffness
 
             For ii = 0 To 100
@@ -2026,8 +2024,8 @@ Public Class Form1
         'TextBox158.Clear()
 
         omg1 = 1        'Start lower limit [rad/sec]
-        omg2 = 600      'Start upper limit [rad/sec]
-        omg3 = 300      'In the middle [rad/sec]
+        omg2 = 300      'Start upper limit [rad/sec]
+        omg3 = 3      'In the middle [rad/sec]
 
         T1 = calc_zeroTorsion_4(omg1)
         T2 = calc_zeroTorsion_4(omg2)
@@ -2046,7 +2044,7 @@ Public Class Form1
             T3 = calc_zeroTorsion_4(omg3)
             'TextBox158.Text &= "omg1, T1=  " & omg1.ToString & ", " & T1.ToString & " omg2,T2=  " & omg2.ToString & ", " & T2.ToString & " omg3,T3=" & omg3.ToString & ", " & T3.ToString & vbCrLf
         Next
-        TextBox84.Text = Round(omg3 * 60 / (2 * PI), 0)        '[rad/s --> rpm]
+        TextBox84.Text = Round((omg3 * 60 / (2 * PI)), 0)        '[rad/s --> rpm]
     End Sub
 
     'Holzer residual torque analyses
@@ -2064,9 +2062,9 @@ Public Class Form1
         Torsion_4 = Torsion_3 + (omega ^ 2) * Inertia_4 * theta_4
 
         If (RadioButton15.Checked) Then
-            Return (Torsion_3 / 10 ^ 6)                 '[Nm] enkel trapper
+            Return (Torsion_3)                 '[Nm] enkel trapper
         Else
-            Return (Torsion_4 / 10 ^ 6)                 '[Nm] meer trapper
+            Return (Torsion_4)                 '[Nm] meer trapper
         End If
 
     End Function
