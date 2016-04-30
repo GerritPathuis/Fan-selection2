@@ -27,11 +27,6 @@ Public Structure Tmodel
     Public TPtot_scaled() As Double         'Totale druk    (scale rules are applied)
     Public Teff_scaled() As Double          'Rendement [%]  (scale rules are applied)
     Public Tverm_scaled() As Double         'Vermogen[kW]   (scale rules are applied)
-    Public TFlow_scaled_poly() As Double    'Debiet[m3/s]   (scale rules are applied + polynoom regressie)
-    Public TPstat_scaled_poly() As Double   'Statische druk (scale rules are applied + polynoom regressie)
-    Public TPtot_scaled_poly() As Double    'Totale druk    (scale rules are applied + polynoom regressie)
-    Public Teff_scaled_poly() As Double     'Rendement [%]  (scale rules are applied + polynoom regressie)
-    Public Tverm_scaled_poly() As Double    'Vermogen[kW]   (scale rules are applied + polynoom regressie)
 End Structure
 
 'Compressor stages
@@ -801,7 +796,7 @@ Public Class Form1
             aantal_schoep = Tschets(T_type).Tdata(13)
             Voorplaat_keel = Tschets(T_type).Tdata(16) / 1000 * (Waaier_dia / 1.0)      'Keel diam [m]
             inw_schoep_dia = Tschets(T_type).Tdata(17) / 1000 * (Waaier_dia / 1.0)      'inwendige schoep diameter [m]
-            Sch_hoek = Tschets(T_type).Tdata(19)                                          'Uittrede hoek in graden
+            Sch_hoek = Tschets(T_type).Tdata(19)                                        'Uittrede hoek in graden
             Sch_dik = NumericUpDown20.Value / 1000 '[m]
             Sch_lengte = Tschets(T_type).Tdata(12) / 1000 * (Waaier_dia / 1.0)
             Sch_breed = Tschets(T_type).Tdata(15) / 1000 * (Waaier_dia / 1.0)           'Schoep breed uittrede [m]
@@ -998,8 +993,6 @@ Public Class Form1
             TextBox211.BackColor = Color.LightGreen
             TextBox212.BackColor = Color.LightGreen
         End If
-
-
     End Sub
 
     Private Sub TabPage2_TextChanged(sender As Object, e As EventArgs) Handles TabPage2.TextChanged
@@ -1069,11 +1062,6 @@ Public Class Form1
         Tschets(0).TPtot_scaled = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}              'Totale druk
         Tschets(0).Tverm_scaled = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}              'Rendement[%]
         Tschets(0).Teff_scaled = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}               'Vermogen[kW]
-        Tschets(0).TFlow_scaled_poly = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}         '[Am3/s]
-        Tschets(0).TPstat_scaled_poly = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}        'Statische druk
-        Tschets(0).TPtot_scaled_poly = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}         'Totale druk
-        Tschets(0).Tverm_scaled_poly = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}         'Rendement[%]
-        Tschets(0).Teff_scaled_poly = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}          'Vermogen[kW]
 
         Tschets(1).Tname = "T1A"
         Tschets(1).Tdata = {1000, 1480, 1.205, 605.4, 832.4, 373.0, 6075.7, 702.7, 881.1, 1063.8, 878.9, 1295.1, 364.3, 12, 133.0, 133.0, 524.3, 605.4, 30, 30}
@@ -1281,7 +1269,7 @@ Public Class Form1
         Tschets(20).werkp_opT = {0, 0, 0, 0, 0}
         Tschets(20).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
 
-        Tschets(21).Tname = "T33B"
+        Tschets(21).Tname = "T33"
         Tschets(21).Tdata = {1000, 1480, 1.205, 1013.2, 857.5, 637.2, 6229.6, 791.6, 877.3, 1060.7, 877.3, 1306.1, 411.6, 8, 314.0, 233.5, 659.6, 688.7, 10, 30}
         Tschets(21).Teff = {0.00, 64.0, 85.1, 86.98, 88.16, 89.0, 89.28, 88.52, 87.1, 84.2, 80.5, 74.0}
         Tschets(21).Tverm = {10.6, 24.3, 29.9, 30.4, 30.9, 31.2, 31.4, 31.0, 30.4, 29.5, 28.2, 26.2}
@@ -1386,11 +1374,6 @@ Public Class Form1
             Tschets(j).TPtot_scaled = Tschets(0).TPtot_scaled           'Totale druk
             Tschets(j).Tverm_scaled = Tschets(0).Tverm_scaled           'Rendement[%]
             Tschets(j).Teff_scaled = Tschets(0).Teff_scaled             'Vermogen[kW]
-            Tschets(j).TFlow_scaled_poly = Tschets(0).TFlow_scaled      '[m3/s]
-            Tschets(j).TPstat_scaled_poly = Tschets(0).TPstat_scaled    'Statische druk
-            Tschets(j).TPtot_scaled_poly = Tschets(0).TPtot_scaled      'Totale druk
-            Tschets(j).Tverm_scaled_poly = Tschets(0).Tverm_scaled      'Rendement[%]
-            Tschets(j).Teff_scaled_poly = Tschets(0).Teff_scaled        'Vermogen[kW]
         Next
 
     End Sub
@@ -1503,7 +1486,6 @@ Public Class Form1
                 If CheckBox1.Checked Then      'Fil chart with Poly lines
                     For hh = 0 To 50
                         Weerstand_coefficient = P_target * 2 / (NumericUpDown12.Value * Q_target ^ 2)
-                        'debiet = Tschets(Tschets_no).TFlow_scaled_poly(hh)
                         debiet = chart1_flow(hh)
                         If CheckBox2.Checked Then debiet = Round(debiet * 3600, 1)      'Per uur
 
@@ -2270,6 +2252,8 @@ Public Class Form1
     End Sub
 
     Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click, NumericUpDown8.ValueChanged, NumericUpDown7.ValueChanged, NumericUpDown6.ValueChanged, NumericUpDown5.ValueChanged, NumericUpDown4.ValueChanged, NumericUpDown3.ValueChanged, NumericUpDown13.ValueChanged, NumericUpDown12.ValueChanged, NumericUpDown1.ValueChanged, ComboBox1.SelectedIndexChanged, RadioButton4.CheckedChanged, RadioButton3.CheckedChanged, CheckBox4.CheckedChanged, NumericUpDown33.ValueChanged, ComboBox7.SelectedIndexChanged, TabPage1.Enter, RadioButton14.CheckedChanged, RadioButton13.CheckedChanged, RadioButton12.CheckedChanged, NumericUpDown58.ValueChanged, NumericUpDown37.ValueChanged
+        NumericUpDown9.Value = NumericUpDown33.Value
+        NumericUpDown10.Value = NumericUpDown13.Value
         If TabControl1.SelectedTab.Name = "TabPage1" Then
             ComboBox7.SelectedIndex = ComboBox1.SelectedIndex       'type selectie
         End If
@@ -2446,6 +2430,8 @@ Public Class Form1
     End Sub
 
     Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click, CheckBox6.CheckedChanged, CheckBox3.CheckedChanged, CheckBox2.CheckedChanged, CheckBox1.CheckedChanged, TabPage3.Enter, NumericUpDown9.ValueChanged, NumericUpDown10.ValueChanged, RadioButton9.CheckedChanged, RadioButton11.CheckedChanged, RadioButton10.CheckedChanged, CheckBox7.CheckedChanged, CheckBox8.CheckedChanged
+        NumericUpDown33.Value = NumericUpDown9.Value
+        NumericUpDown13.Value = NumericUpDown10.Value
         Scale_rules_applied(ComboBox1.SelectedIndex, NumericUpDown9.Value, NumericUpDown10.Value, NumericUpDown12.Value)
         draw_chart1(ComboBox1.SelectedIndex)
     End Sub
