@@ -98,6 +98,13 @@ Public Class Form1
     Public cond(10) As Stage                'Process conditions
     Public PZ(12) As PPOINT                 'Raw data, Polynomial regression
     Public BZ(5, 5) As Double               'Poly Coefficients, Polynomial regression
+
+    Public chart1_flow(50) As Double        'Data storage for chart1
+    Public chart1_Pstat(50) As Double       'Data storage for chart1
+    Public chart1_Ptot(50) As Double        'Data storage for chart1
+    Public chart1_Power(50) As Double       'Data storage for chart1
+    Public chart1_Efficiency(50) As Double  'Data storage for chart1
+
     Dim Torsional_point(100, 2) As Double   'For calculation on torsional frequency
 
     '-----"Oude benaming;Norm:;EN10027-1;Werkstof;[mm/m1/100°C];Poisson ;kg/m3;E [Gpa];Rm (20c);Rp0.2(0c);Rp0.2(20c);Rp(50c);Rp(100c);Rp(150c);Rp(200c);Rp(250c);Rp(300c);Rp(350c);Rp(400c);Equiv-ASTM;Opmerking",
@@ -1374,16 +1381,16 @@ Public Class Form1
         Tschets(30).Geljon = {0.13513, 25.537, -28003.0, 0.0000681, 0.21049, -33.199, 0.000566, 0.001838}
 
         For j = 1 To 30
-            Tschets(j).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-            Tschets(j).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-            Tschets(j).TPtot_scaled = Tschets(0).TPtot_scaled        'Totale druk
-            Tschets(j).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-            Tschets(j).Teff_scaled = Tschets(0).Teff_scaled          'Vermogen[kW]
-            Tschets(j).TFlow_scaled_poly = Tschets(0).TFlow_scaled        '[m3/s]
-            Tschets(j).TPstat_scaled_poly = Tschets(0).TPstat_scaled      'Statische druk
-            Tschets(j).TPtot_scaled_poly = Tschets(0).TPtot_scaled        'Totale druk
-            Tschets(j).Tverm_scaled_poly = Tschets(0).Tverm_scaled        'Rendement[%]
-            Tschets(j).Teff_scaled_poly = Tschets(0).Teff_scaled          'Vermogen[kW]
+            Tschets(j).TFlow_scaled = Tschets(0).TFlow_scaled           '[m3/s]
+            Tschets(j).TPstat_scaled = Tschets(0).TPstat_scaled         'Statische druk
+            Tschets(j).TPtot_scaled = Tschets(0).TPtot_scaled           'Totale druk
+            Tschets(j).Tverm_scaled = Tschets(0).Tverm_scaled           'Rendement[%]
+            Tschets(j).Teff_scaled = Tschets(0).Teff_scaled             'Vermogen[kW]
+            Tschets(j).TFlow_scaled_poly = Tschets(0).TFlow_scaled      '[m3/s]
+            Tschets(j).TPstat_scaled_poly = Tschets(0).TPstat_scaled    'Statische druk
+            Tschets(j).TPtot_scaled_poly = Tschets(0).TPtot_scaled      'Totale druk
+            Tschets(j).Tverm_scaled_poly = Tschets(0).Tverm_scaled      'Rendement[%]
+            Tschets(j).Teff_scaled_poly = Tschets(0).Teff_scaled        'Vermogen[kW]
         Next
 
     End Sub
@@ -1412,6 +1419,9 @@ Public Class Form1
                 Chart1.Series(0).ChartArea = "ChartArea0"
                 Chart1.Series(1).ChartArea = "ChartArea0"
                 Chart1.Series(2).ChartArea = "ChartArea0"
+                Chart1.Series(3).ChartArea = "ChartArea0"
+                Chart1.Series(4).ChartArea = "ChartArea0"
+                Chart1.Series(5).ChartArea = "ChartArea0"
 
                 Chart1.Series(0).ChartType = DataVisualization.Charting.SeriesChartType.Line
                 Chart1.Series(1).ChartType = DataVisualization.Charting.SeriesChartType.Line
@@ -1437,9 +1447,9 @@ Public Class Form1
                 Chart1.Series(4).Color = Color.LightBlue    'Line resistance
                 Chart1.Series(5).Color = Color.Blue         'Static pressure
 
-                '----------- labels on-off ------------------
-                Chart1.Series(5).IsValueShownAsLabel = True
+                '----------- labels on-off ------------------       
                 If CheckBox6.Checked Then   'Labels on
+                    Chart1.Series(0).IsValueShownAsLabel = True
                     Chart1.Series(1).IsValueShownAsLabel = True
                     Chart1.Series(2).IsValueShownAsLabel = True
                     Chart1.Series(5).IsValueShownAsLabel = True
@@ -1448,6 +1458,8 @@ Public Class Form1
                 Chart1.Series(0).BorderWidth = 1    'Total pressure
                 Chart1.Series(1).BorderWidth = 1
                 Chart1.Series(2).BorderWidth = 1
+                Chart1.Series(3).BorderWidth = 1
+                Chart1.Series(4).BorderWidth = 1
                 Chart1.Series(5).BorderWidth = 3    'Static pressure
 
                 Chart1.ChartAreas("ChartArea0").AxisX.Minimum = 0
@@ -1465,10 +1477,13 @@ Public Class Form1
                 Chart1.ChartAreas("ChartArea0").AxisY2.Enabled = AxisEnabled.True
                 Chart1.ChartAreas("ChartArea0").AxisY2.Title = "Rendement [%] As-vermogen [kW]"
 
-                Chart1.Series(5).YAxisType = AxisType.Primary
                 Chart1.Series(0).YAxisType = AxisType.Primary
                 Chart1.Series(1).YAxisType = AxisType.Secondary
                 Chart1.Series(2).YAxisType = AxisType.Secondary
+                Chart1.Series(3).YAxisType = AxisType.Primary
+                Chart1.Series(4).YAxisType = AxisType.Primary
+                Chart1.Series(5).YAxisType = AxisType.Primary
+
 
                 '------------------ Grafiek tekst en target ---------------------
                 If CheckBox2.Checked Then               '========Per uur=========
@@ -1483,40 +1498,46 @@ Public Class Form1
 
                 '------------------- Draw the lines in the chart--------------------
                 '-------------------------------------------------------------------
+                '---------------- add the fan lines-----------------------
 
-                For hh = 0 To 10   'Fill chart
-                    Weerstand_coefficient = P_target * 2 / (NumericUpDown12.Value * Q_target ^ 2)
-                    '---------------- add the fan lines-----------------------
-                    If CheckBox1.Checked Then      'Poly lines
-                        debiet = Tschets(Tschets_no).TFlow_scaled_poly(hh)
+                If CheckBox1.Checked Then      'Fil chart with Poly lines
+                    For hh = 0 To 50
+                        Weerstand_coefficient = P_target * 2 / (NumericUpDown12.Value * Q_target ^ 2)
+                        'debiet = Tschets(Tschets_no).TFlow_scaled_poly(hh)
+                        debiet = chart1_flow(hh)
                         If CheckBox2.Checked Then debiet = Round(debiet * 3600, 1)      'Per uur
-                        Chart1.Series(0).Points.AddXY(debiet, Round(Tschets(Tschets_no).TPtot_scaled_poly(hh), 1))
-                        Chart1.Series(5).Points.AddXY(debiet, Round(Tschets(Tschets_no).TPstat_scaled_poly(hh), 1))
-                        If CheckBox7.Checked Then Chart1.Series(1).Points.AddXY(debiet, Round(Tschets(Tschets_no).Teff_scaled_poly(hh), 1)) 'efficiency
-                        If CheckBox8.Checked Then Chart1.Series(2).Points.AddXY(debiet, Round(Tschets(Tschets_no).Tverm_scaled_poly(hh), 1)) 'Power
-                    Else
+
+                        Chart1.Series(0).Points.AddXY(debiet, Round(chart1_Ptot(hh), 1))
+                        Chart1.Series(5).Points.AddXY(debiet, Round(chart1_Pstat(hh), 1))
+
+                        If CheckBox7.Checked Then Chart1.Series(1).Points.AddXY(debiet, Round(chart1_Efficiency(hh), 1))    'efficiency
+                        If CheckBox8.Checked Then Chart1.Series(2).Points.AddXY(debiet, Round(chart1_Power(hh), 1))         'Power
+                    Next hh
+                Else                        'Fill chart with Tschets data
+                    For hh = 0 To 10
+                        Weerstand_coefficient = P_target * 2 / (NumericUpDown12.Value * Q_target ^ 2)
                         debiet = Tschets(Tschets_no).TFlow_scaled(hh)
                         If CheckBox2.Checked Then debiet = Round(debiet * 3600, 1)      'Per uur
-                        Chart1.Series(0).Points.AddXY(debiet, Round(Tschets(Tschets_no).TPtot_scaled(hh), 1))
-                        Chart1.Series(5).Points.AddXY(debiet, Round(Tschets(Tschets_no).TPstat_scaled(hh), 1))
+                        Chart1.Series(0).Points.AddXY(debiet, Round(Tschets(Tschets_no).TPtot_scaled(hh), 2))
+                        Chart1.Series(5).Points.AddXY(debiet, Round(Tschets(Tschets_no).TPstat_scaled(hh), 2))
                         If CheckBox7.Checked Then Chart1.Series(1).Points.AddXY(debiet, Round(Tschets(Tschets_no).Teff_scaled(hh), 1))
                         If CheckBox8.Checked Then Chart1.Series(2).Points.AddXY(debiet, Round(Tschets(Tschets_no).Tverm_scaled(hh), 1))
-                    End If
+                    Next hh
+                End If
 
-                    '-------------------Target dot ---------------------
-                    If CheckBox3.Checked = True Then
-                        Chart1.Series(3).YAxisType = AxisType.Primary
-                        Chart1.Series(3).Points.AddXY(Q_target, P_target)
-                        Chart1.Series(3).Points(0).MarkerStyle = DataVisualization.Charting.MarkerStyle.Star10
-                        Chart1.Series(3).Points(0).MarkerSize = 20
-                        '---------------- add the duct resistance line-----------------------
-                        If debiet < 1.1 * Q_target Then 'To keep the chart looking nice
-                            p_loss_line = 0.5 * Weerstand_coefficient * NumericUpDown12.Value * debiet ^ 2
-                            Chart1.Series(4).Points.AddXY(debiet, p_loss_line)
-                        End If
+                '-------------------Target dot ---------------------
+                If CheckBox3.Checked = True Then
+                    Chart1.Series(3).YAxisType = AxisType.Primary
+                    Chart1.Series(3).Points.AddXY(Q_target, P_target)
+                    Chart1.Series(3).Points(0).MarkerStyle = DataVisualization.Charting.MarkerStyle.Star10
+                    Chart1.Series(3).Points(0).MarkerSize = 20
+                    '---------------- add the duct resistance line-----------------------
+                    If debiet < 1.1 * Q_target Then 'To keep the chart looking nice
+                        p_loss_line = 0.5 * Weerstand_coefficient * NumericUpDown12.Value * debiet ^ 2
+                        Chart1.Series(4).Points.AddXY(debiet, p_loss_line)
                     End If
+                End If
 
-                Next hh
                 Chart1.Refresh()
             Catch ex As Exception
                 'MessageBox.Show(ex.Message &"Line 1400")  ' Show the exception's message.
@@ -1796,73 +1817,73 @@ Public Class Form1
                     End If
                 Next hh
 
-                TextBox158.Clear()
+
+                '-----------------------------------------------------------
+                ' From the Tschets data point the polynoom Is calculaten
+                ' Then 50 points are calculated to get a smooth chart
+                '-----------------------------------------------------------
                 Dim j As Integer
                 Dim t() As PPOINT
-                Dim flow As Double
-                Dim aantal_punten As Integer = 10
+                Dim flow, max_flow As Double
+                Dim aantal_Tschets_punten As Integer = 10
+                Dim aantal_Grafiek_punten As Integer = 50
 
+                ReDim PZ(aantal_Tschets_punten)          'PZ() too big gives wrong results !!!
+                max_flow = Tschets(ty).TFlow_scaled(aantal_Tschets_punten)
                 If CheckBox1.Checked Then
 
-                    '=============== convert to polynoom, Ptotal ====================
-                    TextBox158.AppendText(Environment.NewLine)
-                    ReDim PZ(aantal_punten)
-                    For j = 0 To aantal_punten     'Get data into PZ()
+
+                    '=============== calculate the polynoom for Ptotal ====================
+                    For j = 0 To aantal_Tschets_punten       'Get data into PZ()
                         PZ(j).x = Tschets(ty).TFlow_scaled(j)
                         PZ(j).y = Tschets(ty).TPtot_scaled(j)
-                        TextBox158.AppendText("count schets=" & j.ToString & " X (flow)=" & PZ(j).x.ToString & " Y (P_tot)=" & PZ(j).y.ToString & Environment.NewLine)
                     Next
-                    t = Trend(PZ, 5)
-                    For j = 0 To aantal_punten     'Calculate new poly data points
-                        flow = j / aantal_punten * Tschets(ty).TFlow_scaled(10)
-                        Tschets(ty).TFlow_scaled_poly(j) = flow
-                        Tschets(ty).TPtot_scaled_poly(j) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3 + BZ(4, 0) * flow ^ 4 + BZ(5, 0) * flow ^ 5
-                        TextBox158.AppendText("count polyt=" & j.ToString & " X (flow)=" & flow.ToString & " Y (P_tot)=" & Tschets(ty).TPtot_scaled_poly(j).ToString & Environment.NewLine)
+                    t = Trend(PZ, 5)            'calculate the polynoom
+
+                    For j = 0 To aantal_Grafiek_punten      'Calculate chart data points
+                        flow = j / aantal_Grafiek_punten * max_flow
+                        chart1_flow(j) = flow
+                        chart1_Ptot(j) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3 + BZ(4, 0) * flow ^ 4 + BZ(5, 0) * flow ^ 5
                     Next
 
-                    '=============== convert to polynoom, Pstatic ====================
-                    TextBox158.AppendText(Environment.NewLine)
-                    For j = 0 To aantal_punten     'Get data into PZ()
+                    '=============== calculate the polynoom for Pstatic ====================
+                    For j = 0 To aantal_Tschets_punten       'Get data into PZ()
                         PZ(j).x = Tschets(ty).TFlow_scaled(j)
                         PZ(j).y = Tschets(ty).TPstat_scaled(j)
-                        TextBox158.AppendText("count schets=" & j.ToString & " X (flow)=" & PZ(j).x.ToString & " Y (Pstat)=" & PZ(j).y.ToString & Environment.NewLine)
                     Next
-                    t = Trend(PZ, 5)
-                    For j = 0 To aantal_punten     'Calculate new poly data points
-                        flow = j / aantal_punten * Tschets(ty).TFlow_scaled(10)
-                        Tschets(ty).TFlow_scaled_poly(j) = flow
-                        Tschets(ty).TPstat_scaled_poly(j) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3 + BZ(4, 0) * flow ^ 4 + BZ(5, 0) * flow ^ 5
-                        TextBox158.AppendText("count polyt=" & j.ToString & " X (flow)=" & flow.ToString & " Y (P_stat)=" & Tschets(ty).TPstat_scaled_poly(j).ToString & Environment.NewLine)
+                    t = Trend(PZ, 5)        'calculate the polynoom
+
+                    For j = 0 To aantal_Grafiek_punten      'Calculate chart data points
+                        flow = j / aantal_Grafiek_punten * max_flow
+                        chart1_flow(j) = flow
+                        chart1_Pstat(j) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3 + BZ(4, 0) * flow ^ 4 + BZ(5, 0) * flow ^ 5
                     Next
 
-                    '=============== convert to polynoom, Power ====================
-                    TextBox158.AppendText(Environment.NewLine)
-                    For j = 0 To aantal_punten     'Get data into PZ()
+                    ''=============== calculate the polynoom for Power ====================
+                    For j = 0 To aantal_Tschets_punten       'Get data into PZ()
                         PZ(j).x = Tschets(ty).TFlow_scaled(j)
                         PZ(j).y = Tschets(ty).Tverm_scaled(j)
-                        TextBox158.AppendText("count=" & j.ToString & " X (flow)=" & PZ(j).x.ToString & " Y (Vermogen)=" & PZ(j).y.ToString & Environment.NewLine)
                     Next
-                    t = Trend(PZ, 5)
-                    For j = 0 To aantal_punten     'Calculate new poly data points
-                        flow = j / aantal_punten * Tschets(ty).TFlow_scaled(10)
-                        Tschets(ty).TFlow_scaled_poly(j) = flow
-                        Tschets(ty).Tverm_scaled_poly(j) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3 + BZ(4, 0) * flow ^ 4 + BZ(5, 0) * flow ^ 5
-                        TextBox158.AppendText("count polyt=" & j.ToString & " X (flow)=" & flow.ToString & " Y (Vermogen)=" & Tschets(ty).Tverm_scaled_poly(j).ToString & Environment.NewLine)
+                    t = Trend(PZ, 5)        'calculate the polynoom
+
+                    For j = 0 To aantal_Grafiek_punten      'Calculate chart data points
+                        flow = j / aantal_Grafiek_punten * max_flow
+                        chart1_flow(j) = flow
+                        chart1_Power(j) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3 + BZ(4, 0) * flow ^ 4 + BZ(5, 0) * flow ^ 5
                     Next
 
                     '=============== convert to polynoom, Efficiency ====================
                     TextBox158.AppendText(Environment.NewLine)
-                    For j = 0 To aantal_punten     'Get data into PZ()
+                    For j = 0 To aantal_Tschets_punten       'Get data into PZ()
                         PZ(j).x = Tschets(ty).TFlow_scaled(j)
                         PZ(j).y = Tschets(ty).Teff_scaled(j)
-                        TextBox158.AppendText("count=" & j.ToString & " X (flow)=" & PZ(j).x.ToString & " Y (Efficiency)=" & PZ(j).y.ToString & Environment.NewLine)
                     Next
-                    t = Trend(PZ, 5)
-                    For j = 0 To aantal_punten     'Calculate new poly data points
-                        flow = j / aantal_punten * Tschets(ty).TFlow_scaled(10)
-                        Tschets(ty).TFlow_scaled_poly(j) = flow
-                        Tschets(ty).Teff_scaled_poly(j) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3 + BZ(4, 0) * flow ^ 4 + BZ(5, 0) * flow ^ 5
-                        TextBox158.AppendText("count polyt=" & j.ToString & " X (flow)=" & flow.ToString & " Y (eff)=" & Tschets(ty).Teff_scaled_poly(j).ToString & Environment.NewLine)
+                    t = Trend(PZ, 5)        'calculate the polynoom
+
+                    For j = 0 To aantal_Grafiek_punten      'Calculate chart data points
+                        flow = j / aantal_Grafiek_punten * max_flow
+                        chart1_flow(j) = flow
+                        chart1_Efficiency(j) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3 + BZ(4, 0) * flow ^ 4 + BZ(5, 0) * flow ^ 5
                     Next
                 End If
 
