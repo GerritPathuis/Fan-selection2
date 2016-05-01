@@ -362,9 +362,12 @@ Public Class Form1
 
         TextBox12.Text = NumericUpDown58.Value.ToString
 
+
         nrq = ComboBox7.SelectedIndex   'Prevent out of bounds error
         If nrq >= 0 And nrq <= 30 Then
             Try
+                Label1.Text = TextBox159.Text & "/" & NumericUpDown33.Value.ToString & "/" & Tschets(ComboBox1.SelectedIndex).Tname
+
                 '------- get data from database--------------------------
                 TextBox1.Text = Tschets(nrq).Tdata(0)           'Diameter waaier. 
 
@@ -632,10 +635,9 @@ Public Class Form1
 
                 Calc_stage(cond(3))                                 'Bereken de waaier #3   
 
-
-                Label154.Text = "Waaier #1, Ro1=" & Round(cond(1).Ro1, 3).ToString & " [kg/m3], Ro2=" & Round(cond(1).Ro2, 3).ToString & " [kg/m3], P2t=" & Round(cond(1).Pt2, 0).ToString & " [Pa]"
-                Label155.Text = "Waaier #2, Ro1=" & Round(cond(2).Ro1, 3).ToString & " [kg/m3], Ro2=" & Round(cond(2).Ro2, 3).ToString & " [kg/m3], Pt2=" & Round(cond(2).Pt2, 0).ToString & " [Pa]"
-                Label156.Text = "Waaier #3, Ro1=" & Round(cond(3).Ro1, 3).ToString & " [kg/m3], Ro2=" & Round(cond(3).Ro2, 3).ToString & " [kg/m3], Pt2=" & Round(cond(3).Pt2, 0).ToString & " [Pa]"
+                'Label154.Text = "Waaier #1, Ro1=" & Round(cond(1).Ro1, 3).ToString & " [kg/m3], Ro2=" & Round(cond(1).Ro2, 3).ToString & " [kg/m3], P2t=" & Round(cond(1).Pt2, 0).ToString & " [Pa]"
+                'Label155.Text = "Waaier #2, Ro1=" & Round(cond(2).Ro1, 3).ToString & " [kg/m3], Ro2=" & Round(cond(2).Ro2, 3).ToString & " [kg/m3], Pt2=" & Round(cond(2).Pt2, 0).ToString & " [Pa]"
+                'Label156.Text = "Waaier #3, Ro1=" & Round(cond(3).Ro1, 3).ToString & " [kg/m3], Ro2=" & Round(cond(3).Ro2, 3).ToString & " [kg/m3], Pt2=" & Round(cond(3).Pt2, 0).ToString & " [Pa]"
 
 
                 '------------ Rendement Waaier (Ackeret) --------------
@@ -656,7 +658,7 @@ Public Class Form1
                 TextBox76.Text = Round(cond(1).Om_velos, 0).ToString                            'Omtrek snelheid [m/s]
                 TextBox218.Text = Round(cond(1).Om_velos / Vel_Mach(cond(1).T1), 2).ToString    'Omtrek snelheid [M]
                 TextBox77.Text = Round((cond(1).Reynolds * 10 ^ -6), 2).ToString
-                TextBox159.Text = Round(cond(1).zuig_dia, 0).ToString                           'Zuigmond diameter.
+                TextBox159.Text = Round(cond(1).zuig_dia / 10, 0) * 10.ToString                 'Zuigmond diameter rounded to 10[mm]
                 TextBox160.Text = Round(cond(1).uitlaat_h, 0).ToString                          'Uitlaat hoogte inw.[mm]
                 TextBox161.Text = Round(cond(1).uitlaat_b, 0).ToString                          'Uitlaat breedte inw.[mm]
                 TextBox57.Text = Round(cond(1).in_velos, 1).ToString                            'Inlaat snelheid [m/s]
@@ -776,15 +778,15 @@ Public Class Form1
         If Sch_hoek > 90 Then TextBox37.Text = "90"
 
         Double.TryParse(TextBox34.Text, sigma_allowed)
-        sigma_allowed *= 0.7                        'Max 70% van sigma 0.2 (info Peter de Wildt)
+        sigma_allowed *= 0.7                                'Max 70% van sigma 0.2 (info Peter de Wildt)
         TextBox40.Text = Round(sigma_allowed, 0).ToString
-        sigma_allowed *= 1000 ^ 2                       '[N/m2] niet [N/mm2] 
+        sigma_allowed *= 1000 ^ 2                           '[N/m2] niet [N/mm2] 
 
-        Double.TryParse(TextBox33.Text, sg_staal)       '[kg/m3]
+        Double.TryParse(TextBox33.Text, sg_staal)           '[kg/m3]
 
-        Waaier_dia = NumericUpDown21.Value / 1000       '[m]
-        Waaier_dik = NumericUpDown17.Value / 1000       '[m]
-        Voorplaat_dik = NumericUpDown31.Value / 1000
+        Waaier_dia = NumericUpDown21.Value / 1000           '[m]
+        Waaier_dik = NumericUpDown17.Value / 1000           '[m]
+        Voorplaat_dik = NumericUpDown31.Value / 1000        '[m]
         '--------Selected type------------
         T_type = ComboBox1.SelectedIndex
 
@@ -1153,11 +1155,6 @@ Public Class Form1
         Tschets(9).TFlow = {0.00, 4.99, 5.54, 6.1, 6.71, 7.32, 8.04, 8.81, 9.59, 10.37, 11.09, 12.09}
         Tschets(9).werkp_opT = {75.2, 286, 0, 7.1, 1.4}
         Tschets(9).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
-        'Tschets(9).TFlow_scaled = Tschets(0).TFlow_scaled        '[m3/s]
-        'Tschets(9).TPstat_scaled = Tschets(0).TPstat_scaled      'Statische druk
-        'Tschets(9).TPtot_scaled = Tschets(0).TPtot_scaled       'Totale druk
-        'Tschets(9).Tverm_scaled = Tschets(0).Tverm_scaled        'Rendement[%]
-        'Tschets(9).Teff_scaled = Tschets(0).Teff_scaled         'Vermogen[kW]
 
         Tschets(10).Tname = "T22B"
         Tschets(10).Tdata = {1000, 1480, 1.205, 964.9, 905.3, 659.6, 4666.7, 666.7, 731.6, 912.3, 649.1, 1101.8, 243.9, 24, 321.1, 271.9, 800.0, 800.0, 20, 25}
@@ -1479,10 +1476,7 @@ Public Class Form1
                     Chart1.ChartAreas("ChartArea0").AxisX.Title = "Debiet [Am3/sec]"
                 End If
 
-                '------------------- Draw the lines in the chart--------------------
-                '-------------------------------------------------------------------
                 '---------------- add the fan lines-----------------------
-
                 If CheckBox1.Checked Then      'Fil chart with Poly lines
                     For hh = 0 To 50
                         Weerstand_coefficient = P_target * 2 / (NumericUpDown12.Value * Q_target ^ 2)
@@ -1611,35 +1605,140 @@ Public Class Form1
     'Save data and line chart to file
     Private Sub save_to_disk()
         Dim bmp_tab_page1 As New Bitmap(TabPage1.Width, TabPage1.Height)
-        Dim bmp_tab_page2 As New Bitmap(TabPage2.Width, TabPage2.Height)
-        Dim str_file1, str_file2, str_file3 As String
+        Dim oWord As Word.Application
+        Dim oDoc As Word.Document
+        Dim oTable As Word.Table
+        Dim oPara1, oPara2, oPara4 As Word.Paragraph
 
-        Dim text As String
-        text = Now.ToString("yyyy_MM_dd_HH_mm_ss_")
+        'Start Word and open the document template. 
+        oWord = CreateObject("Word.Application")
+        oWord.Visible = True
+        oDoc = oWord.Documents.Add
 
-        str_file1 = "c: \temp\" & text & "Fan chart.png"
-        str_file2 = "c:\temp\" & text & "Fan selection data.png"
-        str_file3 = "c:\temp\" & text & "Fan stress waaier.png"
+        'Insert a paragraph at the beginning of the document. 
+        oPara1 = oDoc.Content.Paragraphs.Add
+        oPara1.Range.Text = "VTK Engineering department"
+        oPara1.Range.Font.Name = "Arial"
+        oPara1.Range.Font.Size = 16
+        oPara1.Range.Font.Bold = True
+        oPara1.Format.SpaceAfter = 4                '24 pt spacing after paragraph. 
+        oPara1.Range.InsertParagraphAfter()
 
-        '---------- save chart---------------
-        Chart1.Show()
-        Chart1.Refresh()
-        Chart1.SaveImage(str_file1, Imaging.ImageFormat.Png)
+        oPara2 = oDoc.Content.Paragraphs.Add(oDoc.Bookmarks.Item("\endofdoc").Range)
+        oPara2.Range.Font.Size = 11
+        oPara2.Format.SpaceAfter = 2
+        oPara2.Range.Font.Bold = False
+        oPara2.Range.Text = "Fan selection and sizing " & vbCrLf
+        oPara2.Range.InsertParagraphAfter()
+
+        '----------------------------------------------
+        'Insert a table, fill it with data and change the column widths.
+        oTable = oDoc.Tables.Add(oDoc.Bookmarks.Item("\endofdoc").Range, 4, 3)
+        oTable.Range.ParagraphFormat.SpaceAfter = 1
+        oTable.Range.Font.Size = 11
+        oTable.Range.Font.Bold = False
+        oTable.Rows.Item(1).Range.Font.Bold = True
+
+        oTable.Cell(1, 1).Range.Text = "Project Name"
+        oTable.Cell(1, 2).Range.Text = "."
+        oTable.Cell(2, 1).Range.Text = "Project number "
+        oTable.Cell(2, 2).Range.Text = "."
+        oTable.Cell(3, 1).Range.Text = "Auther "
+        oTable.Cell(3, 2).Range.Text = Environment.UserName
+        oTable.Cell(4, 1).Range.Text = "Date "
+        oTable.Cell(4, 2).Range.Text = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+
+        oTable.Columns.Item(1).Width = oWord.InchesToPoints(2.5)   'Change width of columns 
+        oTable.Columns.Item(2).Width = oWord.InchesToPoints(2)
+
+        oTable.Rows.Item(1).Range.Font.Bold = True
+        oDoc.Bookmarks.Item("\endofdoc").Range.InsertParagraphAfter()
+
+        '----------------------------------------------
+        'Insert a 6 x 3 table, fill it with data and change the column widths.
+        oTable = oDoc.Tables.Add(oDoc.Bookmarks.Item("\endofdoc").Range, 12, 4)
+        oTable.Range.ParagraphFormat.SpaceAfter = 1
+        oTable.Range.Font.Size = 11
+        oTable.Range.Font.Bold = False
+        oTable.Rows.Item(1).Range.Font.Bold = True
+
+        oTable.Cell(1, 1).Range.Text = "Fan type " & Label1.Text
+        oTable.Cell(1, 2).Range.Text = "Design"
+        oTable.Cell(1, 3).Range.Text = "Units"
+        oTable.Cell(1, 4).Range.Text = ""
+
+        oTable.Cell(2, 1).Range.Text = "Capacity"
+        oTable.Cell(2, 2).Range.Text = NumericUpDown3.Value
+        oTable.Cell(2, 3).Range.Text = "[kg/hr]"
+
+        oTable.Cell(3, 1).Range.Text = "Capacity"
+        oTable.Cell(3, 2).Range.Text = TextBox22.Text
+        oTable.Cell(3, 3).Range.Text = "[A.m3/hr]"
+
+        oTable.Cell(4, 1).Range.Text = "Density at inlet"
+        oTable.Cell(4, 2).Range.Text = NumericUpDown12.Value
+        oTable.Cell(4, 3).Range.Text = "[kg/m3]"
+
+        oTable.Cell(5, 1).Range.Text = "Delta Pressure Static"
+        oTable.Cell(5, 2).Range.Text = NumericUpDown37.Value
+        oTable.Cell(5, 3).Range.Text = "[mBar]"
+
+        oTable.Cell(6, 1).Range.Text = "Delta Pressure Total"
+        oTable.Cell(6, 2).Range.Text = TextBox203.Text
+        oTable.Cell(6, 3).Range.Text = "[mBar]"
+
+        oTable.Cell(7, 1).Range.Text = "Diameter impeller"
+        oTable.Cell(7, 2).Range.Text = NumericUpDown33.Value
+        oTable.Cell(7, 3).Range.Text = "[mm]"
+
+        oTable.Cell(8, 1).Range.Text = "Speed impeller"
+        oTable.Cell(8, 2).Range.Text = NumericUpDown13.Value
+        oTable.Cell(8, 3).Range.Text = "[rpm]"
+
+        oTable.Cell(9, 1).Range.Text = "Shaft Power"
+        oTable.Cell(9, 2).Range.Text = TextBox78.Text
+        oTable.Cell(9, 3).Range.Text = "[kW]"
+
+        oTable.Cell(10, 1).Range.Text = "Temperature inlet"
+        oTable.Cell(10, 2).Range.Text = NumericUpDown4.Value
+        oTable.Cell(10, 3).Range.Text = "[°C]"
+
+        oTable.Cell(11, 1).Range.Text = "Temperature outlet"
+        oTable.Cell(11, 2).Range.Text = TextBox54.Text
+        oTable.Cell(11, 3).Range.Text = "[°C]"
+
+        oTable.Cell(12, 1).Range.Text = "Efficiency"
+        oTable.Cell(12, 2).Range.Text = TextBox75.Text
+        oTable.Cell(12, 3).Range.Text = "[%]"
+
+        oTable.Columns.Item(1).Width = oWord.InchesToPoints(2.5)   'Change width of columns 1 & 2.
+        oTable.Columns.Item(2).Width = oWord.InchesToPoints(1)
+        oTable.Columns.Item(3).Width = oWord.InchesToPoints(1)
+        oDoc.Bookmarks.Item("\endofdoc").Range.InsertParagraphAfter()
+
+        '------------------save Chart1 ---------------- 
+        Scale_rules_applied(ComboBox1.SelectedIndex, NumericUpDown9.Value, NumericUpDown10.Value, NumericUpDown12.Value)
+        draw_chart1(ComboBox1.SelectedIndex)
+        Chart1.SaveImage("c:\Temp\Chart1.Jpeg", System.Drawing.Imaging.ImageFormat.Jpeg)
+        oPara4 = oDoc.Content.Paragraphs.Add
+        oPara4.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter
+        oPara4.Range.InlineShapes.AddPicture("c:\Temp\Chart1.Jpeg")
+        oPara4.Range.InlineShapes.Item(1).LockAspectRatio = True
+        oPara4.Range.InlineShapes.Item(1).Width = 500
+        oPara4.Range.InsertParagraphAfter()
 
         '---- save tab page 1---------------
         TabPage2.Show()
+        TabPage2.Refresh()
         TabPage1.DrawToBitmap(bmp_tab_page1, DisplayRectangle)
-        bmp_tab_page1.Save(str_file2, Imaging.ImageFormat.Png)
-
-        '---- save tab page 2---------------
-        TabPage2.Show()
-        TabPage2.DrawToBitmap(bmp_tab_page2, DisplayRectangle)
-        bmp_tab_page2.Save(str_file3, Imaging.ImageFormat.Png)
-
-        MessageBox.Show("Files is saved to c:\temp")
-
+        bmp_tab_page1.Save("c:\Temp\page2.Jpeg", Imaging.ImageFormat.Jpeg)
+        oPara4 = oDoc.Content.Paragraphs.Add
+        oPara4.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter
+        oPara4.Range.InlineShapes.AddPicture("c:\Temp\page2.Jpeg")
+        oPara4.Range.InlineShapes.Item(1).LockAspectRatio = True
+        'oPara4.Range.InlineShapes.Item(1).Width = 400
+        oPara4.Range.InsertParagraphAfter()
     End Sub
-
     'Graphic next model
     Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
         If ComboBox1.SelectedIndex < (ComboBox1.Items.Count - 1) Then
@@ -2045,9 +2144,13 @@ Public Class Form1
             T1 = calc_zeroTorsion_4(omg1)
             T2 = calc_zeroTorsion_4(omg2)
             T3 = calc_zeroTorsion_4(omg3)
-            'TextBox158.Text &= "omg1, T1=  " & omg1.ToString & ", " & T1.ToString & " omg2,T2=  " & omg2.ToString & ", " & T2.ToString & " omg3,T3=" & omg3.ToString & ", " & T3.ToString & vbCrLf
         Next
         TextBox84.Text = Round((omg3 * 60 / (2 * PI)), 0)        '[rad/s --> rpm]
+        If T3 > 1 Then   'Residual torque too big,  problem in choosen bouderies
+            TextBox84.BackColor = Color.Red
+        Else
+            TextBox84.BackColor = Color.LightGreen
+        End If
     End Sub
 
     'Holzer residual torque analyses
