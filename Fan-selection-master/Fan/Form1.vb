@@ -129,9 +129,9 @@ Public Class Form1
    "Weldox700E;EN10137-2 UNS;S690QL;1.8928;1.29;0.28;7850;192;780-930;590;700;643;600;590;580;570;560;550;540;--;--",
    "WSTE/TSTE355;EN 10028-3 UNS;P355NH/NL1;1.0565/66;1.29;0.28;7850;192;470-630;284;315;340;304;284;255;226;206;186;157;A516-Gr70;--"}
 
-    'Motoren
+    'Motoren 1500 rpm
     'Vermogen,Toerental, Frame, Lengte, Geluid Lp
-    Public Shared emotor() As String = {
+    Public Shared emotor_4P() As String = {
    "4.00; 1500; 112M; 380; 56",
    "5.50; 1500; 132S; 465; 56",
    "7.50; 1500; 132M; 505; 59",
@@ -159,6 +159,35 @@ Public Class Form1
    "630; 1500; 400L; 1928; 85",
    "710; 1500; 400L; 1928; 85",
    "1000; 1500; Spec; 00; 00"}
+
+    'Motoren 3000 rpm
+    'Vermogen,Toerental, Frame, Lengte, Geluid Lp
+    Public Shared emotor_2P() As String = {
+    "4;112M;380;67",
+    "	5.5;132S;465;70",
+    "7.7;132S;465;70",
+    "11;160M;645;69",
+    "15;160M;645;69",
+    "18.8;160L;645;69",
+    "22;180M;700;69",
+    "30;200M;774;72",
+    "37;200M;774;72",
+    "45;225S;866;74",
+    "55;250S;875;75",
+    "75;280S;1088;77",
+    "90;280S;1088;77",
+    "110;315S;1174;78",
+    "132;315S;1174;78",
+    "160;315S;1174;78",
+    "200;315M;1285;78",
+    "250;355S;1494;83",
+    "315;355SM;1546;83",
+    "355;355SM;1546;83",
+    "400;355M;1651;83",
+    "450;355M;1651;83",
+    "500;400L;1828;85",
+    "560;400L;1828;85"}
+
 
     'Hz; rpm; Koppel_%,
     Public Shared EXD_VSD_torque() As String = {
@@ -299,8 +328,8 @@ Public Class Form1
         Label34.Text = ChrW(963) & " 0.2 @ T bedrijf [N/mm]"
 
         '-------Fill combobox4, Motor selection------------------
-        For hh = 0 To (emotor.Length - 1)            'Fill combobox 4 electric motor data
-            words = emotor(hh).Split(";")
+        For hh = 0 To (emotor_4P.Length - 1)         'Fill combobox 4 electric motor data
+            words = emotor_4P(hh).Split(";")
             ComboBox4.Items.Add(words(0))
             ComboBox6.Items.Add(words(0))
         Next hh
@@ -510,7 +539,7 @@ Public Class Form1
                     Label95.Visible = True                          'Site hoogte
                     GroupBox16.Visible = True                       'Molair weight
                 Else
-                    NumericUpDown12.Enabled = True                  'Density invullen
+                    NumericUpDown12.Enabled = True     'Density invullen             
                     G_density_act_zuig = NumericUpDown12.Value
                     G_density_N_zuig = calc_sg_air(101325, 0, Rel_humidity, Gas_mol_weight)                     'Normal conditions zuig
                     NumericUpDown1.BackColor = DefaultBackColor    'Whole system under pressure
@@ -558,6 +587,10 @@ Public Class Form1
                     G_eff = T_eff
                 End If
 
+                '---------------- VTK selectie 95.2 gegevens------------------
+                TextBox208.Text = Round(G_Debiet_z_act_sec, 2).ToString     'Capaciteit actual [m3/sec]
+                TextBox260.Text = NumericUpDown4.Value                      'Temperatuur inlet
+                TextBox261.Text = Round(calc_density(NumericUpDown12.Value, P_zuig_Pa_static, 101325, G_air_temp, 0), 3)     'NTP - Normal Temperature and Pressure
 
                 '---------- Calc Static + total Pressure -----------------------
                 Ttype = ComboBox1.SelectedIndex
@@ -576,7 +609,6 @@ Public Class Form1
                 TextBox16.Text = Round(G_temp_uit_c, 0).ToString                        'Temp uit
                 TextBox23.Text = Round(P_pers_Pa_static / 100, 0).ToString              'Static Pers druk in mbar abs
                 TextBox152.Text = Round(P_pers_Pa_total / 100, 0).ToString              'Total druk in mbar abs
-                TextBox24.Text = Round(G_density_N_zuig, 3).ToString
                 TextBox25.Text = Round(G_density_act_pers, 3).ToString
                 TextBox26.Text = Round(G_omtrek_s, 0).ToString                          'Omtrek snelheid [m/s]
                 TextBox217.Text = Round(G_omtrek_s / Vel_Mach(G_air_temp), 2).ToString  'Omtrek snelheid [M]
@@ -1479,7 +1511,6 @@ Public Class Form1
                 '---------------- add the fan lines-----------------------
                 If CheckBox1.Checked Then      'Fil chart with Poly lines
                     For hh = 0 To 50
-                        Weerstand_coefficient = P_target * 2 / (NumericUpDown12.Value * Q_target ^ 2)
                         debiet = chart1_flow(hh)
                         If CheckBox2.Checked Then debiet = Round(debiet * 3600, 1)      'Per uur
 
@@ -1491,7 +1522,6 @@ Public Class Form1
                     Next hh
                 Else                        'Fill chart with Tschets data
                     For hh = 0 To 10
-                        Weerstand_coefficient = P_target * 2 / (NumericUpDown12.Value * Q_target ^ 2)
                         debiet = Tschets(Tschets_no).TFlow_scaled(hh)
                         If CheckBox2.Checked Then debiet = Round(debiet * 3600, 1)      'Per uur
                         Chart1.Series(0).Points.AddXY(debiet, Round(Tschets(Tschets_no).TPtot_scaled(hh), 2))
@@ -1508,10 +1538,14 @@ Public Class Form1
                     Chart1.Series(3).Points(0).MarkerStyle = DataVisualization.Charting.MarkerStyle.Star10
                     Chart1.Series(3).Points(0).MarkerSize = 20
                     '---------------- add the duct resistance line-----------------------
-                    If debiet < 1.1 * Q_target Then 'To keep the chart looking nice
+                    Weerstand_coefficient = P_target * 2 / (NumericUpDown12.Value * Q_target ^ 2)
+
+                    For hh = 0 To 50
+                        debiet = chart1_flow(hh)
+                        If CheckBox2.Checked Then debiet = Round(debiet * 3600, 1)      'Per uur
                         p_loss_line = 0.5 * Weerstand_coefficient * NumericUpDown12.Value * debiet ^ 2
                         Chart1.Series(4).Points.AddXY(debiet, p_loss_line)
-                    End If
+                    Next
                 End If
 
                 Chart1.Refresh()
@@ -2149,7 +2183,7 @@ Public Class Form1
         If T3 > 1 Then   'Residual torque too big,  problem in choosen bouderies
             TextBox84.BackColor = Color.Red
         Else
-            TextBox84.BackColor = Color.LightGreen
+            TextBox84.BackColor = SystemColors.Window
         End If
     End Sub
 
@@ -2276,14 +2310,14 @@ Public Class Form1
 
         '--------- Kracht door V_snaren----------
         If (ComboBox4.SelectedIndex > -1) Then                                  'Prevent exceptions
-            Dim words() As String = emotor(ComboBox4.SelectedIndex).Split(";")
+            Dim words() As String = emotor_4P(ComboBox4.SelectedIndex).Split(";")
             S_power = words(0) * 1000                                           'Motor vermogen
             n_actual = words(1)                                                 'Toerental motor [rpm]
             dia_pulley = NumericUpDown16.Value / 1000
             F_snaar = 0.975 * S_power * 20 / (W_rpm * dia_pulley * 0.5)
 
             '------------- inertia motor--------------------
-            motor_inertia = emotor_inert(n_actual, S_power)
+            motor_inertia = emotor_4P_inert(n_actual, S_power)
             TextBox219.Text = Round(motor_inertia, 1).ToString
             NumericUpDown46.Value = Round(motor_inertia, 1).ToString
         End If
@@ -2356,6 +2390,7 @@ Public Class Form1
 
     Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click, NumericUpDown8.ValueChanged, NumericUpDown7.ValueChanged, NumericUpDown6.ValueChanged, NumericUpDown5.ValueChanged, NumericUpDown4.ValueChanged, NumericUpDown3.ValueChanged, NumericUpDown13.ValueChanged, NumericUpDown12.ValueChanged, NumericUpDown1.ValueChanged, ComboBox1.SelectedIndexChanged, RadioButton4.CheckedChanged, RadioButton3.CheckedChanged, CheckBox4.CheckedChanged, NumericUpDown33.ValueChanged, ComboBox7.SelectedIndexChanged, TabPage1.Enter, RadioButton14.CheckedChanged, RadioButton13.CheckedChanged, RadioButton12.CheckedChanged, NumericUpDown58.ValueChanged, NumericUpDown37.ValueChanged
         NumericUpDown9.Value = NumericUpDown33.Value
+        NumericUpDown21.Value = NumericUpDown33.Value       'Diameter waaier spanning berekening
         NumericUpDown10.Value = NumericUpDown13.Value
         If TabControl1.SelectedTab.Name = "TabPage1" Then
             ComboBox7.SelectedIndex = ComboBox1.SelectedIndex       'type selectie
@@ -2499,14 +2534,14 @@ Public Class Form1
     'Pressure in Pascal absolute
     Private Function calc_density(density1 As Double, pressure1 As Double, pressure2 As Double, temperature1 As Double, temperature2 As Double)
         Dim density2 As Double
-        temperature1 += 273.15
-        temperature2 += 273.15
+
+        ' MessageBox.Show(density1.ToString & " " & pressure1.ToString & "  " & temperature1.ToString)
 
         If (pressure1 < 80000) Or (pressure1 < 80000) Then
             MessageBox.Show("Density calculation warning Pressure must be in Pa absolute")
         End If
 
-        density2 = density1 * (pressure2 / pressure1) * (temperature1 / temperature2)
+        density2 = density1 * (pressure2 / pressure1) * ((temperature1 + 273.15) / (temperature2 + 273.15))
         Return (density2)
     End Function
     'Calculate the labyrinth loss
@@ -2534,6 +2569,7 @@ Public Class Form1
 
     Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click, CheckBox6.CheckedChanged, CheckBox3.CheckedChanged, CheckBox2.CheckedChanged, CheckBox1.CheckedChanged, TabPage3.Enter, NumericUpDown9.ValueChanged, NumericUpDown10.ValueChanged, RadioButton9.CheckedChanged, RadioButton11.CheckedChanged, RadioButton10.CheckedChanged, CheckBox7.CheckedChanged, CheckBox8.CheckedChanged
         NumericUpDown33.Value = NumericUpDown9.Value
+        NumericUpDown21.Value = NumericUpDown9.Value    'Diameter waaier
         NumericUpDown13.Value = NumericUpDown10.Value
         Scale_rules_applied(ComboBox1.SelectedIndex, NumericUpDown9.Value, NumericUpDown10.Value, NumericUpDown12.Value)
         draw_chart1(ComboBox1.SelectedIndex)
@@ -2986,6 +3022,7 @@ Public Class Form1
         End Try
     End Sub
 
+
     Public Sub MxGaussJordan(Matrix(,) As Double)
 
         Dim Rows, Cols As Integer
@@ -3018,7 +3055,7 @@ Public Class Form1
             Next
         Next
     End Sub
-    Private Sub calc_emotor()
+    Private Sub calc_emotor_4P()
         'see http://ecatalog.weg.net/files/wegnet/WEG-specification-of-electric-motors-50039409-manual-english.pdf
         'see http://electrical-engineering-portal.com/calculation-of-motor-starting-time-as-first-approximation
         Dim Ins_power, required_power, aanlooptijd, n_actual, rad As Double
@@ -3030,11 +3067,31 @@ Public Class Form1
         If (ComboBox6.SelectedIndex > -1) Then      'Prevent exceptions
 
             '--------- motor torque-------------
-            Dim words() As String = emotor(ComboBox6.SelectedIndex).Split(";")
-            Ins_power = words(0) * 1000                         'Geinstalleerd vermogen [Watt]
-            n_actual = words(1)                                 'Toerental motor [rpm]
-            TextBox208.Text = words(2)                          'Frame size
-            rad = n_actual / 60 * 2 * PI                        'Hoeksnelheid [rad/s]
+            Dim words() As String = emotor_4P(ComboBox6.SelectedIndex).Split(";")
+            Ins_power = words(0) * 1000             'Geinstalleerd vermogen [Watt]
+
+            Select Case True                        'Toerental motor [rpm] 50 Hz
+                Case RadioButton30.Checked
+                    n_actual = 3000
+                Case RadioButton29.Checked
+                    n_actual = 1500
+                Case RadioButton31.Checked
+                    n_actual = 1000
+                Case RadioButton35.Checked
+                    n_actual = 750
+
+                Case RadioButton33.Checked           'Toerental motor [rpm] 60 Hz
+                    n_actual = 3600
+                Case RadioButton34.Checked
+                    n_actual = 1800
+                Case RadioButton32.Checked
+                    n_actual = 1200
+                Case RadioButton36.Checked
+                    n_actual = 900
+            End Select
+
+
+            rad = n_actual / 60 * 2 * PI                    'Hoeksnelheid [rad/s]
             m_torque_rated = Ins_power / rad
             m_torque_inrush = m_torque_rated * NumericUpDown14.Value
             m_torque_max = m_torque_rated * NumericUpDown34.Value
@@ -3049,7 +3106,7 @@ Public Class Form1
             impellar_inertia = impellar_inertia * NumericUpDown35.Value ^ 2         'in case speed ratio impeller/motor 
 
             '------------- inertia motor--------------------
-            motor_inertia = emotor_inert(n_actual, Ins_power)
+            motor_inertia = emotor_4P_inert(n_actual, Ins_power)
 
             total_inertia = impellar_inertia + motor_inertia    '[kg.m2]
             inertia_torque = total_inertia * ang_acceleration     '[N.m]
@@ -3094,14 +3151,14 @@ Public Class Form1
         End If
     End Sub
 
-    Private Sub Button9_Click(sender As Object, e As EventArgs) Handles Button9.Click, TabPage12.Enter, NumericUpDown38.ValueChanged, NumericUpDown34.ValueChanged, NumericUpDown14.ValueChanged, ComboBox6.SelectedIndexChanged, NumericUpDown35.ValueChanged, NumericUpDown36.ValueChanged
+    Private Sub Button9_Click(sender As Object, e As EventArgs) Handles TabPage12.Enter, NumericUpDown38.ValueChanged, NumericUpDown34.ValueChanged, NumericUpDown14.ValueChanged, ComboBox6.SelectedIndexChanged, NumericUpDown35.ValueChanged, NumericUpDown36.ValueChanged, RadioButton30.CheckedChanged, RadioButton36.CheckedChanged, RadioButton35.CheckedChanged, RadioButton34.CheckedChanged, RadioButton33.CheckedChanged, RadioButton32.CheckedChanged, RadioButton31.CheckedChanged, RadioButton29.CheckedChanged
         Calc_stress_impeller()
-        calc_emotor()
+        calc_emotor_4P()
         draw_chart3()
     End Sub
     Private Sub draw_chart3()
         Dim hh As Integer
-            Dim words() As String
+        Dim words() As String
 
         Try
             'Clear all series And chart areas so we can re-add them
@@ -3134,16 +3191,16 @@ Public Class Form1
 
     End Sub
     ' see http://ecatalog.weg.net/files/wegnet/WEG-specification-of-electric-motors-50039409-manual-english.pdf
-    Function emotor_inert(rpm As Double, kw As Double)
+    Function emotor_4P_inert(rpm As Double, kw As Double)
         Dim motor_inertia As Double
         Select Case True
-            Case rpm = 3000
+            Case rpm = 3000 Or rpm = 3600
                 motor_inertia = 0.04 * (kw / 1000) ^ 0.9 * 1 ^ 2.5    '2 poles (1 pair) (3000 rpm) [kg.m2]
-            Case rpm = 1500
+            Case rpm = 1500 Or rpm = 1800
                 motor_inertia = 0.04 * (kw / 1000) ^ 0.9 * 2 ^ 2.5    '4 poles (2 pair) (1500 rpm) [kg.m2]
-            Case rpm = 1000
+            Case rpm = 1000 Or rpm = 1200
                 motor_inertia = 0.04 * (kw / 1000) ^ 0.9 * 3 ^ 2.5    '6 poles (3 pair) (1000 rpm) [kg.m2]
-            Case rpm = 750
+            Case rpm = 750 Or rpm = 900
                 motor_inertia = 0.04 * (kw / 1000) ^ 0.9 * 4 ^ 2.5    '8 poles (4 pair) (750 rpm) [kg.m2]
             Case Else
                 MessageBox.Show("Error occured in Motor Inertia calculation ")
