@@ -590,7 +590,7 @@ Public Class Form1
                 '---------------- VTK selectie 95.2 gegevens------------------
                 TextBox208.Text = Round(G_Debiet_z_act_sec, 2).ToString     'Capaciteit actual [m3/sec]
                 TextBox260.Text = NumericUpDown4.Value                      'Temperatuur inlet
-                TextBox261.Text = Round(calc_density(NumericUpDown12.Value, P_zuig_Pa_static, 101325, G_air_temp, 0), 3)     'NTP - Normal Temperature and Pressure
+                TextBox261.Text = Round(calc_Normal_density(NumericUpDown12.Value, P_zuig_Pa_static, G_air_temp), 3) 'Normal Conditions
 
                 '---------- Calc Static + total Pressure -----------------------
                 Ttype = ComboBox1.SelectedIndex
@@ -641,8 +641,8 @@ Public Class Form1
                 cond(1).Qkg = NumericUpDown3.Value                  '[kg/hr]
 
                 cond(1).Ro1 = NumericUpDown12.Value                 'density [kg/m3] inlet flange
-                cond(1).Pt1 = P_zuig_Pa_static - 101300             '[PaG] inlet flange waaier #1           
-                cond(1).Ps1 = P_zuig_Pa_static - 101300             '[PaG] inlet flange waaier #1
+                cond(1).Pt1 = P_zuig_Pa_static - 101325             '[PaG] inlet flange waaier #1           
+                cond(1).Ps1 = P_zuig_Pa_static - 101325             '[PaG] inlet flange waaier #1
                 cond(1).Power0 = Tschets(cond(1).Typ).werkp_opT(3)  '[Am3/s] Tschets
 
                 Calc_stage(cond(1))                                 'Bereken de waaier #1  
@@ -1870,8 +1870,8 @@ Public Class Form1
 
                         cond(4).Dia1 = Dia1                                             '[mm]           
                         cond(4).Qkg = NumericUpDown3.Value                              '[kg/hr]
-                        cond(4).Pt1 = Convert.ToDouble(TextBox91.Text) * 100 - 101300   'Press total [Pa] abs. inlet flange                                           
-                        cond(4).Ps1 = Convert.ToDouble(TextBox91.Text) * 100 - 101300   'Press total [Pa] abs. inlet flange                                 
+                        cond(4).Pt1 = Convert.ToDouble(TextBox91.Text) * 100 - 101325   'Press total [Pa] abs. inlet flange                                           
+                        cond(4).Ps1 = Convert.ToDouble(TextBox91.Text) * 100 - 101325   'Press total [Pa] abs. inlet flange                                 
                         cond(4).Rpm1 = n2                                               '[rpm]          
                         cond(4).Qkg = NumericUpDown3.Value                              '[kg/hr]       
                         cond(4).Ro1 = NumericUpDown12.Value                             '[kg/m3] density inlet flange       
@@ -2526,12 +2526,11 @@ Public Class Form1
         distance = 1    '[m]
         Return (power - Abs(10 * Log10(1 / (4 * PI * distance ^ 2))))
     End Function
-
-
     'Calculate density
     '1= inlet, 2= outlet
     'Temperatures in celsius
     'Pressure in Pascal absolute
+
     Private Function calc_density(density1 As Double, pressure1 As Double, pressure2 As Double, temperature1 As Double, temperature2 As Double)
         Dim density2 As Double
 
@@ -2543,6 +2542,12 @@ Public Class Form1
 
         density2 = density1 * (pressure2 / pressure1) * ((temperature1 + 273.15) / (temperature2 + 273.15))
         Return (density2)
+    End Function
+
+    'Calculate density at Normal Conditions
+    'Normaal condities; 0 celsius, 101325 Pascal
+    Private Function calc_Normal_density(density1 As Double, pressure As Double, temperature As Double)
+        Return (density1 * (pressure / 101325) * (273.15 / (temperature + 273.15)))
     End Function
     'Calculate the labyrinth loss
     Private Sub Button10_Click(sender As Object, e As EventArgs) Handles Button10.Click, NumericUpDown55.ValueChanged, NumericUpDown54.ValueChanged, NumericUpDown53.ValueChanged, NumericUpDown52.ValueChanged, NumericUpDown51.ValueChanged, NumericUpDown50.ValueChanged, TabPage9.Enter
@@ -2611,7 +2616,7 @@ Public Class Form1
 
         y.Ackeret = 1 - 0.5 * (1.0 - Tschets(y.Typ).werkp_opT(0) / 100) * Pow((1 + (T_reynolds / y.Reynolds)), 0.2)
 
-        y.Ro2 = calc_density(y.Ro1, (y.Pt1 + 101300), (y.Pt2 + 101300), y.T1, y.T2) 'Ro outlet flange fan
+        y.Ro2 = calc_density(y.Ro1, (y.Pt1 + 101325), (y.Pt2 + 101325), y.T1, y.T2) 'Ro outlet flange fan
     End Sub
 
     Private Sub calc_loop_loss(ByRef x As Stage)
@@ -2639,7 +2644,7 @@ Public Class Form1
 
         x.Pt3 = x.Pt2 - x.loop_loss                                             '[Pa]
         x.Ps3 = x.Ps2 - x.loop_loss
-        x.Ro3 = calc_density(x.Ro1, (x.Pt1 + 101300), (x.Pt3 + 101300), x.T1, x.T2)
+        x.Ro3 = calc_density(x.Ro1, (x.Pt1 + 101325), (x.Pt3 + 101325), x.T1, x.T2)
     End Sub
 
     Public Function Trend(Data() As PPOINT, ByVal Degree As Integer) As PPOINT()
@@ -3021,7 +3026,10 @@ Public Class Form1
         Catch ex As Exception
         End Try
     End Sub
-
+    'Calculate Normal conditions
+    Private Sub Button14_Click(sender As Object, e As EventArgs) Handles Button14.Click, NumericUpDown64.ValueChanged, NumericUpDown60.ValueChanged, NumericUpDown47.ValueChanged
+        TextBox263.Text = Round(calc_Normal_density(NumericUpDown47.Value, NumericUpDown64.Value, NumericUpDown60.Value), 3) 'Normal Conditions
+    End Sub
 
     Public Sub MxGaussJordan(Matrix(,) As Double)
 
