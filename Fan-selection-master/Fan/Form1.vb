@@ -590,7 +590,7 @@ Public Class Form1
                 '---------------- VTK selectie 95.2 gegevens------------------
                 TextBox208.Text = Round(G_Debiet_z_act_sec, 2).ToString     'Capaciteit actual [m3/sec]
                 TextBox260.Text = NumericUpDown4.Value                      'Temperatuur inlet
-                TextBox261.Text = Round(calc_Normal_density(NumericUpDown12.Value, P_zuig_Pa_static, G_air_temp), 3) 'Normal Conditions
+                TextBox261.Text = Round(calc_Normal_density(NumericUpDown12.Value, P_zuig_Pa_static, G_air_temp), 4) 'Normal Conditions
 
                 '---------- Calc Static + total Pressure -----------------------
                 Ttype = ComboBox1.SelectedIndex
@@ -609,7 +609,7 @@ Public Class Form1
                 TextBox16.Text = Round(G_temp_uit_c, 0).ToString                        'Temp uit
                 TextBox23.Text = Round(P_pers_Pa_static / 100, 0).ToString              'Static Pers druk in mbar abs
                 TextBox152.Text = Round(P_pers_Pa_total / 100, 0).ToString              'Total druk in mbar abs
-                TextBox25.Text = Round(G_density_act_pers, 3).ToString
+                TextBox25.Text = Round(G_density_act_pers, 4).ToString
                 TextBox26.Text = Round(G_omtrek_s, 0).ToString                          'Omtrek snelheid [m/s]
                 TextBox217.Text = Round(G_omtrek_s / Vel_Mach(G_air_temp), 2).ToString  'Omtrek snelheid [M]
                 TextBox28.Text = Round(G_Debiet_p * 3600, 0).ToString                   'Pers debiet is kleiner dan zuig debiet door drukverhoging
@@ -684,7 +684,7 @@ Public Class Form1
                 TextBox54.Text = Round(cond(1).T2, 0).ToString                                  'Temp uit [c]
                 TextBox81.Text = Round((cond(1).delta_pt / 100), 1).ToString                    'dP_Total  [mbar]
                 TextBox150.Text = Round((cond(1).delta_ps / 100), 1).ToString                   'dp_Static [mbar]
-                TextBox151.Text = Round(((cond(1).Pt2 - cond(1).Ps2) / 100), 0).ToString        'dynamic press [mbar]
+                TextBox151.Text = Round(((cond(1).Pt2 - cond(1).Ps2) / 100), 1).ToString        'dynamic press [mbar]
                 TextBox83.Text = Round(cond(1).Q1 * 3600.0, 0).ToString                         'Debiet inlet [m3/hr]
                 TextBox157.Text = Round(cond(1).Qkg, 0).ToString                                'Debiet [kg/hr]
                 TextBox76.Text = Round(cond(1).Om_velos, 0).ToString                            'Omtrek snelheid [m/s]
@@ -2532,21 +2532,23 @@ Public Class Form1
     'Pressure in Pascal absolute
 
     Private Function calc_density(density1 As Double, pressure1 As Double, pressure2 As Double, temperature1 As Double, temperature2 As Double)
-        Dim density2 As Double
-
         ' MessageBox.Show(density1.ToString & " " & pressure1.ToString & "  " & temperature1.ToString)
+        'If (pressure1 < 80000) Or (pressure1 < 80000) Then
+        '    MessageBox.Show("Density calculation warning Pressure must be in Pa absolute")
+        'End If
 
-        If (pressure1 < 80000) Or (pressure1 < 80000) Then
-            MessageBox.Show("Density calculation warning Pressure must be in Pa absolute")
-        End If
-
-        density2 = density1 * (pressure2 / pressure1) * ((temperature1 + 273.15) / (temperature2 + 273.15))
-        Return (density2)
+        Return (density1 * (pressure2 / pressure1) * ((temperature1 + 273.15) / (temperature2 + 273.15)))
     End Function
 
     'Calculate density at Normal Conditions
     'Normaal condities; 0 celsius, 101325 Pascal
     Private Function calc_Normal_density(density1 As Double, pressure As Double, temperature As Double)
+        Return (density1 * (101325 / pressure) * ((temperature + 273.15) / 273.15))
+    End Function
+
+    'Calculate density at Actual Conditions
+    'Normaal condities; 0 celsius, 101325 Pascal
+    Private Function calc_Actual_density(density1 As Double, pressure As Double, temperature As Double)
         Return (density1 * (pressure / 101325) * (273.15 / (temperature + 273.15)))
     End Function
     'Calculate the labyrinth loss
@@ -3026,9 +3028,20 @@ Public Class Form1
         Catch ex As Exception
         End Try
     End Sub
-    'Calculate Normal conditions
+    'Calculate Actula-> Normal conditions
+    'http://www.engineeringtoolbox.com/scfm-acfm-icfm-d_1012.html
     Private Sub Button14_Click(sender As Object, e As EventArgs) Handles Button14.Click, NumericUpDown64.ValueChanged, NumericUpDown60.ValueChanged, NumericUpDown47.ValueChanged
-        TextBox263.Text = Round(calc_Normal_density(NumericUpDown47.Value, NumericUpDown64.Value, NumericUpDown60.Value), 3) 'Normal Conditions
+        TextBox263.Text = Round(calc_Normal_density(NumericUpDown47.Value, NumericUpDown64.Value, NumericUpDown60.Value), 4) 'Normal Conditions
+    End Sub
+    'Calculate Normal-> Actual conditions
+    'http://www.engineeringtoolbox.com/scfm-acfm-icfm-d_1012.html
+    Private Sub Button15_Click(sender As Object, e As EventArgs) Handles Button15.Click, NumericUpDown71.ValueChanged, NumericUpDown70.ValueChanged, NumericUpDown68.ValueChanged
+        TextBox264.Text = Round(calc_Actual_density(NumericUpDown68.Value, NumericUpDown71.Value, NumericUpDown70.Value), 4) 'Actual conditions
+    End Sub
+    'Pressure Units conversion
+    Private Sub Button16_Click(sender As Object, e As EventArgs) Handles Button16.Click, NumericUpDown65.ValueChanged
+        TextBox265.Text = Round(NumericUpDown65.Value * 9.80665, 0)           'Pascal
+        TextBox266.Text = Round(NumericUpDown65.Value * 9.80665 / 100, 2)     'mbar
     End Sub
 
     Public Sub MxGaussJordan(Matrix(,) As Double)
@@ -3063,6 +3076,11 @@ Public Class Form1
             Next
         Next
     End Sub
+
+    Private Sub Button17_Click(sender As Object, e As EventArgs) Handles Button17.Click
+        draw_chart5()   'Draw the cases
+    End Sub
+
     Private Sub calc_emotor_4P()
         'see http://ecatalog.weg.net/files/wegnet/WEG-specification-of-electric-motors-50039409-manual-english.pdf
         'see http://electrical-engineering-portal.com/calculation-of-motor-starting-time-as-first-approximation
@@ -3215,6 +3233,109 @@ Public Class Form1
         End Select
         Return (motor_inertia)
     End Function
+    'Different Cases
 
+    Private Sub draw_chart5()
+        Dim hh As Integer
+
+        Try
+            'Clear all series And chart areas so we can re-add them
+            Chart1.Series.Clear()
+            Chart1.ChartAreas.Clear()
+            Chart1.Titles.Clear()
+
+            Chart5.Series.Add("Series0")    'Total Pressure 
+            Chart5.Series.Add("Series1")    'Efficiency
+            Chart5.Series.Add("Series2")    'Power
+            Chart5.Series.Add("Series3")    'Market dot
+            Chart5.Series.Add("Series4")    'Line resistance
+            Chart5.Series.Add("Series5")    'Pressure static
+
+            Chart5.ChartAreas.Add("ChartArea0")
+            Chart5.Series(0).ChartArea = "ChartArea0"
+            Chart5.Series(1).ChartArea = "ChartArea0"
+            Chart5.Series(2).ChartArea = "ChartArea0"
+            Chart5.Series(3).ChartArea = "ChartArea0"
+            Chart5.Series(4).ChartArea = "ChartArea0"
+            Chart5.Series(5).ChartArea = "ChartArea0"
+
+            Chart5.Series(0).ChartType = DataVisualization.Charting.SeriesChartType.Line
+            Chart5.Series(1).ChartType = DataVisualization.Charting.SeriesChartType.Line
+            Chart5.Series(2).ChartType = DataVisualization.Charting.SeriesChartType.Line
+            Chart5.Series(3).ChartType = DataVisualization.Charting.SeriesChartType.Line
+            Chart5.Series(4).ChartType = DataVisualization.Charting.SeriesChartType.Line
+            Chart5.Series(5).ChartType = DataVisualization.Charting.SeriesChartType.Line
+
+            Chart5.Titles.Add("hhh")
+            Chart5.Titles(0).Font = New Font("Arial", 16, System.Drawing.FontStyle.Bold)
+
+            Chart5.Series(0).Name = "P static [mBar]"
+            Chart5.Series(1).Name = "P static [mBar]"
+            Chart5.Series(2).Name = "P static [mBar]"
+            Chart5.Series(3).Name = "P static [mBar]"
+            Chart5.Series(4).Name = "Power [kW]"
+            Chart5.Series(5).Name = "Power [kW]"
+
+
+            Chart5.ChartAreas("ChartArea0").AxisX.Minimum = 0
+            Chart5.ChartAreas("ChartArea0").AxisX.MinorTickMark.Enabled = True
+            Chart5.ChartAreas("ChartArea0").AxisY.MinorTickMark.Enabled = True
+            Chart5.ChartAreas("ChartArea0").AxisY2.MinorTickMark.Enabled = True
+
+            Chart5.ChartAreas("ChartArea0").AxisY.Title = "Pressure [mBar]"
+            Chart5.ChartAreas("ChartArea0").AlignmentOrientation = DataVisualization.Charting.AreaAlignmentOrientations.Vertical
+            Chart5.ChartAreas("ChartArea0").AxisY2.Enabled = AxisEnabled.True
+            Chart5.ChartAreas("ChartArea0").AxisY2.Title = "Shaft power [kW]"
+
+            Chart5.Series(0).YAxisType = AxisType.Primary
+            Chart5.Series(1).YAxisType = AxisType.Secondary
+            Chart5.Series(2).YAxisType = AxisType.Secondary
+            Chart5.Series(3).YAxisType = AxisType.Primary
+            Chart5.Series(4).YAxisType = AxisType.Primary
+            Chart5.Series(5).YAxisType = AxisType.Primary
+
+
+            '------------------ Grafiek tekst en target ---------------------
+            'If CheckBox2.Checked Then               '========Per uur=========
+            '    Q_target = G_Debiet_z_act_hr                                            '[Am3/hr]
+            '    P_target = NumericUpDown37.Value                                        '[mBar] Gewenste fan  gegevens
+            '    Chart5.ChartAreas("ChartArea0").AxisX.Title = "Debiet [Am3/hr]"
+            'Else                                    '========Per seconde=========
+            '    Q_target = G_Debiet_z_act_hr / 3600                                     '[Am3/sec]
+            '    P_target = NumericUpDown37.Value                                        '[mBar] Gewenste fan  gegevens
+            '    Chart5.ChartAreas("ChartArea0").AxisX.Title = "Debiet [Am3/sec]"
+            'End If
+
+            '---------------- add the fan lines-----------------------
+            'If CheckBox1.Checked Then      'Fil chart with Poly lines
+            '    For hh = 0 To 50
+            '        debiet = chart5_flow(hh)
+            '        If CheckBox2.Checked Then debiet = Round(debiet * 3600, 1)      'Per uur
+
+            '        Chart5.Series(0).Points.AddXY(debiet, Round(chart5_Ptot(hh), 1))
+            '        Chart5.Series(5).Points.AddXY(debiet, Round(chart5_Pstat(hh), 1))
+
+            '        If CheckBox7.Checked Then Chart5.Series(1).Points.AddXY(debiet, Round(chart5_Efficiency(hh), 1))    'efficiency
+            '        If CheckBox8.Checked Then Chart5.Series(2).Points.AddXY(debiet, Round(chart5_Power(hh), 1))         'Power
+            '    Next hh
+            'Else                        'Fill chart with Tschets data
+            'For hh = 0 To 10
+            '    debiet = Tschets(Tschets_no).TFlow_scaled(hh)
+            '    If CheckBox2.Checked Then debiet = Round(debiet * 3600, 1)      'Per uur
+            '    Chart5.Series(0).Points.AddXY(debiet, Round(Tschets(Tschets_no).TPtot_scaled(hh), 2))
+            '    Chart5.Series(5).Points.AddXY(debiet, Round(Tschets(Tschets_no).TPstat_scaled(hh), 2))
+            '    If CheckBox7.Checked Then Chart5.Series(1).Points.AddXY(debiet, Round(Tschets(Tschets_no).Teff_scaled(hh), 1))
+            '    If CheckBox8.Checked Then Chart5.Series(2).Points.AddXY(debiet, Round(Tschets(Tschets_no).Tverm_scaled(hh), 1))
+            'Next hh
+            'End If
+
+            '-------------------Target dot ---------------------
+
+            Chart5.Refresh()
+        Catch ex As Exception
+            'MessageBox.Show(ex.Message &"Line 3332")  ' Show the exception's message.
+        End Try
+
+    End Sub
 
 End Class
