@@ -3057,9 +3057,6 @@ Public Class Form1
     'Save Case button is hit
     Private Sub Button18_Click_1(sender As Object, e As EventArgs) Handles Button18.Click
 
-        Button11_Click(sender, New System.EventArgs())  'Draw chart1
-        Button17_Click(sender, New System.EventArgs())  'Draw chart5
-
         '----------- Varable------------------
         case_x_conditions(0, 10) = "Case name"
         case_x_conditions(1, 10) = "Model"
@@ -3136,16 +3133,21 @@ Public Class Form1
         case_x_conditions(15, NumericUpDown72.Value) = TextBox203.Text                  'Total dP [mbar.g]
         case_x_conditions(16, NumericUpDown72.Value) = TextBox78.Text                   'Shaft power [kW]
 
+        Button11_Click(sender, New System.EventArgs())  'Draw chart1 (calculate the data points before storage)
+
         '----------- chart data -------------------
         For hh = 0 To 50
             case_x_flow(hh, NumericUpDown72.Value) = case_x_flow(hh, 0)
             case_x_Pstat(hh, NumericUpDown72.Value) = case_x_Pstat(hh, 0)
             case_x_Power(hh, NumericUpDown72.Value) = case_x_Power(hh, 0)
         Next hh
+
+        Button17_Click(sender, New System.EventArgs())  'Draw chart5
     End Sub
     'Case number is changed
     Private Sub NumericUpDown72_ValueChanged(sender As Object, e As EventArgs) Handles NumericUpDown72.ValueChanged
         TextBox89.Text = case_x_conditions(0, NumericUpDown72.Value)
+
     End Sub
 
     Private Sub calc_emotor_4P()
@@ -3304,63 +3306,83 @@ Public Class Form1
 
     Private Sub draw_chart5()
         Dim hh, case_j As Integer
+        Dim case_counter As Integer = 0
         Dim debiet As Double
 
-        Try
-            Chart5.Series.Clear()
-            Chart5.ChartAreas.Clear()
-            Chart5.Titles.Clear()
-            Chart5.ChartAreas.Add("ChartArea0")
+        Chart5.Series.Clear()
+        Chart5.Titles.Clear()
+        Chart5.ChartAreas.Clear()
+        Chart5.ChartAreas.Add("ChartArea0")
 
-            For hh = 0 To 16                                '16 lines=(8x pressure + 8x power)
-                Chart5.Series.Add("Series" & hh.ToString)
-                Chart5.Series(hh).ChartArea = "ChartArea0"
-                Chart5.Series(hh).ChartType = DataVisualization.Charting.SeriesChartType.Line
-                Chart5.Series(hh).IsVisibleInLegend = False
-                'Chart5.Series(hh).Name = "P static [mBar]"
+        Try
+            For hh = 1 To 9 'Determine how many cases there are
+                If Not String.IsNullOrEmpty(case_x_conditions(0, hh)) Then case_counter += 1
             Next
 
-            Chart5.Titles.Add("Pressure Chart")
+            '---------- Pressure cases  ------------------
+            For hh = 1 To (case_counter)
+                Chart5.Series.Add("Pressure " & case_x_conditions(0, hh))
+                Chart5.Series(hh - 1).ChartArea = "ChartArea0"
+                Chart5.Series(hh - 1).IsVisibleInLegend = True
+                Chart5.Series(hh - 1).BorderWidth = 1
+            Next
+
+
+            '---------- Power cases ------------------
+            For hh = 1 To (case_counter)
+                Chart5.Series.Add("Power " & case_x_conditions(0, hh))
+                Chart5.Series(hh - 1).ChartArea = "ChartArea0"
+                Chart5.Series(hh - 1).IsVisibleInLegend = True
+                Chart5.Series(hh - 1).BorderWidth = 1
+            Next
+
+
+            'Chart5.Series(0).Legend = "Legend2"
+
+            Chart5.Titles.Add("Static Pressure and power")
             Chart5.Titles(0).Font = New Font("Arial", 16, System.Drawing.FontStyle.Bold)
+
 
             Chart5.ChartAreas("ChartArea0").AxisX.Minimum = 0
             Chart5.ChartAreas("ChartArea0").AxisX.MinorTickMark.Enabled = True
             Chart5.ChartAreas("ChartArea0").AxisY.MinorTickMark.Enabled = True
             Chart5.ChartAreas("ChartArea0").AxisY2.MinorTickMark.Enabled = True
 
+
             Chart5.ChartAreas("ChartArea0").AxisY.Title = "Pressure [mBar]"
             Chart5.ChartAreas("ChartArea0").AlignmentOrientation = DataVisualization.Charting.AreaAlignmentOrientations.Vertical
             Chart5.ChartAreas("ChartArea0").AxisY2.Enabled = AxisEnabled.True
             Chart5.ChartAreas("ChartArea0").AxisY2.Title = "Shaft power [kW]"
 
-            'Chart5.Series(0).YAxisType = AxisType.Primary
-            'Chart5.Series(1).YAxisType = AxisType.Secondary
-            'Chart5.Series(2).YAxisType = AxisType.Secondary
-            'Chart5.Series(3).YAxisType = AxisType.Primary
-            'Chart5.Series(4).YAxisType = AxisType.Primary
-            'Chart5.Series(5).YAxisType = AxisType.Primary
+            'TextBox267.Clear()
+            'For case_j = 0 To 8                'Plot the cases 1...8
+            '    TextBox267.AppendText("case_j " & case_j.ToString & " " & case_x_Pstat(0, case_j) & vbCrLf)
+            'Next
 
             '----------------------------- pressure-----------------------
-            For case_j = 0 To 8                    'Plot the cases 1...8
-                'Chart5.Series(case_j).Name = "hhh"
+            For case_j = 1 To (case_counter)                  'Plot the cases 1...8
+                Chart5.Series(case_j - 1).ChartType = DataVisualization.Charting.SeriesChartType.Line
                 For hh = 0 To 50
                     debiet = case_x_flow(hh, case_j) * 3600 '/hr
-                    Chart5.Series(case_j).Points.AddXY(debiet, Round(case_x_Pstat(hh, case_j), 1))
+                    Chart5.Series(case_j - 1).Points.AddXY(debiet, Round(case_x_Pstat(hh, case_j), 1))
+                    'TextBox267.AppendText("case_j " & case_j.ToString & " " & case_x_flow(hh, case_j) & " " & case_x_Pstat(hh, case_j) & vbCrLf)
                 Next hh
             Next case_j
 
-            ''----------------------------- power-----------------------
-            For case_j = 0 To 8                    'Plot the cases 1...8
+            '----------------------------- power-----------------------
+            For case_j = 1 To (case_counter)                 'Plot the cases 1...8
+                Chart5.Series(case_j - 1 + case_counter).ChartType = DataVisualization.Charting.SeriesChartType.Point
                 For hh = 0 To 50
                     debiet = case_x_flow(hh, case_j) * 3600 '/hr
-                    Chart5.Series(case_j + 8).Points.AddXY(debiet, Round(case_x_Power(hh, case_j), 1))
+                    Chart5.Series(case_j - 1 + case_counter).Points.AddXY(debiet, Round(case_x_Power(hh, case_j), 1))
+                    'TextBox267.AppendText("case_j " & case_j.ToString & " " & case_x_flow(hh, case_j) & " " & case_x_Pstat(hh, case_j) & vbCrLf)
                 Next hh
             Next case_j
 
 
             Chart5.Refresh()
         Catch ex As Exception
-            MessageBox.Show(ex.Message & "Line 3332")  ' Show the exception's message.
+            'MessageBox.Show(ex.Message & "Line 3332")  ' Show the exception's message.
         End Try
 
     End Sub
