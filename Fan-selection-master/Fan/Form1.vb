@@ -644,9 +644,12 @@ Public Class Form1
                 cond(1).T1 = G_air_temp                             '[c]
                 cond(1).Dia1 = NumericUpDown33.Value                '[mm]
                 cond(1).Rpm1 = NumericUpDown13.Value                '[rpm]
-                cond(1).Qkg = NumericUpDown3.Value                  '[kg/hr]
-
                 cond(1).Ro1 = NumericUpDown12.Value                 'density [kg/m3] inlet flange
+
+                '---------- Massa flow = Actual Volume flow * actual soortelijk gewicht 
+                cond(1).Qkg = Scale_rule_cap(cond(1).Q0, cond(1).Dia0, cond(1).Dia1, cond(1).Rpm0, cond(1).Rpm1) * cond(1).Ro1 * 3600
+
+
                 cond(1).Pt1 = P_zuig_Pa_static - 101325             '[PaG] inlet flange waaier #1           
                 cond(1).Ps1 = P_zuig_Pa_static - 101325             '[PaG] inlet flange waaier #1
                 cond(1).Power0 = Tschets(cond(1).Typ).werkp_opT(3)  '[Am3/s] Tschets
@@ -2562,7 +2565,7 @@ Public Class Form1
         Dim area_uitlaat_flens As Double
 
         '---------- snelheden inlaat en uitlaat----------------
-        '---Note; Voor Q1 en Q2 speelt het sg medum !!!!!!!!!!
+        '---Note; Voor Q1 en Q2 speelt het sg geen rol !!!!!!!!!!
         '------------------------------------------------------
         y.zuig_dia = Round(Tschets(y.Typ).Tdata(3) * y.Dia1 / y.Dia0, 0)        'Zuigmond diameter.
         y.in_velos = y.Q1 / (PI / 4 * (y.zuig_dia / 1000) ^ 2)                  'Zuigmond snelheid
@@ -2780,7 +2783,7 @@ Public Class Form1
         oPara2.Range.Font.Size = 11
         oPara2.Format.SpaceAfter = 2
         oPara2.Range.Font.Bold = False
-        oPara2.Range.Text = "This torsional analyses is based on the Holzer method" & vbCrLf
+        oPara2.Range.Text = "This torsional analyses is (API-673) based on the Holzer method" & vbCrLf
         oPara2.Range.InsertParagraphAfter()
 
         '----------------------------------------------
@@ -2807,7 +2810,7 @@ Public Class Form1
 
         '----------------------------------------------
         'Insert a 6 x 3 table, fill it with data and change the column widths.
-        oTable = oDoc.Tables.Add(oDoc.Bookmarks.Item("\endofdoc").Range, 7, 3)
+        oTable = oDoc.Tables.Add(oDoc.Bookmarks.Item("\endofdoc").Range, 7, 5)
         oTable.Range.ParagraphFormat.SpaceAfter = 1
         oTable.Range.Font.Size = 11
         oTable.Range.Font.Bold = False
@@ -2830,19 +2833,28 @@ Public Class Form1
         oTable.Cell(4, 3).Range.Text = "[kg.m2]"
 
         oTable.Cell(5, 1).Range.Text = "Shaft stiffness"
-        oTable.Cell(5, 2).Range.Text = TextBox258.Text
-        oTable.Cell(5, 3).Range.Text = "[k.N.m/°]"
+        oTable.Cell(5, 2).Range.Text = TextBox259.Text
+        oTable.Cell(5, 3).Range.Text = "[N.m/rad]"
+        oTable.Cell(5, 4).Range.Text = TextBox258.Text
+        oTable.Cell(5, 5).Range.Text = "[k.N.m/°]"
 
         oTable.Cell(6, 1).Range.Text = "Coupling stiffness"
-        oTable.Cell(6, 2).Range.Text = TextBox257.Text
-        oTable.Cell(6, 3).Range.Text = "[k.N.m/°]"
+        oTable.Cell(6, 2).Range.Text = NumericUpDown44.Value
+        oTable.Cell(6, 3).Range.Text = "[N.m/rad]"
+        oTable.Cell(6, 4).Range.Text = TextBox257.Text
+        oTable.Cell(6, 5).Range.Text = "[k.N.m/°]"
 
         oTable.Cell(7, 1).Range.Text = "First natural speed"
         oTable.Cell(7, 2).Range.Text = TextBox84.Text
         oTable.Cell(7, 3).Range.Text = "[rpm]"
 
-        oTable.Columns.Item(1).Width = oWord.InchesToPoints(2.5)   'Change width of columns 1 & 2.
-        oTable.Columns.Item(2).Width = oWord.InchesToPoints(1)
+        oTable.Columns.Item(1).Width = oWord.InchesToPoints(2.0)   'Change width of columns 1 & 2.
+        oTable.Columns.Item(2).Width = oWord.InchesToPoints(0.8)
+        oTable.Columns.Item(3).Width = oWord.InchesToPoints(0.9)
+        oTable.Columns.Item(4).Width = oWord.InchesToPoints(0.6)
+        oTable.Columns.Item(5).Width = oWord.InchesToPoints(0.8)
+
+
         oDoc.Bookmarks.Item("\endofdoc").Range.InsertParagraphAfter()
 
         '------------------save picture ---------------- 
@@ -3051,7 +3063,7 @@ Public Class Form1
         Next
     End Sub
 
-    Private Sub Button17_Click(sender As Object, e As EventArgs) Handles Button17.Click, TabPage14.Enter
+    Private Sub Button17_Click(sender As Object, e As EventArgs) Handles Button17.Click, TabPage14.Enter, CheckBox9.CheckedChanged, CheckBox5.CheckedChanged
         draw_chart5()   'Draw the cases
     End Sub
     'Save Case button is hit
@@ -3073,7 +3085,7 @@ Public Class Form1
         '----------- outlet data--------------------
         case_x_conditions(9, 10) = "Discharge Flow"
         case_x_conditions(10, 10) = "Discharge Temp."
-        case_x_conditions(11, 10) = "Discharge Pressure"
+        case_x_conditions(11, 10) = "Disch.Pres.static"
         case_x_conditions(12, 10) = "Discharge Density"
 
         '----------- performance-------------------
@@ -3113,24 +3125,24 @@ Public Class Form1
         case_x_conditions(1, NumericUpDown72.Value) = Tschets(ComboBox1.SelectedIndex).Tname 'Model 
         case_x_conditions(2, NumericUpDown72.Value) = NumericUpDown13.Value.ToString    'Speed [rpm]
         case_x_conditions(3, NumericUpDown72.Value) = NumericUpDown33.Value.ToString    'Diameter [mm]
-        case_x_conditions(4, NumericUpDown72.Value) = NumericUpDown3.Value.ToString     'Mass flow [kg/hr]
+        case_x_conditions(4, NumericUpDown72.Value) = TextBox157.Text                   'Mass flow [kg/hr]
 
         '----------- inlet data--------------------
-        case_x_conditions(5, NumericUpDown72.Value) = TextBox22.Text                    'Flow [Am3/hr]
+        case_x_conditions(5, NumericUpDown72.Value) = TextBox83.Text                    'Flow [Am3/hr]
         case_x_conditions(6, NumericUpDown72.Value) = NumericUpDown4.Value.ToString     'Temp [c]
         case_x_conditions(7, NumericUpDown72.Value) = TextBox91.Text                    'Pressure [mbar abs]
         case_x_conditions(8, NumericUpDown72.Value) = NumericUpDown12.Value.ToString    'Density [kg/Am3]
 
         '----------- outlet data--------------------
-        case_x_conditions(9, NumericUpDown72.Value) = NumericUpDown12.Value.ToString    'Flow [Am3/hr]
-        case_x_conditions(10, NumericUpDown72.Value) = TextBox28.Text                   'Temp [c]
+        case_x_conditions(9, NumericUpDown72.Value) = TextBox28.Text                    'Volume Flow [Am3/hr]
+        case_x_conditions(10, NumericUpDown72.Value) = TextBox54.Text                   'Temp uit[c]
         case_x_conditions(11, NumericUpDown72.Value) = TextBox23.Text                   'Static Pressure [mbar abs]
         case_x_conditions(12, NumericUpDown72.Value) = TextBox25.Text                   'Density [kg/Am3]
 
         '----------- performance-------------------
-        case_x_conditions(13, NumericUpDown72.Value) = NumericUpDown37.Value.ToString   'Static dP [mbar.g]
+        case_x_conditions(13, NumericUpDown72.Value) = TextBox150.Text                  'Static dP [mbar.g]
         case_x_conditions(14, NumericUpDown72.Value) = TextBox151.Text                  'Dynamic dP [mbar.g]
-        case_x_conditions(15, NumericUpDown72.Value) = TextBox203.Text                  'Total dP [mbar.g]
+        case_x_conditions(15, NumericUpDown72.Value) = TextBox81.Text                   'Total dP [mbar.g]
         case_x_conditions(16, NumericUpDown72.Value) = TextBox78.Text                   'Shaft power [kW]
 
         Button11_Click(sender, New System.EventArgs())  'Draw chart1 (calculate the data points before storage)
@@ -3323,7 +3335,11 @@ Public Class Form1
             For hh = 1 To (case_counter)
                 Chart5.Series.Add("Pressure " & case_x_conditions(0, hh))
                 Chart5.Series(hh - 1).ChartArea = "ChartArea0"
-                Chart5.Series(hh - 1).IsVisibleInLegend = True
+                If CheckBox9.Checked Then
+                    Chart5.Series(hh - 1).IsVisibleInLegend = True
+                Else
+                    Chart5.Series(hh - 1).IsVisibleInLegend = False
+                End If
                 Chart5.Series(hh - 1).BorderWidth = 1
             Next
 
@@ -3331,33 +3347,36 @@ Public Class Form1
             '---------- Power cases ------------------
             For hh = 1 To (case_counter)
                 Chart5.Series.Add("Power " & case_x_conditions(0, hh))
-                Chart5.Series(hh - 1).ChartArea = "ChartArea0"
-                Chart5.Series(hh - 1).IsVisibleInLegend = True
-                Chart5.Series(hh - 1).BorderWidth = 1
+                Chart5.Series(hh - 1 + case_counter).ChartArea = "ChartArea0"
+                If CheckBox9.Checked Then
+                    Chart5.Series(hh - 1 + case_counter).IsVisibleInLegend = True
+                Else
+                    Chart5.Series(hh - 1 + case_counter).IsVisibleInLegend = False
+                End If
+                Chart5.Series(hh - 1 + case_counter).BorderWidth = 1
             Next
 
 
-            'Chart5.Series(0).Legend = "Legend2"
-
-            Chart5.Titles.Add("Static Pressure and power")
+            If CheckBox5.Checked Then
+                Chart5.Titles.Add("Static Pressure and power")
+            Else
+                Chart5.Titles.Add("Static Pressure")
+            End If
             Chart5.Titles(0).Font = New Font("Arial", 16, System.Drawing.FontStyle.Bold)
 
 
             Chart5.ChartAreas("ChartArea0").AxisX.Minimum = 0
+            Chart5.ChartAreas("ChartArea0").AxisX.Title = "Suction Volume flow [Am3/hr]"
             Chart5.ChartAreas("ChartArea0").AxisX.MinorTickMark.Enabled = True
             Chart5.ChartAreas("ChartArea0").AxisY.MinorTickMark.Enabled = True
-            Chart5.ChartAreas("ChartArea0").AxisY2.MinorTickMark.Enabled = True
 
 
-            Chart5.ChartAreas("ChartArea0").AxisY.Title = "Pressure [mBar]"
+            Chart5.ChartAreas("ChartArea0").AxisY.Title = "Delta Static Pressure [mBar]"
             Chart5.ChartAreas("ChartArea0").AlignmentOrientation = DataVisualization.Charting.AreaAlignmentOrientations.Vertical
             Chart5.ChartAreas("ChartArea0").AxisY2.Enabled = AxisEnabled.True
             Chart5.ChartAreas("ChartArea0").AxisY2.Title = "Shaft power [kW]"
+            Chart5.ChartAreas("ChartArea0").AxisY2.MinorTickMark.Enabled = True
 
-            'TextBox267.Clear()
-            'For case_j = 0 To 8                'Plot the cases 1...8
-            '    TextBox267.AppendText("case_j " & case_j.ToString & " " & case_x_Pstat(0, case_j) & vbCrLf)
-            'Next
 
             '----------------------------- pressure-----------------------
             For case_j = 1 To (case_counter)                  'Plot the cases 1...8
@@ -3365,20 +3384,19 @@ Public Class Form1
                 For hh = 0 To 50
                     debiet = case_x_flow(hh, case_j) * 3600 '/hr
                     Chart5.Series(case_j - 1).Points.AddXY(debiet, Round(case_x_Pstat(hh, case_j), 1))
-                    'TextBox267.AppendText("case_j " & case_j.ToString & " " & case_x_flow(hh, case_j) & " " & case_x_Pstat(hh, case_j) & vbCrLf)
                 Next hh
             Next case_j
 
             '----------------------------- power-----------------------
-            For case_j = 1 To (case_counter)                 'Plot the cases 1...8
-                Chart5.Series(case_j - 1 + case_counter).ChartType = DataVisualization.Charting.SeriesChartType.Point
-                For hh = 0 To 50
-                    debiet = case_x_flow(hh, case_j) * 3600 '/hr
-                    Chart5.Series(case_j - 1 + case_counter).Points.AddXY(debiet, Round(case_x_Power(hh, case_j), 1))
-                    'TextBox267.AppendText("case_j " & case_j.ToString & " " & case_x_flow(hh, case_j) & " " & case_x_Pstat(hh, case_j) & vbCrLf)
-                Next hh
-            Next case_j
-
+            If CheckBox5.Checked Then
+                For case_j = 1 To (case_counter)                 'Plot the cases 1...8
+                    Chart5.Series(case_j - 1 + case_counter).ChartType = DataVisualization.Charting.SeriesChartType.Line
+                    For hh = 0 To 50
+                        debiet = case_x_flow(hh, case_j) * 3600 '/hr
+                        Chart5.Series(case_j - 1 + case_counter).Points.AddXY(debiet, Round(case_x_Power(hh, case_j), 1))
+                    Next hh
+                Next case_j
+            End If
 
             Chart5.Refresh()
         Catch ex As Exception
