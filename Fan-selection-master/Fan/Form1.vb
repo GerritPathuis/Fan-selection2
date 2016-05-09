@@ -705,6 +705,12 @@ Public Class Form1
                 TextBox57.Text = Round(cond(1).in_velos, 1).ToString                            'Inlaat snelheid [m/s]
                 TextBox65.Text = Round(cond(1).uit_velos, 1).ToString                           'Uitlaat snelheid [m/s]
 
+                cond(1).Q2 = cond(1).Qkg / cond(1).Ro2                                          'Debiet pers [Am3/hr]
+
+                TextBox267.Text = Round(cond(1).Q2, 0).ToString                                 'Debiet outlet [Am3/hr]
+                TextBox268.Text = Round(cond(1).Ro2, 3).ToString                                'Density outlet [kg/Am3]
+                TextBox269.Text = Round(cond(1).Qkg / Convert.ToDouble(TextBox261.Text), 0).ToString    ''Debiet pers [Nm3/hr]
+
                 '----------------------- present waaier #1 ------------------------
                 TextBox163.Text = Round(cond(1).Pt1 / 100, 0).ToString          '[mbar] inlet flange
                 TextBox165.Text = Round(cond(1).T2, 0).ToString                 '[c] outlet flange
@@ -3069,7 +3075,7 @@ Public Class Form1
     'Save Case button is hit
     Private Sub Button18_Click_1(sender As Object, e As EventArgs) Handles Button18.Click
 
-        '----------- Varable------------------
+        '----------- Variable------------------
         case_x_conditions(0, 10) = "Case name"
         case_x_conditions(1, 10) = "Model"
         case_x_conditions(2, 10) = "Speed"
@@ -3078,21 +3084,22 @@ Public Class Form1
 
         '----------- inlet data--------------------
         case_x_conditions(5, 10) = "Suction Flow"
-        case_x_conditions(6, 10) = "Suction Temp."
-        case_x_conditions(7, 10) = "Suction Pressure"
-        case_x_conditions(8, 10) = "Suction Density"
+        case_x_conditions(6, 10) = "Suction Flow"
+        case_x_conditions(7, 10) = "Suction Temp."
+        case_x_conditions(8, 10) = "Suction Pressure"
+        case_x_conditions(9, 10) = "Suction Density"
 
         '----------- outlet data--------------------
-        case_x_conditions(9, 10) = "Discharge Flow"
-        case_x_conditions(10, 10) = "Discharge Temp."
-        case_x_conditions(11, 10) = "Disch.Pres.static"
-        case_x_conditions(12, 10) = "Discharge Density"
+        case_x_conditions(10, 10) = "Discharge Flow"
+        case_x_conditions(11, 10) = "Discharge Temp."
+        case_x_conditions(12, 10) = "Disch.Pres.static"
+        case_x_conditions(13, 10) = "Discharge Density"
 
         '----------- performance-------------------
-        case_x_conditions(13, 10) = "Static dP"
-        case_x_conditions(14, 10) = "Dynamic dP"
-        case_x_conditions(15, 10) = "Total dP"
-        case_x_conditions(16, 10) = "Shaft power"
+        case_x_conditions(14, 10) = "dP Static"
+        case_x_conditions(15, 10) = "dP Dynamic"
+        case_x_conditions(16, 10) = "dP Total"
+        case_x_conditions(17, 10) = "Shaft power"
 
         '----------- Units------------------
         '------------------------------------------
@@ -3104,21 +3111,22 @@ Public Class Form1
 
         '----------- inlet data--------------------
         case_x_conditions(5, 11) = "[Am3/hr]"
-        case_x_conditions(6, 11) = "[c]"
-        case_x_conditions(7, 11) = "[mbar abs]"
-        case_x_conditions(8, 11) = "[kg/Am3]"
+        case_x_conditions(6, 11) = "[Nm3/hr]"
+        case_x_conditions(7, 11) = "[c]"
+        case_x_conditions(8, 11) = "[mbar abs]"
+        case_x_conditions(9, 11) = "[kg/Am3]"
 
         '----------- outlet data--------------------
-        case_x_conditions(9, 11) = "[Am3/hr]"
-        case_x_conditions(10, 11) = "[°c]"
-        case_x_conditions(11, 11) = "[mbar abs]"
-        case_x_conditions(12, 11) = "[kg/Am3]"
+        case_x_conditions(10, 11) = "[Am3/hr]"
+        case_x_conditions(11, 11) = "[°c]"
+        case_x_conditions(12, 11) = "[mbar abs]"
+        case_x_conditions(13, 11) = "[kg/Am3]"
 
         '----------- performance-------------------
-        case_x_conditions(13, 11) = "[mbar.g]"
         case_x_conditions(14, 11) = "[mbar.g]"
         case_x_conditions(15, 11) = "[mbar.g]"
-        case_x_conditions(16, 11) = "[kW]"
+        case_x_conditions(16, 11) = "[mbar.g]"
+        case_x_conditions(17, 11) = "[kW]"
 
         '----------- general data------------------
         case_x_conditions(0, NumericUpDown72.Value) = TextBox89.Text                    'Case name 
@@ -3129,21 +3137,22 @@ Public Class Form1
 
         '----------- inlet data--------------------
         case_x_conditions(5, NumericUpDown72.Value) = TextBox83.Text                    'Flow [Am3/hr]
-        case_x_conditions(6, NumericUpDown72.Value) = NumericUpDown4.Value.ToString     'Temp [c]
-        case_x_conditions(7, NumericUpDown72.Value) = TextBox91.Text                    'Pressure [mbar abs]
-        case_x_conditions(8, NumericUpDown72.Value) = NumericUpDown12.Value.ToString    'Density [kg/Am3]
+        case_x_conditions(6, NumericUpDown72.Value) = TextBox269.Text                   'Flow [Nm3/hr]
+        case_x_conditions(7, NumericUpDown72.Value) = NumericUpDown4.Value.ToString     'Temp [c]
+        case_x_conditions(8, NumericUpDown72.Value) = TextBox91.Text                    'Pressure [mbar abs]
+        case_x_conditions(9, NumericUpDown72.Value) = NumericUpDown12.Value.ToString    'Density [kg/Am3]
 
         '----------- outlet data--------------------
-        case_x_conditions(9, NumericUpDown72.Value) = TextBox28.Text                    'Volume Flow [Am3/hr]
-        case_x_conditions(10, NumericUpDown72.Value) = TextBox54.Text                   'Temp uit[c]
-        case_x_conditions(11, NumericUpDown72.Value) = TextBox23.Text                   'Static Pressure [mbar abs]
-        case_x_conditions(12, NumericUpDown72.Value) = TextBox25.Text                   'Density [kg/Am3]
+        case_x_conditions(10, NumericUpDown72.Value) = TextBox267.Text                   'Volume Flow [Am3/hr]
+        case_x_conditions(11, NumericUpDown72.Value) = TextBox54.Text                   'Temp uit[c]
+        case_x_conditions(12, NumericUpDown72.Value) = TextBox23.Text                   'Static Pressure [mbar abs]
+        case_x_conditions(13, NumericUpDown72.Value) = TextBox268.Text                  'Density [kg/Am3]
 
         '----------- performance-------------------
-        case_x_conditions(13, NumericUpDown72.Value) = TextBox150.Text                  'Static dP [mbar.g]
-        case_x_conditions(14, NumericUpDown72.Value) = TextBox151.Text                  'Dynamic dP [mbar.g]
-        case_x_conditions(15, NumericUpDown72.Value) = TextBox81.Text                   'Total dP [mbar.g]
-        case_x_conditions(16, NumericUpDown72.Value) = TextBox78.Text                   'Shaft power [kW]
+        case_x_conditions(14, NumericUpDown72.Value) = TextBox150.Text                  'Static dP [mbar.g]
+        case_x_conditions(15, NumericUpDown72.Value) = TextBox151.Text                  'Dynamic dP [mbar.g]
+        case_x_conditions(16, NumericUpDown72.Value) = TextBox81.Text                   'Total dP [mbar.g]
+        case_x_conditions(17, NumericUpDown72.Value) = TextBox78.Text                   'Shaft power [kW]
 
         Button11_Click(sender, New System.EventArgs())  'Draw chart1 (calculate the data points before storage)
 
