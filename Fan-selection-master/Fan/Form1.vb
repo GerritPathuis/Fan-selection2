@@ -522,13 +522,13 @@ Public Class Form1
                 '--------------- site hoogte---------------
                 'Molgewicht lucht is (Gas_mol_weight) 0,0288 kg/mol
                 'R= algemene gasconstante = 8,3144621
-                P_ambient_Pa = Round(1013.15 * Pow(E, -Gas_mol_weight * 9.81 * site_altitude / (8.3144621 * (G_air_temp + 273.15))), 0) * 100
+                P_ambient_Pa = Round(1013.25 * Pow(E, -Gas_mol_weight * 9.81 * site_altitude / (8.31432 * (G_air_temp + 273.15))), 2) * 100
 
                 '----------- Zuigdruk ----------------
                 P_zuig_Pa_static = P_ambient_Pa - (NumericUpDown6.Value * 100) 'Inlet resctrictions reduce the pressure inside the fan
 
                 P_zuig_Pa_static += P_systeem_Pa
-                TextBox91.Text = Round(P_zuig_Pa_static.ToString / 100, 0)
+                TextBox91.Text = Round(P_zuig_Pa_static / 100, 2).ToString
                 P_pers_Pa_static = P_zuig_Pa_static + G_Pstat_Pa
 
                 '---------------Density berekenen of invullen----------------
@@ -536,7 +536,7 @@ Public Class Form1
                     NumericUpDown12.Enabled = False
                     G_density_act_zuig = calc_sg_air(P_zuig_Pa_static, G_air_temp, Rel_humidity, Gas_mol_weight)       'Actual conditions zuig
                     G_density_N_zuig = calc_sg_air(101325, 0, Rel_humidity, Gas_mol_weight)                     'Normal conditions zuig
-                    NumericUpDown12.Text = Round(G_density_act_zuig, 3).ToString                                'Density zuig
+                    NumericUpDown12.Text = Round(G_density_act_zuig, 5).ToString                                'Density zuig
                     NumericUpDown12.BackColor = Color.White         'Density invullen
                     NumericUpDown1.BackColor = Color.Yellow         'Whole system under pressure
                     NumericUpDown6.BackColor = Color.Yellow         'dp inlet ascessories
@@ -1577,9 +1577,9 @@ Public Class Form1
                 NumericUpDown8.Value = 28.96                'According ISO6972 for dry air
                 Label96.Text = "Air"
                 NumericUpDown8.BackColor = Color.White
-            Case RadioButton2.Checked
+            Case RadioButton2.Checked                       'Medium is gas, mol weight is entered
                 Label96.Text = "Enter mol whgt"
-                NumericUpDown8.BackColor = Color.Yellow     'Medium is gas
+                NumericUpDown8.BackColor = Color.Yellow
         End Select
 
         '---------------- We assume that above the 100c the air is dry ----------------------------
@@ -1597,6 +1597,11 @@ Public Class Form1
             p1 = Pow(10, (8.14019 - (1810.94 / (244.485 + T)))) * 133.322368
         End If
 
+        If RadioButton1.Checked Or RadioButton2.Checked Then
+            RH = 0              'RH is not calculated
+            p1 = 0              'Partial pressure water not calculated    
+        End If
+
         p1 = p1 * RH / 100
         p2 = P - p1
 
@@ -1604,6 +1609,7 @@ Public Class Form1
         'gecontroleerd tegen http://www.denysschen.com/catalogue/density.aspx --------
         'Algmene Gasconstante is 8314,32
         '8314,32/28.8= 288.69
+
 
         sg1 = p1 / (461.495 * (T + 273.15))             'Water vapor
         sg2 = p2 / (8.31432 / MG * (T + 273.15))        'Droge lucht
@@ -3168,7 +3174,12 @@ Public Class Form1
     'Case number is changed
     Private Sub NumericUpDown72_ValueChanged(sender As Object, e As EventArgs) Handles NumericUpDown72.ValueChanged
         TextBox89.Text = case_x_conditions(0, NumericUpDown72.Value)
+    End Sub
 
+    Private Sub Button19_Click(sender As Object, e As EventArgs) Handles Button19.Click, NumericUpDown75.ValueChanged, NumericUpDown74.ValueChanged, NumericUpDown73.ValueChanged
+        'Calculate the density with mol weight and Boltzmann constant
+        'Ro= P * MW /(8.31432 * (T+273))
+        TextBox270.Text = Round(NumericUpDown73.Value * NumericUpDown75.Value / (8.31432 * 1000 * (NumericUpDown74.Value + 273.15)), 5).ToString
     End Sub
 
     Private Sub calc_emotor_4P()
