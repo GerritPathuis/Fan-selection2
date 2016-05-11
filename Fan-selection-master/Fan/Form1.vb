@@ -43,10 +43,10 @@ Public Structure Stage
     Public Q0 As Double         'Debiet inlet [Am3/s] Tschets
     Public Q1 As Double         'Debiet inlet [Am3/s]
     Public Q2 As Double         'Debiet outlet [Am3/s]
-    Public Ro0 As Double        'Density[kg/m3] inlet flange Tschets
-    Public Ro1 As Double        'Density[kg/m3] inlet flange fan
-    Public Ro2 As Double        'Density[kg/m3] outlet flange fan
-    Public Ro3 As Double        'Density[kg/m3] outlet flange loop
+    Public Ro0 As Double        'Density[kg/Am3] inlet flange Tschets
+    Public Ro1 As Double        'Density[kg/Am3] inlet flange fan
+    Public Ro2 As Double        'Density[kg/Am3] outlet flange fan
+    Public Ro3 As Double        'Density[kg/Am3] outlet flange loop
     Public Ps0 As Double        'Statische druk [Pa G] Tschets
     Public Ps1 As Double        'Statische druk [Pa G] inlet flange
     Public Ps2 As Double        'Statische druk [Pa G] outlet flange fan
@@ -89,7 +89,7 @@ End Structure
 Public Class Form1
     Public Tschets(31) As Tmodel            'was 31
     Public section(4) As Shaft_section      'Impeller shaft section
-    Public cp_air As Double = 1.005         'Specific heat air
+    Public cp_air As Double = 1.005         'Specific heat air [kJ/kg.K]
     Public cond(10) As Stage                'Process conditions
     Public PZ(12) As PPOINT                 'Raw data, Polynomial regression
     Public BZ(5, 5) As Double               'Poly Coefficients, Polynomial regression
@@ -521,7 +521,7 @@ Public Class Form1
 
                 '--------------- site hoogte---------------
                 'Molgewicht lucht is (Gas_mol_weight) 0,0288 kg/mol
-                'R= algemene gasconstante = 8,3144621
+                'R= algemene gasconstante = 8,31432
                 P_ambient_Pa = Round(1013.25 * Pow(E, -Gas_mol_weight * 9.81 * site_altitude / (8.31432 * (G_air_temp + 273.15))), 2) * 100
 
                 '----------- Zuigdruk ----------------
@@ -573,11 +573,15 @@ Public Class Form1
                 '---------- as vermogen gewenste waaier-----------
                 G_as_kw = 0.001 * G_Debiet_z_act_sec * G_Ptot_Pa / T_eff    'Go to Kw
 
+                'MessageBox.Show("T uit " & G_temp_uit_c.ToString & " G_as_kw  " & G_as_kw.ToString & " G_Debiet_kg_s " & G_Debiet_kg_s.ToString & " cp_air " & cp_air.ToString)
+
                 '---------- temperaturen, lost power is tranferred to heat -----------
                 G_temp_uit_c = G_air_temp + (G_as_kw / (cp_air * G_Debiet_kg_s))
 
                 '----------------- Actual conditions at discharge ----------------------------
+
                 G_density_act_pers = calc_density(G_density_act_zuig, P_zuig_Pa_static, P_pers_Pa_static, G_air_temp, G_temp_uit_c)
+
 
                 '--------- Kinmatic viscosity air[m2/s]-----------------------
                 G_visco_kin = kin_visco_air(G_air_temp)                         'Kin viscositeit [m2/s]
@@ -655,6 +659,7 @@ Public Class Form1
                 cond(1).Power0 = Tschets(cond(1).Typ).werkp_opT(3)  '[Am3/s] Tschets
 
                 Calc_stage(cond(1))                                 'Bereken de waaier #1  
+                '  MessageBox.Show(cond(1).Ro0.ToString & "  " & cond(1).Ro1.ToString & "  " & cond(1).Ro2.ToString)
                 calc_loop_loss(cond(1))                             'Bereken de omloop verliezen  
 
                 '-------------------------- Waaier #2 ----------------------
@@ -750,9 +755,9 @@ Public Class Form1
                 '-------------------------- Aantal trappen ----------------------
                 Select Case True
                     Case RadioButton12.Checked              '1 trap
-                        GroupBox13.Visible = True
+                        '  GroupBox13.Visible = True
                         GroupBox18.Visible = False
-                        GroupBox24.Visible = True
+                        '  GroupBox24.Visible = True
                         GroupBox40.Visible = False
                         GroupBox43.Visible = False
                         GroupBox44.Visible = False
@@ -760,8 +765,8 @@ Public Class Form1
                         GroupBox46.Visible = False
                     Case RadioButton13.Checked              '2 traps
                         GroupBox18.Visible = True
-                        GroupBox13.Visible = False
-                        GroupBox24.Visible = False
+                        '  GroupBox13.Visible = False
+                        '   GroupBox24.Visible = False
                         GroupBox40.Visible = True
                         GroupBox43.Visible = True
                         GroupBox44.Visible = False
@@ -773,8 +778,8 @@ Public Class Form1
                         TextBox64.Text = Round(cond(2).T2, 0)
                     Case RadioButton14.Checked              '3 traps
                         GroupBox18.Visible = True
-                        GroupBox13.Visible = False
-                        GroupBox24.Visible = False
+                        '   GroupBox13.Visible = False
+                        '   GroupBox24.Visible = False
                         GroupBox40.Visible = True
                         GroupBox43.Visible = True
                         GroupBox44.Visible = True
@@ -1784,10 +1789,10 @@ Public Class Form1
     'Q=Capacity in [m3/s]
     'Speed in [rpm] or [rad/s] or [rps] if used consequently
     'Note; sg medum speelt geen rol !!!!!!!!!!
-    Private Function Scale_rule_cap(QQ1 As Double, Dia0 As Double, Dia1 As Double, n1 As Double, n2 As Double)
+    Private Function Scale_rule_cap(QQ1 As Double, Dia1 As Double, Dia2 As Double, n1 As Double, n2 As Double)
         Dim QQ2 As Double
 
-        QQ2 = QQ1 * (n2 / n1) * (Dia1 / Dia0) ^ 3
+        QQ2 = QQ1 * (n2 / n1) * (Dia2 / Dia1) ^ 3
 
         Return (QQ2)
     End Function
@@ -1798,10 +1803,10 @@ Public Class Form1
     'Diameter in [m]
     'Q=Capacity in [m3/s]
     'Speed in [rpm] or [rad/s] or [rps] if used consequently
-    Private Function Scale_rule_Pressure(Pt1 As Double, Dia0 As Double, Dia1 As Double, n1 As Double, n2 As Double, Ro0 As Double, Ro1 As Double)
+    Private Function Scale_rule_Pressure(Pt1 As Double, Dia1 As Double, Dia2 As Double, n1 As Double, n2 As Double, Ro1 As Double, Ro2 As Double)
         Dim Pt2 As Double
 
-        Pt2 = Pt1 * (n2 / n1) ^ 2 * (Ro1 / Ro0) * (Dia1 / Dia0) ^ 2
+        Pt2 = Pt1 * (n2 / n1) ^ 2 * (Ro2 / Ro1) * (Dia2 / Dia1) ^ 2
 
         Return (Pt2)
     End Function
@@ -1810,10 +1815,10 @@ Public Class Form1
     'Diameter in [m]
     'Q=Capacity in [m3/s]
     'Speed in [rpm] or [rad/s] or [rps] if used consequently
-    Private Function Scale_rule_Power(Power1 As Double, Dia0 As Double, Dia1 As Double, n1 As Double, n2 As Double, Ro0 As Double, Ro1 As Double)
+    Private Function Scale_rule_Power(Power1 As Double, Dia1 As Double, Dia2 As Double, n1 As Double, n2 As Double, Ro1 As Double, Ro2 As Double)
         Dim Power2 As Double
 
-        Power2 = Power1 * (n2 / n1) ^ 3 * (Ro1 / Ro0) * (Dia1 / Dia0) ^ 5
+        Power2 = Power1 * (n2 / n1) ^ 3 * (Ro2 / Ro1) * (Dia2 / Dia1) ^ 5
 
         Return (Power2)
     End Function
@@ -2509,11 +2514,11 @@ Public Class Form1
         End If
     End Sub
     'Convert Sound power to pressure
-    Private Function power_to_pressure(power As Double)
+    Private Function power_to_pressure(sound_power As Double)
         Dim distance As Double
 
         distance = 1    '[m]
-        Return (power - Abs(10 * Log10(1 / (4 * PI * distance ^ 2))))
+        Return (sound_power - Abs(10 * Log10(1 / (4 * PI * distance ^ 2))))
     End Function
     'Calculate density
     '1= inlet, 2= outlet
@@ -2598,7 +2603,8 @@ Public Class Form1
 
         y.Eff = y.Q1 * y.Pt2 / (y.Power * 1000)                                    'Eff =Press*Volume/Power
 
-        y.T2 = y.T1 + (y.Power * 1000 / (cp_air * y.Qkg))                           'Temperature outlet flange [celsius]
+
+        y.T2 = y.T1 + (y.Power * 3600 / (cp_air * y.Qkg))                           'Temperature outlet flange [celsius]
         y.Om_velos = PI * y.Dia1 / 1000 * y.Rpm1 / 60                               'Omtreksnelheid waaier
 
 
@@ -3181,6 +3187,7 @@ Public Class Form1
         'Ro= P * MW /(8.31432 * (T+273))
         TextBox270.Text = Round(NumericUpDown73.Value * NumericUpDown75.Value / (8.31432 * 1000 * (NumericUpDown74.Value + 273.15)), 5).ToString
     End Sub
+
 
     Private Sub calc_emotor_4P()
         'see http://ecatalog.weg.net/files/wegnet/WEG-specification-of-electric-motors-50039409-manual-english.pdf
