@@ -100,6 +100,12 @@ Public Class Form1
 
     Public case_x_conditions(20, 12) As String 'Case name, type, dia, speed for case 1..8, 
     'case10= names, case11= units
+    Public ABCDE_Psta(5) As Double          'ABCD.. formula factors For the Static pressure
+    Public ABCDE_Pdyn(5) As Double          'ABCD.. formula factors For the Dynamic pressure
+    Public ABCDE_Ptot(5) As Double           'ABCD.. formula factors For the Total pressure
+    Public ABCDE_Pow(5) As Double           'ABCD.. formula factors For the power 
+    Public ABCDE_Eff(5) As Double           'ABCD.. formula factors For the Efficiency
+
     Public case_x_flow(50, 8) As Double     'Data storage for case 1..8
     Public case_x_Pstat(50, 8) As Double    'Data storage forcase 1..8
     Public case_x_Ptot(50) As Double        'Data storage for case 0
@@ -390,7 +396,7 @@ Public Class Form1
         Dim site_altitude As Double
         Dim Ttype As Int16                  'Waaier type
         Dim diam1, diam2, nn1, nn2, roo1, roo2 As Double
-        Dim Power_total As Double
+        Dim Power_total, flow As Double
 
         '0-Diameter,1-Toerental,2-Dichtheid,3-Zuigmond diameter,4-Persmond lengte,5-Breedte huis,6-Lengte spiraal,7 breedte pers,8 lengte pers,9-c,10-d,11-e,
         '12-Schoeplengte,13-Aantal schoepen,14-Breedte inwendig,15-Breedte uitwendig,16-Keeldiameter,17-Inw. dia. schoepen,18-Intrede hoek,19-Uittrede hoek
@@ -637,6 +643,42 @@ Public Class Form1
 
                 '========================= 2de Bedrijfspunt===================================================================
                 '=============================================================================================================
+
+                '------------ Calcu Pstatic @ Star-Flow in chart1----------------------------------------------- 
+                Dim star_flow, star_Ptot, star_Psta, star_pow, star_eff, start_dyn As Double
+
+                flow = G_Debiet_z_act_sec
+                star_flow = Round(flow * 3600, 0)
+                star_Psta = (ABCDE_Psta(0) + ABCDE_Psta(1) * flow ^ 1 + ABCDE_Psta(2) * flow ^ 2 + ABCDE_Psta(3) * flow ^ 3 + ABCDE_Psta(4) * flow ^ 4 + ABCDE_Psta(5) * flow ^ 5).ToString
+                star_Ptot = (ABCDE_Ptot(0) + ABCDE_Ptot(1) * flow ^ 1 + ABCDE_Ptot(2) * flow ^ 2 + ABCDE_Ptot(3) * flow ^ 3 + ABCDE_Ptot(4) * flow ^ 4 + ABCDE_Ptot(5) * flow ^ 5).ToString
+                star_pow = (ABCDE_Pow(0) + ABCDE_Pow(1) * flow ^ 1 + ABCDE_Pow(2) * flow ^ 2 + ABCDE_Pow(3) * flow ^ 3 + ABCDE_Pow(4) * flow ^ 4 + ABCDE_Pow(5) * flow ^ 5).ToString
+                star_eff = (ABCDE_Eff(0) + ABCDE_Eff(1) * flow ^ 1 + ABCDE_Eff(2) * flow ^ 2 + ABCDE_Eff(3) * flow ^ 3 + ABCDE_Eff(4) * flow ^ 4 + ABCDE_Eff(5) * flow ^ 5).ToString
+                start_dyn = star_Ptot - star_Psta
+
+                flow = G_Debiet_z_act_sec
+                TextBox272.Text = star_flow
+                TextBox271.Text = Round(star_Psta, 3)
+                TextBox273.Text = Round(star_Ptot, 3)
+                TextBox274.Text = Round(star_pow, 0)
+                TextBox275.Text = Round(star_eff, 2)
+                TextBox75.Text = Round(start_dyn, 1)
+
+
+                cond(1).Typ = ComboBox1.SelectedIndex               '[-]        T_SCHETS
+                cond(1).Q0 = Tschets(cond(1).Typ).werkp_opT(4)      '[Am3/s]    T_SCHETS
+                cond(1).Pt0 = Tschets(cond(1).Typ).werkp_opT(1)     '[PaG]      T_SCHETS Pressure total  
+                cond(1).Ps0 = Tschets(cond(1).Typ).werkp_opT(2)     '[PaG]      T_SCHETS pressure static 
+                cond(1).Dia0 = Tschets(cond(1).Typ).Tdata(0)        '[mm]       T_SCHETS
+                cond(1).Rpm0 = Tschets(cond(1).Typ).Tdata(1)        '[rpm]      T_SCHETS
+                cond(1).Ro0 = Tschets(cond(1).Typ).Tdata(2)         '[kg/m3]    T_SCHETS density inlet flange 
+
+                cond(1).T1 = G_air_temp                             '[c]
+                cond(1).Dia1 = NumericUpDown33.Value                '[mm]
+                cond(1).Rpm1 = NumericUpDown13.Value                '[rpm]
+                cond(1).Ro1 = NumericUpDown12.Value                 'density [kg/m3] inlet flange
+
+
+
                 cond(1).Typ = ComboBox1.SelectedIndex               '[-]        T_SCHETS
                 cond(1).Q0 = Tschets(cond(1).Typ).werkp_opT(4)      '[Am3/s]    T_SCHETS
                 cond(1).Pt0 = Tschets(cond(1).Typ).werkp_opT(1)     '[PaG]      T_SCHETS Pressure total  
@@ -693,13 +735,13 @@ Public Class Form1
                     Direct_eff = cond(1).Eff
                 End If
 
-                TextBox75.Text = Round(Direct_eff, 2).ToString                                  'Efficiency
-                TextBox78.Text = Round(cond(1).Power, 0).ToString                               'As vermogen in [kW]
+                'TextBox75.Text = Round(Direct_eff, 2).ToString                                  'Efficiency
+                'TextBox78.Text = Round(cond(1).Power, 0).ToString                               'As vermogen in [kW]
                 TextBox54.Text = Round(cond(1).T2, 0).ToString                                  'Temp uit [c]
-                TextBox81.Text = Round((cond(1).delta_pt / 100), 1).ToString                    'dP_Total  [mbar]
-                TextBox150.Text = Round((cond(1).delta_ps / 100), 1).ToString                   'dp_Static [mbar]
-                TextBox151.Text = Round(((cond(1).Pt2 - cond(1).Ps2) / 100), 1).ToString        'dynamic press [mbar]
-                TextBox83.Text = Round(cond(1).Q1 * 3600.0, 0).ToString                         'Debiet inlet [m3/hr]
+                ' TextBox273.Text = Round((cond(1).delta_pt / 100), 1).ToString                    'dP_Total  [mbar]
+                'TextBox150.Text = Round((cond(1).delta_ps / 100), 1).ToString                   'dp_Static [mbar]
+                'TextBox151.Text = Round(((cond(1).Pt2 - cond(1).Ps2) / 100), 1).ToString        'dynamic press [mbar]
+                'TextBox83.Text = Round(cond(1).Q1 * 3600.0, 0).ToString                         'Debiet inlet [m3/hr]
                 TextBox157.Text = Round(cond(1).Qkg, 0).ToString                                'Debiet [kg/hr]
                 TextBox76.Text = Round(cond(1).Om_velos, 0).ToString                            'Omtrek snelheid [m/s]
                 TextBox218.Text = Round(cond(1).Om_velos / Vel_Mach(cond(1).T1), 2).ToString    'Omtrek snelheid [M]
@@ -1949,6 +1991,11 @@ Public Class Form1
                     Next
                     t = Trend(PZ, 5)            'calculate the polynoom
 
+                    For j = 0 To 5      'Store the variable for later use
+                        ABCDE_Ptot(j) = BZ(j, 0)
+                    Next
+
+
                     For j = 0 To aantal_Grafiek_punten      'Calculate chart data points
                         flow = j / aantal_Grafiek_punten * max_flow
                         case_x_flow(j, 0) = flow
@@ -1961,6 +2008,11 @@ Public Class Form1
                         PZ(j).y = Tschets(ty).TPstat_scaled(j)
                     Next
                     t = Trend(PZ, 5)        'calculate the polynoom
+
+                    For j = 0 To 5      'Store the variable for later use
+                        ABCDE_Psta(j) = BZ(j, 0)
+                    Next
+
 
                     For j = 0 To aantal_Grafiek_punten      'Calculate chart data points
                         flow = j / aantal_Grafiek_punten * max_flow
@@ -1975,6 +2027,10 @@ Public Class Form1
                     Next
                     t = Trend(PZ, 5)        'calculate the polynoom
 
+                    For j = 0 To 5      'Store the variable for later use
+                        ABCDE_Pow(j) = BZ(j, 0)
+                    Next
+
                     For j = 0 To aantal_Grafiek_punten      'Calculate chart data points
                         flow = j / aantal_Grafiek_punten * max_flow
                         case_x_flow(j, 0) = flow
@@ -1988,6 +2044,11 @@ Public Class Form1
                         PZ(j).y = Tschets(ty).Teff_scaled(j)
                     Next
                     t = Trend(PZ, 5)        'calculate the polynoom
+
+                    For j = 0 To 5      'Store the variable for later use
+                        ABCDE_Eff(j) = BZ(j, 0)
+                    Next
+
 
                     For j = 0 To aantal_Grafiek_punten      'Calculate chart data points
                         flow = j / aantal_Grafiek_punten * max_flow
@@ -2585,7 +2646,7 @@ Public Class Form1
         '---Note; Voor Q1 en Q2 speelt het sg geen rol !!!!!!!!!!
         '------------------------------------------------------
         y.zuig_dia = Round(Tschets(y.Typ).Tdata(3) * y.Dia1 / y.Dia0, 0)        'Zuigmond diameter.
-        y.in_velos = y.Q1 / (PI / 4 * (y.zuig_dia / 1000) ^ 2)                  'Zuigmond snelheid
+        y.in_velos = y.Q1 / (PI / 4 * (y.zuig_dia / 1000) ^ 2)                  'Zuigmond snelheid [m/s]
 
         y.uitlaat_h = Round(Tschets(y.Typ).Tdata(4) * y.Dia1 / y.Dia0, 0)       'Uitlaat hoogte inw.[mm]
         y.uitlaat_b = Round(Tschets(y.Typ).Tdata(5) * y.Dia1 / y.Dia0, 0)       'Uitlaat breedte inw.[mm]
@@ -3148,23 +3209,23 @@ Public Class Form1
         case_x_conditions(4, NumericUpDown72.Value) = TextBox157.Text                   'Mass flow [kg/hr]
 
         '----------- inlet data--------------------
-        case_x_conditions(5, NumericUpDown72.Value) = TextBox83.Text                    'Flow [Am3/hr]
+        case_x_conditions(5, NumericUpDown72.Value) = TextBox272.Text                   'Flow [Am3/hr]
         case_x_conditions(6, NumericUpDown72.Value) = TextBox269.Text                   'Flow [Nm3/hr]
         case_x_conditions(7, NumericUpDown72.Value) = NumericUpDown4.Value.ToString     'Temp [c]
         case_x_conditions(8, NumericUpDown72.Value) = TextBox91.Text                    'Pressure [mbar abs]
         case_x_conditions(9, NumericUpDown72.Value) = NumericUpDown12.Value.ToString    'Density [kg/Am3]
 
         '----------- outlet data--------------------
-        case_x_conditions(10, NumericUpDown72.Value) = TextBox267.Text                   'Volume Flow [Am3/hr]
+        case_x_conditions(10, NumericUpDown72.Value) = TextBox267.Text                  'Volume Flow [Am3/hr]
         case_x_conditions(11, NumericUpDown72.Value) = TextBox54.Text                   'Temp uit[c]
         case_x_conditions(12, NumericUpDown72.Value) = TextBox23.Text                   'Static Pressure [mbar abs]
         case_x_conditions(13, NumericUpDown72.Value) = TextBox268.Text                  'Density [kg/Am3]
 
         '----------- performance-------------------
-        case_x_conditions(14, NumericUpDown72.Value) = TextBox150.Text                  'Static dP [mbar.g]
-        case_x_conditions(15, NumericUpDown72.Value) = TextBox151.Text                  'Dynamic dP [mbar.g]
-        case_x_conditions(16, NumericUpDown72.Value) = TextBox81.Text                   'Total dP [mbar.g]
-        case_x_conditions(17, NumericUpDown72.Value) = TextBox78.Text                   'Shaft power [kW]
+        case_x_conditions(14, NumericUpDown72.Value) = TextBox271.Text                  'Static dP [mbar.g]
+        case_x_conditions(15, NumericUpDown72.Value) = TextBox75.Text                   'Dynamic dP [mbar.g]
+        case_x_conditions(16, NumericUpDown72.Value) = TextBox273.Text                  'Total dP [mbar.g]
+        case_x_conditions(17, NumericUpDown72.Value) = TextBox274.Text                  'Shaft power [kW]
 
         Button11_Click(sender, New System.EventArgs())  'Draw chart1 (calculate the data points before storage)
 
