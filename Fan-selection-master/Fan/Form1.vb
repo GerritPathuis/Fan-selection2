@@ -387,7 +387,6 @@ Public Class Form1
 
         Dim nrq As Integer
         Dim Rel_humidity As Double
-        Dim P_systeem_Pa As Double          'Ring syteem onder druk Pressure abs in [Pa]
         Dim P_ambient_Pa As Double          'Pressure abs in [Pa] static
         Dim P_zuig_Pa_static As Double      'Pressure abs in [Pa] static
         Dim P_pers_Pa_static As Double      'Pressure abs in [Pa] static
@@ -522,20 +521,19 @@ Public Class Form1
                 G_Debiet_kg_hr = NumericUpDown3.Value
                 G_Debiet_kg_s = G_Debiet_kg_hr / 3600       'Gewenst Debiet [kg/sec]
 
-                '---------------- Gesloten systeem onder druk------------------
-                P_systeem_Pa = NumericUpDown1.Value * 100
-
                 '--------------- site hoogte---------------
                 'Molgewicht lucht is (Gas_mol_weight) 0,0288 kg/mol
                 'R= algemene gasconstante = 8,31432
                 P_ambient_Pa = Round(1013.25 * Pow(E, -Gas_mol_weight * 9.81 * site_altitude / (8.31432 * (G_air_temp + 273.15))), 2) * 100
 
                 '----------- Zuigdruk ----------------
-                P_zuig_Pa_static = P_ambient_Pa - (NumericUpDown6.Value * 100) 'Inlet resctrictions reduce the pressure inside the fan
+                P_zuig_Pa_static = NumericUpDown76.Value * 100                      '[Pa abs]
+                TextBox81.Text = Round((P_zuig_Pa_static - 101325) / 100, 2)        '[mbar g]
+                TextBox83.Text = Round((P_zuig_Pa_static - 101325), 2)              '[Pa g]
+                TextBox91.Text = Round((P_zuig_Pa_static - 101325) / 9.80665, 1)    '[Pa g]
 
-                P_zuig_Pa_static += P_systeem_Pa
-                TextBox91.Text = Round(P_zuig_Pa_static / 100, 2).ToString
-                P_pers_Pa_static = P_zuig_Pa_static + G_Pstat_Pa
+                '----------- Persdruk ----------------
+                P_pers_Pa_static = P_zuig_Pa_static + G_Pstat_Pa   '[Pa abs]
 
                 '---------------Density berekenen of invullen----------------
                 If RadioButton3.Checked = True Then     'Density berekenen
@@ -544,8 +542,6 @@ Public Class Form1
                     G_density_N_zuig = calc_sg_air(101325, 0, Rel_humidity, Gas_mol_weight)                     'Normal conditions zuig
                     NumericUpDown12.Text = Round(G_density_act_zuig, 5).ToString                                'Density zuig
                     NumericUpDown12.BackColor = Color.White         'Density invullen
-                    NumericUpDown1.BackColor = Color.Yellow         'Whole system under pressure
-                    NumericUpDown6.BackColor = Color.Yellow         'dp inlet ascessories
                     NumericUpDown5.Visible = True                   'Relative humidity
                     NumericUpDown7.Visible = True                   'Site hoogte
                     Label95.Visible = True                          'Site hoogte
@@ -553,9 +549,7 @@ Public Class Form1
                 Else
                     NumericUpDown12.Enabled = True     'Density invullen             
                     G_density_act_zuig = NumericUpDown12.Value
-                    G_density_N_zuig = calc_sg_air(101325, 0, Rel_humidity, Gas_mol_weight)                     'Normal conditions zuig
-                    NumericUpDown1.BackColor = DefaultBackColor    'Whole system under pressure
-                    NumericUpDown6.BackColor = DefaultBackColor    'dp inlet ascessories
+                    G_density_N_zuig = Round(calc_Normal_density(NumericUpDown12.Value, P_zuig_Pa_static, G_air_temp), 4) 'Normal Conditions                   'Normal conditions zuig
 
                     NumericUpDown12.BackColor = Color.Yellow        'Density invullen
                     NumericUpDown5.Visible = False                  'Relative humidity  
@@ -569,7 +563,7 @@ Public Class Form1
                 G_Debiet_z_act_sec = G_Debiet_kg_s / G_density_act_zuig     'Gewenst Debiet [Am3/hr]
                 G_Debiet_z_act_hr = G_Debiet_z_act_sec * 3600.0             'Gewenst Debiet [Am3/hr]
                 G_Debiet_z_N_hr = G_Debiet_kg_s / G_density_N_zuig * 3600   'Gewenst Debiet [Nm3/hr]
-                G_Debiet_p = G_Debiet_kg_s / G_density_act_pers             'Pers Debiet [Am3/hr]
+
 
                 '----------- calc diameter and rpm gewenste waaier---------------
                 G_omtrek_s = Pow(2 * G_Pstat_Pa / (G_density_act_zuig * T_Staticdruckzahl), 0.5)
@@ -585,9 +579,8 @@ Public Class Form1
                 G_temp_uit_c = G_air_temp + (G_as_kw / (cp_air * G_Debiet_kg_s))
 
                 '----------------- Actual conditions at discharge ----------------------------
-
                 G_density_act_pers = calc_density(G_density_act_zuig, P_zuig_Pa_static, P_pers_Pa_static, G_air_temp, G_temp_uit_c)
-
+                G_Debiet_p = G_Debiet_kg_s / G_density_act_pers             'Pers Debiet [Am3/hr]
 
                 '--------- Kinmatic viscosity air[m2/s]-----------------------
                 G_visco_kin = kin_visco_air(G_air_temp)                         'Kin viscositeit [m2/s]
@@ -637,7 +630,7 @@ Public Class Form1
                 TextBox203.Text = Round(G_Ptot_Pa / 100, 1).ToString                    'Ptotal [mBar] 
                 TextBox72.Text = Round((G_reynolds * 10 ^ -6), 2).ToString
                 TextBox70.Text = visco_temp.ToString                                    'Visco T_schets
-                TextBox74.Text = Round(G_eff, 2).ToString                               'Efficiency
+                TextBox74.Text = Round(G_eff * 100, 1).ToString                               'Efficiency
 
 
 
@@ -657,13 +650,12 @@ Public Class Form1
 
                 flow = G_Debiet_z_act_sec
                 TextBox272.Text = star_flow
-                TextBox271.Text = Round(star_Psta, 3)
-                TextBox273.Text = Round(star_Ptot, 3)
+                TextBox271.Text = Round(star_Psta, 1)
+                TextBox273.Text = Round(star_Ptot, 1)
                 TextBox274.Text = Round(star_pow, 0)
                 TextBox275.Text = Round(star_eff, 2)
                 TextBox75.Text = Round(start_dyn, 1)
 
-
                 cond(1).Typ = ComboBox1.SelectedIndex               '[-]        T_SCHETS
                 cond(1).Q0 = Tschets(cond(1).Typ).werkp_opT(4)      '[Am3/s]    T_SCHETS
                 cond(1).Pt0 = Tschets(cond(1).Typ).werkp_opT(1)     '[PaG]      T_SCHETS Pressure total  
@@ -677,8 +669,6 @@ Public Class Form1
                 cond(1).Rpm1 = NumericUpDown13.Value                '[rpm]
                 cond(1).Ro1 = NumericUpDown12.Value                 'density [kg/m3] inlet flange
 
-
-
                 cond(1).Typ = ComboBox1.SelectedIndex               '[-]        T_SCHETS
                 cond(1).Q0 = Tschets(cond(1).Typ).werkp_opT(4)      '[Am3/s]    T_SCHETS
                 cond(1).Pt0 = Tschets(cond(1).Typ).werkp_opT(1)     '[PaG]      T_SCHETS Pressure total  
@@ -691,13 +681,9 @@ Public Class Form1
                 cond(1).Dia1 = NumericUpDown33.Value                '[mm]
                 cond(1).Rpm1 = NumericUpDown13.Value                '[rpm]
                 cond(1).Ro1 = NumericUpDown12.Value                 'density [kg/m3] inlet flange
-
-                '---------- Massa flow = Actual Volume flow * actual soortelijk gewicht 
-                cond(1).Qkg = Scale_rule_cap(cond(1).Q0, cond(1).Dia0, cond(1).Dia1, cond(1).Rpm0, cond(1).Rpm1) * cond(1).Ro1 * 3600
-
-
-                cond(1).Pt1 = P_zuig_Pa_static - 101325             '[PaG] inlet flange waaier #1           
-                cond(1).Ps1 = P_zuig_Pa_static - 101325             '[PaG] inlet flange waaier #1
+                cond(1).Qkg = NumericUpDown3.Value                  '[kg/hr]
+                cond(1).Pt1 = P_zuig_Pa_static                      '[Pa abs] inlet flange waaier #1           
+                cond(1).Ps1 = P_zuig_Pa_static                      '[Pa abs] inlet flange waaier #1
                 cond(1).Power0 = Tschets(cond(1).Typ).werkp_opT(3)  '[Am3/s] Tschets
 
                 Calc_stage(cond(1))                                 'Bereken de waaier #1  
@@ -735,13 +721,7 @@ Public Class Form1
                     Direct_eff = cond(1).Eff
                 End If
 
-                'TextBox75.Text = Round(Direct_eff, 2).ToString                                  'Efficiency
-                'TextBox78.Text = Round(cond(1).Power, 0).ToString                               'As vermogen in [kW]
                 TextBox54.Text = Round(cond(1).T2, 0).ToString                                  'Temp uit [c]
-                ' TextBox273.Text = Round((cond(1).delta_pt / 100), 1).ToString                    'dP_Total  [mbar]
-                'TextBox150.Text = Round((cond(1).delta_ps / 100), 1).ToString                   'dp_Static [mbar]
-                'TextBox151.Text = Round(((cond(1).Pt2 - cond(1).Ps2) / 100), 1).ToString        'dynamic press [mbar]
-                'TextBox83.Text = Round(cond(1).Q1 * 3600.0, 0).ToString                         'Debiet inlet [m3/hr]
                 TextBox157.Text = Round(cond(1).Qkg, 0).ToString                                'Debiet [kg/hr]
                 TextBox76.Text = Round(cond(1).Om_velos, 0).ToString                            'Omtrek snelheid [m/s]
                 TextBox218.Text = Round(cond(1).Om_velos / Vel_Mach(cond(1).T1), 2).ToString    'Omtrek snelheid [M]
@@ -756,7 +736,7 @@ Public Class Form1
 
                 TextBox267.Text = Round(cond(1).Q2, 0).ToString                                 'Debiet outlet [Am3/hr]
                 TextBox268.Text = Round(cond(1).Ro2, 3).ToString                                'Density outlet [kg/Am3]
-                TextBox269.Text = Round(cond(1).Qkg / Convert.ToDouble(TextBox261.Text), 0).ToString    ''Debiet pers [Nm3/hr]
+                TextBox269.Text = Round(cond(1).Qkg / Convert.ToDouble(TextBox261.Text), 0).ToString    'Debiet zuig [Nm3/hr]
 
                 '----------------------- present waaier #1 ------------------------
                 TextBox163.Text = Round(cond(1).Pt1 / 100, 0).ToString          '[mbar] inlet flange
@@ -1767,12 +1747,12 @@ Public Class Form1
 
         oTable.Columns.Item(1).Width = oWord.InchesToPoints(1.3)   'Change width of columns 
         oTable.Columns.Item(2).Width = oWord.InchesToPoints(0.8)
-        oTable.Columns.Item(3).Width = oWord.InchesToPoints(0.6)
-        oTable.Columns.Item(4).Width = oWord.InchesToPoints(0.6)
-        oTable.Columns.Item(5).Width = oWord.InchesToPoints(0.6)
-        oTable.Columns.Item(6).Width = oWord.InchesToPoints(0.6)
-        oTable.Columns.Item(7).Width = oWord.InchesToPoints(0.6)
-        oTable.Columns.Item(8).Width = oWord.InchesToPoints(0.6)
+        oTable.Columns.Item(3).Width = oWord.InchesToPoints(0.65)
+        oTable.Columns.Item(4).Width = oWord.InchesToPoints(0.65)
+        oTable.Columns.Item(5).Width = oWord.InchesToPoints(0.65)
+        oTable.Columns.Item(6).Width = oWord.InchesToPoints(0.65)
+        oTable.Columns.Item(7).Width = oWord.InchesToPoints(0.65)
+        oTable.Columns.Item(8).Width = oWord.InchesToPoints(0.65)
 
 
         '------------------save Chart1 ---------------- 
@@ -1906,8 +1886,8 @@ Public Class Form1
 
                         cond(4).Dia1 = Dia1                                             '[mm]           
                         cond(4).Qkg = NumericUpDown3.Value                              '[kg/hr]
-                        cond(4).Pt1 = Convert.ToDouble(TextBox91.Text) * 100 - 101325   'Press total [Pa] abs. inlet flange                                           
-                        cond(4).Ps1 = Convert.ToDouble(TextBox91.Text) * 100 - 101325   'Press total [Pa] abs. inlet flange                                 
+                        cond(4).Pt1 = NumericUpDown76.Value * 100                       'Press total [Pa] abs. inlet flange                                           
+                        cond(4).Ps1 = NumericUpDown76.Value * 100                       'Press total [Pa] abs. inlet flange                                 
                         cond(4).Rpm1 = n2                                               '[rpm]          
                         cond(4).Qkg = NumericUpDown3.Value                              '[kg/hr]       
                         cond(4).Ro1 = NumericUpDown12.Value                             '[kg/m3] density inlet flange       
@@ -2443,7 +2423,7 @@ Public Class Form1
         TextBox111.Text = Round(N_max_doorbuiging * 1000, 3).ToString   'Max doorbuiging in [mm]
     End Sub
 
-    Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click, NumericUpDown8.ValueChanged, NumericUpDown7.ValueChanged, NumericUpDown6.ValueChanged, NumericUpDown5.ValueChanged, NumericUpDown4.ValueChanged, NumericUpDown3.ValueChanged, NumericUpDown13.ValueChanged, NumericUpDown12.ValueChanged, NumericUpDown1.ValueChanged, ComboBox1.SelectedIndexChanged, RadioButton4.CheckedChanged, RadioButton3.CheckedChanged, CheckBox4.CheckedChanged, NumericUpDown33.ValueChanged, ComboBox7.SelectedIndexChanged, TabPage1.Enter, RadioButton14.CheckedChanged, RadioButton13.CheckedChanged, RadioButton12.CheckedChanged, NumericUpDown58.ValueChanged, NumericUpDown37.ValueChanged
+    Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click, NumericUpDown8.ValueChanged, NumericUpDown5.ValueChanged, NumericUpDown4.ValueChanged, NumericUpDown3.ValueChanged, NumericUpDown13.ValueChanged, NumericUpDown12.ValueChanged, ComboBox1.SelectedIndexChanged, RadioButton4.CheckedChanged, RadioButton3.CheckedChanged, CheckBox4.CheckedChanged, NumericUpDown33.ValueChanged, ComboBox7.SelectedIndexChanged, RadioButton14.CheckedChanged, RadioButton13.CheckedChanged, RadioButton12.CheckedChanged, NumericUpDown58.ValueChanged, NumericUpDown37.ValueChanged, NumericUpDown76.ValueChanged
         NumericUpDown9.Value = NumericUpDown33.Value
         NumericUpDown21.Value = NumericUpDown33.Value       'Diameter waaier spanning berekening
         NumericUpDown10.Value = NumericUpDown13.Value
@@ -2476,7 +2456,8 @@ Public Class Form1
 
             '---------------- ASHRAE Handbook----------
             Double.TryParse(TextBox58.Text, Kw)     'as vermogen
-            Double.TryParse(TextBox74.Text, eff)    'Efficiency
+            Double.TryParse(TextBox74.Text, eff)    'Efficiency [%]
+            eff /= 100                              'Efficiency [-]
             n_imp = NumericUpDown13.Value           'toerental
             no_schoepen = Tschets(ComboBox1.SelectedIndex).Tdata(13)        'aantal schoepen.    
             bpf = no_schoepen * n_imp / 60                                  'schoepen per seconde
@@ -2674,7 +2655,7 @@ Public Class Form1
 
         y.Ackeret = 1 - 0.5 * (1.0 - Tschets(y.Typ).werkp_opT(0) / 100) * Pow((1 + (T_reynolds / y.Reynolds)), 0.2)
 
-        y.Ro2 = calc_density(y.Ro1, (y.Pt1 + 101325), (y.Pt2 + 101325), y.T1, y.T2) 'Ro outlet flange fan
+        y.Ro2 = calc_density(y.Ro1, (y.Ps1 + 101325), (y.Ps2 + 101325), y.T1, y.T2) 'Ro outlet flange fan
     End Sub
 
     Private Sub calc_loop_loss(ByRef x As Stage)
@@ -3212,7 +3193,7 @@ Public Class Form1
         case_x_conditions(5, NumericUpDown72.Value) = TextBox272.Text                   'Flow [Am3/hr]
         case_x_conditions(6, NumericUpDown72.Value) = TextBox269.Text                   'Flow [Nm3/hr]
         case_x_conditions(7, NumericUpDown72.Value) = NumericUpDown4.Value.ToString     'Temp [c]
-        case_x_conditions(8, NumericUpDown72.Value) = TextBox91.Text                    'Pressure [mbar abs]
+        case_x_conditions(8, NumericUpDown72.Value) = NumericUpDown76.Value.ToString    'Pressure [mbar abs]
         case_x_conditions(9, NumericUpDown72.Value) = NumericUpDown12.Value.ToString    'Density [kg/Am3]
 
         '----------- outlet data--------------------

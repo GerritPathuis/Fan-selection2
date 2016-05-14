@@ -121,6 +121,7 @@
     <value>1) All is base on the required Volume-flow/Static pressure combination (star in the chart)
 2) The impeller diameter-speed combination with the highest efficiency is calculated, based on the highest efficiency point of the Tschets data
 3) The alternative diameter-speed combination gives a line in the chart, the inlet conditions are identical
-4) When the star meet the line the Volume flow and Static pressure requirements are met.</value>
+4) When the star meets the line the Volume flow and Static pressure requirements are met.
+5) Alternative impeller conditions are calculated on basis of the Volume Flow indicated by the star position in the chart</value>
   </data>
 </root>
