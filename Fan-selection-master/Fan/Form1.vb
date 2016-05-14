@@ -387,12 +387,11 @@ Public Class Form1
 
         Dim nrq As Integer
         Dim Rel_humidity As Double
-        Dim P_ambient_Pa As Double          'Pressure abs in [Pa] static
         Dim P_zuig_Pa_static As Double      'Pressure abs in [Pa] static
         Dim P_pers_Pa_static As Double      'Pressure abs in [Pa] static
         Dim P_pers_Pa_total As Double       'Pressure abs in [Pa] total
         Dim visco_temp As Double
-        Dim site_altitude As Double
+
         Dim Ttype As Int16                  'Waaier type
         Dim diam1, diam2, nn1, nn2, roo1, roo2 As Double
         Dim Power_total, flow As Double
@@ -438,8 +437,7 @@ Public Class Form1
                 T_Toerental_rpm = Tschets(nrq).Tdata(1)         'Toerental [rpm]
                 T_Toerental_sec = T_Toerental_rpm / 60.0                         'Toerental [/sec]
 
-                '------------ site altitude-----------------
-                site_altitude = NumericUpDown7.Value                             'Site hoogte boven zee niveau
+
 
                 '----------- temperaturen----------------
                 T_air_temp = 20                                                 'T-schetsen proef temperatuur
@@ -521,11 +519,6 @@ Public Class Form1
                 G_Debiet_kg_hr = NumericUpDown3.Value
                 G_Debiet_kg_s = G_Debiet_kg_hr / 3600       'Gewenst Debiet [kg/sec]
 
-                '--------------- site hoogte---------------
-                'Molgewicht lucht is (Gas_mol_weight) 0,0288 kg/mol
-                'R= algemene gasconstante = 8,31432
-                P_ambient_Pa = Round(1013.25 * Pow(E, -Gas_mol_weight * 9.81 * site_altitude / (8.31432 * (G_air_temp + 273.15))), 2) * 100
-
                 '----------- Zuigdruk ----------------
                 P_zuig_Pa_static = NumericUpDown76.Value * 100                      '[Pa abs]
                 TextBox81.Text = Round((P_zuig_Pa_static - 101325) / 100, 2)        '[mbar g]
@@ -543,8 +536,6 @@ Public Class Form1
                     NumericUpDown12.Text = Round(G_density_act_zuig, 5).ToString                                'Density zuig
                     NumericUpDown12.BackColor = Color.White         'Density invullen
                     NumericUpDown5.Visible = True                   'Relative humidity
-                    NumericUpDown7.Visible = True                   'Site hoogte
-                    Label95.Visible = True                          'Site hoogte
                     GroupBox16.Visible = True                       'Molair weight
                 Else
                     NumericUpDown12.Enabled = True     'Density invullen             
@@ -553,8 +544,6 @@ Public Class Form1
 
                     NumericUpDown12.BackColor = Color.Yellow        'Density invullen
                     NumericUpDown5.Visible = False                  'Relative humidity  
-                    NumericUpDown7.Visible = False                  'Site hoogte
-                    Label95.Visible = False                         'Site hoogte
                     GroupBox16.Visible = False                      'Molair weight
                 End If
 
@@ -579,6 +568,9 @@ Public Class Form1
                 G_temp_uit_c = G_air_temp + (G_as_kw / (cp_air * G_Debiet_kg_s))
 
                 '----------------- Actual conditions at discharge ----------------------------
+                ' MessageBox.Show("P_pers_Pa_static= " & P_pers_Pa_static.ToString)  ?
+
+
                 G_density_act_pers = calc_density(G_density_act_zuig, P_zuig_Pa_static, P_pers_Pa_static, G_air_temp, G_temp_uit_c)
                 G_Debiet_p = G_Debiet_kg_s / G_density_act_pers             'Pers Debiet [Am3/hr]
 
@@ -614,10 +606,13 @@ Public Class Form1
                 G_Ptot_Pa = Round(Scale_rule_Pressure(Tschets(Ttype).werkp_opT(1), diam1, diam2, nn1, nn2, roo1, roo2), 0)
                 P_pers_Pa_total = P_zuig_Pa_static + G_Ptot_Pa
 
+
+
+
                 '---------- presenteren-----------------------  
                 TextBox16.Text = Round(G_temp_uit_c, 0).ToString                        'Temp uit
-                TextBox23.Text = Round(P_pers_Pa_static / 100, 0).ToString              'Static Pers druk in mbar abs
-                TextBox152.Text = Round(P_pers_Pa_total / 100, 0).ToString              'Total druk in mbar abs
+                TextBox23.Text = Round(P_pers_Pa_static / 100, 2).ToString              'Static Pers druk in mbar abs
+                TextBox152.Text = Round(P_pers_Pa_total / 100, 2).ToString              'Total druk in mbar abs
                 TextBox25.Text = Round(G_density_act_pers, 4).ToString
                 TextBox26.Text = Round(G_omtrek_s, 0).ToString                          'Omtrek snelheid [m/s]
                 TextBox217.Text = Round(G_omtrek_s / Vel_Mach(G_air_temp), 2).ToString  'Omtrek snelheid [M]
@@ -650,11 +645,13 @@ Public Class Form1
 
                 flow = G_Debiet_z_act_sec
                 TextBox272.Text = star_flow
-                TextBox271.Text = Round(star_Psta, 1)
-                TextBox273.Text = Round(star_Ptot, 1)
+                TextBox271.Text = Round(star_Psta, 1)                             'Pstatic [mBar abs]
+                TextBox273.Text = Round(star_Ptot, 1)                             'Ptotal [mBar abs]
                 TextBox274.Text = Round(star_pow, 0)
                 TextBox275.Text = Round(star_eff, 2)
                 TextBox75.Text = Round(start_dyn, 1)
+                TextBox151.Text = Round(star_Psta + NumericUpDown76.Value, 2)     'Pstatic [mBar g]
+                TextBox150.Text = Round(star_Ptot + NumericUpDown76.Value, 2)     'Ptotal [mBar g]
 
                 cond(1).Typ = ComboBox1.SelectedIndex               '[-]        T_SCHETS
                 cond(1).Q0 = Tschets(cond(1).Typ).werkp_opT(4)      '[Am3/s]    T_SCHETS
@@ -687,7 +684,6 @@ Public Class Form1
                 cond(1).Power0 = Tschets(cond(1).Typ).werkp_opT(3)  '[Am3/s] Tschets
 
                 Calc_stage(cond(1))                                 'Bereken de waaier #1  
-                '  MessageBox.Show(cond(1).Ro0.ToString & "  " & cond(1).Ro1.ToString & "  " & cond(1).Ro2.ToString)
                 calc_loop_loss(cond(1))                             'Bereken de omloop verliezen  
 
                 '-------------------------- Waaier #2 ----------------------
@@ -777,9 +773,7 @@ Public Class Form1
                 '-------------------------- Aantal trappen ----------------------
                 Select Case True
                     Case RadioButton12.Checked              '1 trap
-                        '  GroupBox13.Visible = True
                         GroupBox18.Visible = False
-                        '  GroupBox24.Visible = True
                         GroupBox40.Visible = False
                         GroupBox43.Visible = False
                         GroupBox44.Visible = False
@@ -787,8 +781,6 @@ Public Class Form1
                         GroupBox46.Visible = False
                     Case RadioButton13.Checked              '2 traps
                         GroupBox18.Visible = True
-                        '  GroupBox13.Visible = False
-                        '   GroupBox24.Visible = False
                         GroupBox40.Visible = True
                         GroupBox43.Visible = True
                         GroupBox44.Visible = False
@@ -800,8 +792,6 @@ Public Class Form1
                         TextBox64.Text = Round(cond(2).T2, 0)
                     Case RadioButton14.Checked              '3 traps
                         GroupBox18.Visible = True
-                        '   GroupBox13.Visible = False
-                        '   GroupBox24.Visible = False
                         GroupBox40.Visible = True
                         GroupBox43.Visible = True
                         GroupBox44.Visible = True
@@ -2430,6 +2420,7 @@ Public Class Form1
         If TabControl1.SelectedTab.Name = "TabPage1" Then
             ComboBox7.SelectedIndex = ComboBox1.SelectedIndex       'type selectie
         End If
+        Scale_rules_applied(ComboBox1.SelectedIndex, NumericUpDown9.Value, NumericUpDown10.Value, NumericUpDown12.Value)
         Selectie_1()
     End Sub
     Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click, TabPage4.Enter, RadioButton6.CheckedChanged, NumericUpDown42.ValueChanged, ComboBox5.SelectedIndexChanged
@@ -2618,7 +2609,7 @@ Public Class Form1
         draw_chart1(ComboBox1.SelectedIndex)
     End Sub
     'Calculate a impellar stage process condition inlet and outlet
-    ' Gebaseerd op de schaal regels voor vetilatoren
+    ' Gebaseerd op de schaal regels voor ventilatoren
 
     Private Sub Calc_stage(ByRef y As Stage)
         Dim area_uitlaat_flens As Double
@@ -3229,7 +3220,23 @@ Public Class Form1
         'Ro= P * MW /(8.31432 * (T+273))
         TextBox270.Text = Round(NumericUpDown73.Value * NumericUpDown75.Value / (8.31432 * 1000 * (NumericUpDown74.Value + 273.15)), 5).ToString
     End Sub
+    'Site altitude ambient prssure calculation
+    Private Sub Button20_Click(sender As Object, e As EventArgs) Handles Button20.Click, NumericUpDown6.ValueChanged, NumericUpDown1.ValueChanged, NumericUpDown77.ValueChanged
+        Dim site_altitude, ambient_Pa, ambient_Gas_mol_weight, ambient_temp As Double
 
+        site_altitude = NumericUpDown1.Value
+        ambient_Gas_mol_weight = NumericUpDown6.Value
+        ambient_temp = NumericUpDown77.Value
+        '--------------- site hoogte---------------
+        'Molgewicht lucht is (Gas_mol_weight) 0,0288 kg/mol
+        'R= algemene gasconstante = 8,31432
+
+        'P_ambient_Pa = Round(1013.25 * Pow(E, -Gas_mol_weight * 9.81 * site_altitude / (8.31432 * (G_air_temp + 273.15))), 2) * 100
+
+        ambient_Pa = Round(1013.25 * Pow(Math.E, -ambient_Gas_mol_weight * 9.81 * site_altitude / (8.31432 * (ambient_temp + 273.15))), 2) * 100
+
+        TextBox78.Text = ambient_Pa
+    End Sub
 
     Private Sub calc_emotor_4P()
         'see http://ecatalog.weg.net/files/wegnet/WEG-specification-of-electric-motors-50039409-manual-english.pdf
