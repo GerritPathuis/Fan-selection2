@@ -705,10 +705,6 @@ Public Class Form1
 
                 Calc_stage(cond(3))                                 'Bereken de waaier #3   
 
-                'Label154.Text = "Waaier #1, Ro1=" & Round(cond(1).Ro1, 3).ToString & " [kg/m3], Ro2=" & Round(cond(1).Ro2, 3).ToString & " [kg/m3], P2t=" & Round(cond(1).Pt2, 0).ToString & " [Pa]"
-                'Label155.Text = "Waaier #2, Ro1=" & Round(cond(2).Ro1, 3).ToString & " [kg/m3], Ro2=" & Round(cond(2).Ro2, 3).ToString & " [kg/m3], Pt2=" & Round(cond(2).Pt2, 0).ToString & " [Pa]"
-                'Label156.Text = "Waaier #3, Ro1=" & Round(cond(3).Ro1, 3).ToString & " [kg/m3], Ro2=" & Round(cond(3).Ro2, 3).ToString & " [kg/m3], Pt2=" & Round(cond(3).Pt2, 0).ToString & " [Pa]"
-
 
                 '------------ Rendement Waaier (Ackeret) --------------
                 If CheckBox4.Checked Then
@@ -739,12 +735,13 @@ Public Class Form1
                 TextBox165.Text = Round(cond(1).T2, 0).ToString                 '[c] outlet flange
                 TextBox166.Text = Round(cond(1).Pt2 / 100, 0).ToString          '[mbar] outlet P_total
                 TextBox162.Text = Round(cond(1).Ps2 / 100, 0).ToString          '[mbar] outlet P_static
-                TextBox82.Text = Round(cond(1).delta_pt / 100, 0).ToString      '[mbar] dp P_total
+                TextBox82.Text = Round(cond(1).delta_ps / 100, 0).ToString      '[mbar] dp P_static
+                TextBox281.Text = Round(cond(1).Ro1, 3).ToString                '[kg/Am3] density fan in
 
                 TextBox164.Text = Round(cond(1).Power, 0).ToString              '[kW]
                 TextBox182.Text = Round(cond(1).loop_velos, 1).ToString         'snelheid [m/s]
-                TextBox187.Text = Round(cond(1).Ro2, 3).ToString                '[kg/m3] Density fan uit
-                TextBox184.Text = Round(cond(1).Ro3, 3).ToString                '[kg/m3] Density loop uit
+                TextBox187.Text = Round(cond(1).Ro2, 3).ToString                '[kg/Am3] Density fan uit
+                TextBox184.Text = Round(cond(1).Ro3, 3).ToString                '[kg/Am3] Density loop uit
                 TextBox167.Text = Round(cond(1).loop_loss / 100, 0).ToString    '[mbar]
 
                 '-------------------------- Waaier #2 ----------------------
@@ -755,10 +752,11 @@ Public Class Form1
                 TextBox171.Text = Round(cond(2).T2, 0).ToString                 '[c] outlet flange
                 TextBox170.Text = Round(cond(2).Power, 0).ToString              '[kW]
                 TextBox183.Text = Round(cond(2).loop_velos, 1).ToString         '[m/s]
-                TextBox188.Text = Round(cond(2).Ro2, 3).ToString                '[kg/m3] Density fan uit
-                TextBox185.Text = Round(cond(2).Ro3, 3).ToString                '[kg/m3] Density loop uit
+                TextBox188.Text = Round(cond(2).Ro2, 3).ToString                '[kg/Am3] Density fan uit
+                TextBox185.Text = Round(cond(2).Ro3, 3).ToString                '[kg/Am3] Density loop uit
                 TextBox173.Text = Round(cond(2).loop_loss / 100, 0).ToString    '[mbar]
-                TextBox128.Text = Round(cond(2).delta_pt / 100, 0).ToString     '[mbar] dp P_total
+                TextBox128.Text = Round(cond(2).delta_ps / 100, 0).ToString     '[mbar] dp P_static
+                TextBox280.Text = Round(cond(2).Ro1, 3).ToString                '[kg/Am3] density fan in
 
                 '-------------------------- Waaier #3 (geen omloop)----------------------
                 '----------- present  waaier #3 (geen omloop)------------------------
@@ -767,40 +765,43 @@ Public Class Form1
                 TextBox174.Text = Round(cond(3).Ps2 / 100, 0).ToString          '[mbar] outlet P_static
                 TextBox177.Text = Round(cond(3).T2, 0).ToString                 '[c] outlet flange
                 TextBox176.Text = Round(cond(3).Power, 0).ToString              '[kW]
-                TextBox186.Text = Round(cond(3).Ro2, 3).ToString                '[kg/m3] Density fan uit
-                TextBox129.Text = Round(cond(3).delta_pt / 100, 0).ToString     '[mbar] dp P_total
+                TextBox186.Text = Round(cond(3).Ro2, 3).ToString                '[kg/Am3] Density fan uit
+                TextBox129.Text = Round(cond(3).delta_ps / 100, 0).ToString     '[mbar] dp P_static
+                TextBox279.Text = Round(cond(3).Ro1, 3).ToString                '[kg/Am3] density fan in
 
                 '-------------------------- Aantal trappen ----------------------
                 Select Case True
                     Case RadioButton12.Checked              '1 trap
                         GroupBox18.Visible = False
                         GroupBox40.Visible = False
-                        GroupBox43.Visible = False
-                        GroupBox44.Visible = False
-                        GroupBox45.Visible = False
                         GroupBox46.Visible = False
                     Case RadioButton13.Checked              '2 traps
                         GroupBox18.Visible = True
                         GroupBox40.Visible = True
-                        GroupBox43.Visible = True
-                        GroupBox44.Visible = False
-                        GroupBox45.Visible = False
                         GroupBox46.Visible = True
-                        Power_total = cond(1).Power + cond(2).Power                                '[kW]
-                        TextBox180.Text = Round((cond(2).Pt2 - cond(1).Pt1) / 100, 0).ToString     '[mbar] dP fan total
-                        TextBox179.Text = Round((cond(2).Ps2 - cond(1).Ps1) / 100, 0).ToString     '[mbar] dP fan static
+                        Panel1.Visible = False
+                        Panel2.Visible = False
+                        Power_total = cond(1).Power + cond(2).Power                                 '[kW]
+                        TextBox180.Text = Round((cond(2).Pt2 - cond(1).Pt1) / 100, 0).ToString      '[mbar] dP fan total
+                        TextBox179.Text = Round((cond(2).Ps2 - cond(1).Ps1) / 100, 0).ToString      '[mbar] dP fan static
+                        TextBox276.Text = Round((cond(2).Ps2) / 100, 0).ToString                    '[mbar] gauge fan static
+                        TextBox277.Text = Round((cond(2).Pt2) / 100, 0).ToString                    '[mbar] gauge fan total
                         TextBox64.Text = Round(cond(2).T2, 0)
+                        TextBox278.Text = Round((cond(2).Ro2), 3).ToString                          '[kg/Am3] density out
                     Case RadioButton14.Checked              '3 traps
                         GroupBox18.Visible = True
                         GroupBox40.Visible = True
-                        GroupBox43.Visible = True
-                        GroupBox44.Visible = True
-                        GroupBox45.Visible = True
                         GroupBox46.Visible = True
+                        Panel1.Visible = True
+                        Panel2.Visible = True
+                        TextBox276.Text = Round((cond(3).Ps2) / 100, 0).ToString                   '[mbar] gauge fan static
+                        TextBox277.Text = Round((cond(3).Pt2) / 100, 0).ToString                   '[mbar] gauge fan total
                         Power_total = cond(1).Power + cond(2).Power + cond(3).Power                '[kW]
                         TextBox180.Text = Round((cond(3).Pt2 - cond(1).Pt1) / 100, 0).ToString     '[mbar] dP fan total
                         TextBox179.Text = Round((cond(3).Ps2 - cond(1).Ps1) / 100, 0).ToString     '[mbar] dP fan static
                         TextBox64.Text = Round(cond(3).T2, 0)
+                        TextBox278.Text = Round((cond(3).Ro2), 3).ToString                         '[kg/Am3] density out
+
                 End Select
                 TextBox181.Text = Round(Power_total, 0).ToString               '[kW]
             Catch ex As Exception
@@ -1856,15 +1857,15 @@ Public Class Form1
 
         Label66.Location = New Point(10, 10)
     End Sub
-    'Diameter impeller is changed, recalculate and draw chart
+    'Diameter or speed impeller changed or density changed, recalculate and draw chart
     Private Sub Scale_rules_applied(ty As Integer, Dia1 As Double, n2 As Double, Ro1 As Double)
         Dim hh As Integer
 
         If (ty >= 0) And (ty < (ComboBox1.Items.Count)) Then    'Preventing exceptions
             Try
-                For hh = 0 To 11
-                    If Tschets(ty).TPtot(hh) > 0 Then            'Rest of the array is empty
-
+                For hh = 0 To 11                                '10 Meetpunten per Tschets type
+                    If Tschets(ty).TPtot(hh) > 0 Then           'Rest of the array is empty
+                        '============================ TSchets data inlezen ================================
                         cond(4).Typ = ty                                                '[-]        T_SCHETS  
                         cond(4).Q0 = Tschets(ty).TFlow(hh)                              '[Am3/s]    T_SCHETS Volume debiet
                         cond(4).Pt0 = Tschets(ty).TPtot(hh)                             '[PaG]      T_SCHETS Ptotal          
@@ -1874,6 +1875,7 @@ Public Class Form1
                         cond(4).Dia0 = Tschets(ty).Tdata(0)                             '[mm]       T_SCHETS diameter waaier
                         cond(4).Ro0 = Tschets(cond(1).Typ).Tdata(2)                     '[kg/m3]    T_SCHETS density inlet flange                         
 
+                        '======================== data van het scherm inlezen ============================
                         cond(4).Dia1 = Dia1                                             '[mm]           
                         cond(4).Qkg = NumericUpDown3.Value                              '[kg/hr]
                         cond(4).Pt1 = NumericUpDown76.Value * 100                       'Press total [Pa] abs. inlet flange                                           
@@ -1884,8 +1886,8 @@ Public Class Form1
                         cond(4).T1 = NumericUpDown4.Value                               '[c]                                
 
                         '======================== waaier #1 ===============================================
-                        Calc_stage(cond(4))             'Bereken de waaier #1  (in elf stappen)
-                        calc_loop_loss(cond(4))         'Bereken de omloop verliezen 
+                        Calc_stage(cond(4))                     'Bereken de waaier #1  (in elf stappen)
+                        calc_loop_loss(cond(4))                 'Bereken de omloop verliezen 
 
                         '======================== waaier #2 ===============================================
                         cond(5) = cond(4)                       'Kopieer de struct met gegevens
@@ -1940,8 +1942,8 @@ Public Class Form1
 
 
                 '-----------------------------------------------------------
-                ' From the Tschets data point the polynoom Is calculaten
-                ' Then 50 points are calculated to get a smooth chart
+                ' From the Tschets data points the polynoom variable are calculated
+                ' Then 50 chart points are calculated to get a smooth line
                 '-----------------------------------------------------------
                 Dim j As Integer
                 Dim t() As PPOINT
@@ -2029,7 +2031,7 @@ Public Class Form1
 
                 draw_chart1(ty)
             Catch ex As Exception
-                MessageBox.Show(ex.Message & " Problem in Scale_rules_applied, line 1878")  ' Show the exception's message.
+                MessageBox.Show(ex.Message & " Problem in Scale_rules_applied, line 2033")  ' Show the exception's message.
             End Try
         End If
     End Sub
@@ -2674,6 +2676,7 @@ Public Class Form1
 
         x.Pt3 = x.Pt2 - x.loop_loss                                             '[Pa]
         x.Ps3 = x.Ps2 - x.loop_loss
+
         x.Ro3 = calc_density(x.Ro1, (x.Pt1 + 101325), (x.Pt3 + 101325), x.T1, x.T2)
     End Sub
 
@@ -3221,21 +3224,18 @@ Public Class Form1
         TextBox270.Text = Round(NumericUpDown73.Value * NumericUpDown75.Value / (8.31432 * 1000 * (NumericUpDown74.Value + 273.15)), 5).ToString
     End Sub
     'Site altitude ambient prssure calculation
+    'See https://en.wikipedia.org/wiki/Barometric_formula
     Private Sub Button20_Click(sender As Object, e As EventArgs) Handles Button20.Click, NumericUpDown6.ValueChanged, NumericUpDown1.ValueChanged, NumericUpDown77.ValueChanged
-        Dim site_altitude, ambient_Pa, ambient_Gas_mol_weight, ambient_temp As Double
+        Dim site_altitude, ambient_mbar, ambient_Gas_mol_weight, ambient_temp, temp As Double
 
         site_altitude = NumericUpDown1.Value
-        ambient_Gas_mol_weight = NumericUpDown6.Value
+        ambient_Gas_mol_weight = NumericUpDown6.Value / 1000
         ambient_temp = NumericUpDown77.Value
-        '--------------- site hoogte---------------
-        'Molgewicht lucht is (Gas_mol_weight) 0,0288 kg/mol
-        'R= algemene gasconstante = 8,31432
 
-        'P_ambient_Pa = Round(1013.25 * Pow(E, -Gas_mol_weight * 9.81 * site_altitude / (8.31432 * (G_air_temp + 273.15))), 2) * 100
+        temp = -9.80665 * ambient_Gas_mol_weight * (site_altitude - 0) / (8.31432 * (ambient_temp + 273.15))
+        ambient_mbar = 1013.25 * Pow(Math.E, temp)
 
-        ambient_Pa = Round(1013.25 * Pow(Math.E, -ambient_Gas_mol_weight * 9.81 * site_altitude / (8.31432 * (ambient_temp + 273.15))), 2) * 100
-
-        TextBox78.Text = ambient_Pa
+        TextBox78.Text = Round(ambient_mbar, 2).ToString
     End Sub
 
     Private Sub calc_emotor_4P()
