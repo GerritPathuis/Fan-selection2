@@ -648,7 +648,7 @@ Public Class Form1
                 TextBox271.Text = Round(star_Psta, 1)                             'Pstatic [mBar abs]
                 TextBox273.Text = Round(star_Ptot, 1)                             'Ptotal [mBar abs]
                 TextBox274.Text = Round(star_pow, 0)
-                TextBox275.Text = Round(star_eff, 2)
+                TextBox275.Text = Round(star_eff, 0)
                 TextBox75.Text = Round(start_dyn, 1)
                 TextBox151.Text = Round(star_Psta + NumericUpDown76.Value, 2)     'Pstatic [mBar g]
                 TextBox150.Text = Round(star_Ptot + NumericUpDown76.Value, 2)     'Ptotal [mBar g]
@@ -742,7 +742,7 @@ Public Class Form1
                 TextBox182.Text = Round(cond(1).loop_velos, 1).ToString         'snelheid [m/s]
                 TextBox187.Text = Round(cond(1).Ro2, 3).ToString                '[kg/Am3] Density fan uit
                 TextBox184.Text = Round(cond(1).Ro3, 3).ToString                '[kg/Am3] Density loop uit
-                TextBox167.Text = Round(cond(1).loop_loss / 100, 0).ToString    '[mbar]
+                TextBox167.Text = Round(cond(1).loop_loss / 100, 1).ToString    '[mbar]
 
                 '-------------------------- Waaier #2 ----------------------
                 '----------- present  waaier #2 ------------------------
@@ -754,7 +754,7 @@ Public Class Form1
                 TextBox183.Text = Round(cond(2).loop_velos, 1).ToString         '[m/s]
                 TextBox188.Text = Round(cond(2).Ro2, 3).ToString                '[kg/Am3] Density fan uit
                 TextBox185.Text = Round(cond(2).Ro3, 3).ToString                '[kg/Am3] Density loop uit
-                TextBox173.Text = Round(cond(2).loop_loss / 100, 0).ToString    '[mbar]
+                TextBox173.Text = Round(cond(2).loop_loss / 100, 1).ToString    '[mbar]
                 TextBox128.Text = Round(cond(2).delta_ps / 100, 0).ToString     '[mbar] dp P_static
                 TextBox280.Text = Round(cond(2).Ro1, 3).ToString                '[kg/Am3] density fan in
 
@@ -1723,7 +1723,7 @@ Public Class Form1
         oTable.Rows.Item(1).Range.Font.Bold = True
 
 
-        For j = 0 To 17
+        For j = 0 To 18 'Rows
             oTable.Cell(j + 1, 1).Range.Text = case_x_conditions(j, 10)     'Write all variables
             oTable.Cell(j + 1, 2).Range.Text = case_x_conditions(j, 11)     'Write all units
             oTable.Cell(j + 1, 3).Range.Text = case_x_conditions(j, 1)      'Case 1
@@ -2250,7 +2250,7 @@ Public Class Form1
 
             Chart4.Series(0).ChartType = DataVisualization.Charting.SeriesChartType.Line
 
-            Chart4.Titles.Add("Torsie eigenfrequentie analyse")
+            Chart4.Titles.Add("Torsional natural frequency analysis")
             Chart4.Titles(0).Font = New Font("Arial", 16, System.Drawing.FontStyle.Bold)
 
             Chart4.Series(0).Name = "Torque"
@@ -2664,7 +2664,8 @@ Public Class Form1
 
         '----------------- actual drukverlies omloop  (3 bochten) -------
         phi = NumericUpDown58.Value
-        x.loop_loss = 0.5 * phi * x.loop_velos ^ 2 * x.Ro1                      '[Pa]
+        x.loop_loss = 0.5 * phi * x.loop_velos ^ 2 * x.Ro1      '[Pa]
+        x.loop_loss *= 3                                        '3x sharp bend
 
         '===== Druk verlies kan nooit groter zijn dan de begindruk =============
         If x.loop_loss > x.Pt2 Then
@@ -2863,10 +2864,10 @@ Public Class Form1
         oDoc.Bookmarks.Item("\endofdoc").Range.InsertParagraphAfter()
 
         '----------------------------------------------
-        'Insert a 6 x 3 table, fill it with data and change the column widths.
-        oTable = oDoc.Tables.Add(oDoc.Bookmarks.Item("\endofdoc").Range, 7, 5)
+        'Insert a 14 x 5 table, fill it with data and change the column widths.
+        oTable = oDoc.Tables.Add(oDoc.Bookmarks.Item("\endofdoc").Range, 14, 5)
         oTable.Range.ParagraphFormat.SpaceAfter = 1
-        oTable.Range.Font.Size = 11
+        oTable.Range.Font.Size = 10
         oTable.Range.Font.Bold = False
         oTable.Rows.Item(1).Range.Font.Bold = True
 
@@ -2898,16 +2899,42 @@ Public Class Form1
         oTable.Cell(6, 4).Range.Text = TextBox257.Text
         oTable.Cell(6, 5).Range.Text = "[k.N.m/°]"
 
-        oTable.Cell(7, 1).Range.Text = "First natural speed"
-        oTable.Cell(7, 2).Range.Text = TextBox84.Text
-        oTable.Cell(7, 3).Range.Text = "[rpm]"
+        '---- Shaft length-----
+        oTable.Cell(7, 1).Range.Text = "Overhang impeller"
+        oTable.Cell(7, 2).Range.Text = NumericUpDown22.Value
+        oTable.Cell(7, 3).Range.Text = "[mm]"
+
+        oTable.Cell(8, 1).Range.Text = "Distance between bearings"
+        oTable.Cell(8, 2).Range.Text = NumericUpDown23.Value
+        oTable.Cell(8, 3).Range.Text = "[mm]"
+
+        oTable.Cell(9, 1).Range.Text = "Overhang coupling"
+        oTable.Cell(9, 2).Range.Text = NumericUpDown24.Value
+        oTable.Cell(9, 3).Range.Text = "[mm]"
+
+        '---- Shaft diameter-----
+        oTable.Cell(10, 1).Range.Text = "Diameter impeller shaft"
+        oTable.Cell(10, 2).Range.Text = NumericUpDown25.Value
+        oTable.Cell(10, 3).Range.Text = "[mm]"
+
+        oTable.Cell(11, 1).Range.Text = "Diameter shaft bearings"
+        oTable.Cell(11, 2).Range.Text = NumericUpDown26.Value
+        oTable.Cell(11, 3).Range.Text = "[mm]"
+
+        oTable.Cell(12, 1).Range.Text = "Diameter shaft coupling"
+        oTable.Cell(12, 2).Range.Text = NumericUpDown27.Value
+        oTable.Cell(12, 3).Range.Text = "[mm]"
+
+        '---- results---------
+        oTable.Cell(14, 1).Range.Text = "First natural speed"
+        oTable.Cell(14, 2).Range.Text = TextBox84.Text
+        oTable.Cell(14, 3).Range.Text = "[rpm]"
 
         oTable.Columns.Item(1).Width = oWord.InchesToPoints(2.0)   'Change width of columns 1 & 2.
         oTable.Columns.Item(2).Width = oWord.InchesToPoints(0.8)
         oTable.Columns.Item(3).Width = oWord.InchesToPoints(0.9)
         oTable.Columns.Item(4).Width = oWord.InchesToPoints(0.6)
         oTable.Columns.Item(5).Width = oWord.InchesToPoints(0.8)
-
 
         oDoc.Bookmarks.Item("\endofdoc").Range.InsertParagraphAfter()
 
@@ -3122,7 +3149,9 @@ Public Class Form1
     End Sub
     'Save Case button is hit
     Private Sub Button18_Click_1(sender As Object, e As EventArgs) Handles Button18.Click
-
+        'If String.IsNullOrEmpty(TextBox99.Text) Then
+        '    TextBox99.Text = "?"
+        'End If
         '----------- Variable------------------
         case_x_conditions(0, 10) = "Case name"
         case_x_conditions(1, 10) = "Model"
@@ -3148,6 +3177,7 @@ Public Class Form1
         case_x_conditions(15, 10) = "dP Dynamic"
         case_x_conditions(16, 10) = "dP Total"
         case_x_conditions(17, 10) = "Shaft power"
+        case_x_conditions(18, 10) = "Efficiency"
 
         '----------- Units------------------
         '------------------------------------------
@@ -3160,7 +3190,7 @@ Public Class Form1
         '----------- inlet data--------------------
         case_x_conditions(5, 11) = "[Am3/hr]"
         case_x_conditions(6, 11) = "[Nm3/hr]"
-        case_x_conditions(7, 11) = "[c]"
+        case_x_conditions(7, 11) = "[°c]"
         case_x_conditions(8, 11) = "[mbar abs]"
         case_x_conditions(9, 11) = "[kg/Am3]"
 
@@ -3175,6 +3205,7 @@ Public Class Form1
         case_x_conditions(15, 11) = "[mbar.g]"
         case_x_conditions(16, 11) = "[mbar.g]"
         case_x_conditions(17, 11) = "[kW]"
+        case_x_conditions(18, 11) = "[%]"
 
         '----------- general data------------------
         case_x_conditions(0, NumericUpDown72.Value) = TextBox89.Text                    'Case name 
@@ -3201,6 +3232,7 @@ Public Class Form1
         case_x_conditions(15, NumericUpDown72.Value) = TextBox75.Text                   'Dynamic dP [mbar.g]
         case_x_conditions(16, NumericUpDown72.Value) = TextBox273.Text                  'Total dP [mbar.g]
         case_x_conditions(17, NumericUpDown72.Value) = TextBox274.Text                  'Shaft power [kW]
+        case_x_conditions(18, NumericUpDown72.Value) = TextBox275.Text                  'Efficiency [%]
 
         Button11_Click(sender, New System.EventArgs())  'Draw chart1 (calculate the data points before storage)
 
