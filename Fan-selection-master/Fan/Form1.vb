@@ -3261,7 +3261,7 @@ Public Class Form1
         'Ro= P * MW /(8.31432 * (T+273))
         TextBox270.Text = Round(NumericUpDown73.Value * NumericUpDown75.Value / (8.31432 * 1000 * (NumericUpDown74.Value + 273.15)), 5).ToString
     End Sub
-    'Site altitude ambient prssure calculation
+    'Site altitude ambient prssure calculation ..
     'See https://en.wikipedia.org/wiki/Barometric_formula
     Private Sub Button20_Click(sender As Object, e As EventArgs) Handles Button20.Click, NumericUpDown6.ValueChanged, NumericUpDown1.ValueChanged, NumericUpDown77.ValueChanged
         Dim site_altitude, ambient_mbar, ambient_Gas_mol_weight, ambient_temp, temp As Double
