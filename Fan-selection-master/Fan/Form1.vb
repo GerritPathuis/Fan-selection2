@@ -1552,7 +1552,7 @@ Public Class Form1
                 End If
 
                 '-------------------Target dot ---------------------
-                If CheckBox3.Checked = True Then
+                If CheckBox3.Checked Then
                     Chart1.Series(3).YAxisType = AxisType.Primary
                     Chart1.Series(3).Points.AddXY(Q_target, P_target)
                     Chart1.Series(3).Points(0).MarkerStyle = DataVisualization.Charting.MarkerStyle.Star10
@@ -1564,7 +1564,9 @@ Public Class Form1
                         debiet = case_x_flow(hh, 0)
                         If CheckBox2.Checked Then debiet = Round(debiet * 3600, 1)      'Per uur
                         p_loss_line = 0.5 * Weerstand_coefficient * NumericUpDown12.Value * debiet ^ 2
-                        Chart1.Series(4).Points.AddXY(debiet, p_loss_line)
+                        If CheckBox10.Checked Then
+                            Chart1.Series(4).Points.AddXY(debiet, p_loss_line)
+                        End If
                     Next
                 End If
 
@@ -2603,7 +2605,7 @@ Public Class Form1
         TextBox145.Text = Round(spalt_loss, 1).ToString     '[kg/hr]
     End Sub
 
-    Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click, CheckBox6.CheckedChanged, CheckBox3.CheckedChanged, CheckBox2.CheckedChanged, CheckBox1.CheckedChanged, TabPage3.Enter, NumericUpDown9.ValueChanged, NumericUpDown10.ValueChanged, RadioButton9.CheckedChanged, RadioButton11.CheckedChanged, RadioButton10.CheckedChanged, CheckBox7.CheckedChanged, CheckBox8.CheckedChanged
+    Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click, CheckBox6.CheckedChanged, CheckBox3.CheckedChanged, CheckBox2.CheckedChanged, CheckBox1.CheckedChanged, TabPage3.Enter, NumericUpDown9.ValueChanged, NumericUpDown10.ValueChanged, RadioButton9.CheckedChanged, RadioButton11.CheckedChanged, RadioButton10.CheckedChanged, CheckBox7.CheckedChanged, CheckBox8.CheckedChanged, CheckBox10.CheckedChanged
         NumericUpDown33.Value = NumericUpDown9.Value
         NumericUpDown21.Value = NumericUpDown9.Value    'Diameter waaier
         NumericUpDown13.Value = NumericUpDown10.Value
