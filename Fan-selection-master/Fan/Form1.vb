@@ -176,7 +176,7 @@ Public Class Form1
     'Vermogen,Toerental, Frame, Lengte, Geluid Lp
     Public Shared emotor_2P() As String = {
     "4;112M;380;67",
-    "	5.5;132S;465;70",
+    "5.5;132S;465;70",
     "7.7;132S;465;70",
     "11;160M;645;69",
     "15;160M;645;69",
@@ -231,6 +231,99 @@ Public Class Form1
      "355;4.6;24;50;60;54;36;34;31;25;0",
      "560;4.6;22;47;53;37;33;33;27;25;0",
      "815;4.6;22;51;46;26;26;24;22;38;0"}
+
+
+    'Sound insulation casing
+    'Beschrijving,63,125,25,500,1000,2000,4000,8000
+
+    Public Shared insulation_casing() As String = {
+    "50mm Rockwool, Al-plate;0;0;0;2;7;12;12;12;12",
+    "50mm Rockwool, Fe-plate;0;0;0;3;10;15;16;16;16",
+    "75mm Rockwool, Al-plate;0;0;0;3;8;13;13;13;13",
+    "75mm Rockwool, Fe-plate;0;0;0;4;12;19;20;20;20",
+    "100mm Rockwool, Al-plate;0;0;1;5;10;15;15;15;15",
+    "100mm Rockwool, Fe-plate;0;0;2;6;14;21;21;21;21",
+    "125mm Rockwool, Al-plate;0;1;3;7;12;17;17;17;17",
+    "125mm Rockwool, Fe-plate;0;2;4;9;16;22;22;22;22",
+    "150mm Rockwool, Al-plate;0;3;7;12;17;21;21;21;21",
+    "150mm Rockwool, Fe-plate;0;5;9;14;19;23;23;23;23",
+    "175mm Rockwool, Al-plate;0;4;9;15;21;23;23;23;23",
+    "175mm Rockwool, Fe-plate;0;7;12;17;22;24;24;24;24",
+    "200mm Rockwool, Al-plate;0;5;10;17;24;25;25;25;25",
+    "200mm Rockwool, Fe-plate;0;8;13;19;24;25;25;25;25",
+    "50mm Rockwool, Al-plate;2,6;0;3;7;12;17;19;19;19",
+    "50mm Rockwool, Fe-plate;2,6;3;7;12;17;20;21;21;21",
+    "75mm Rockwool, Al-plate;2,6;1;3;10;15;18;20;20;20",
+    "75mm Rockwool, Fe-plate;2,6;4;8;15;20;21;21;22;22",
+    "100mm Rockwool, Al-plate;2,6;1;4;11;16;19;21;21;21",
+    "100mm Rockwool, Fe-plate;2,6;5;9;16;21;22;22;22;22",
+    "125mm Rockwool, Al-plate;2,6;2;7;13;19;22;23;23;23",
+    "125mm Rockwool, Fe-plate;2,6;6;14;19;22;23;23;23;23",
+    "150mm Rockwool, Al-plate;2,6;4;10;15;20;23;24;24;24",
+    "150mm Rockwool, Fe-plate;2,6;8;15;21;24;25;25;25;25",
+    "175mm Rockwool, Al-plate;2,6;5;12;17;21;23;24;24;24",
+    "175mm Rockwool, Fe-plate;2,6;9;16;22;25;26;26;26;26",
+    "200mm Rockwool, Al-plate;2,6;6;14;18;22;24;25;25;25",
+    "200mm Rockwool, Fe-plate;2,6;10;17;24;25;26;27;27;27"}
+
+
+    'Inlet noise dempers
+    'Lengte;63;125;250;500;1000;2000;4000;8000,
+    Public Shared inlet_damper() As String = {
+    "500mm;-3;-5;-10;-17;-24;-20;-14;-11",
+    "750mm;-3;-6;-13;-24;-32;-26;-16;-12",
+    "1000mm;-4;-8;-17;-30;-40;-32;-19;-13",
+    "1250mm;-5;-10;-20;-35;-49;-38;-22;-15",
+    "1500mm;-6;-14;-23;-41;-50;-44;-25;-17",
+    "1750mm;-7;-16;-27;-47;-50;-50;-27;-18",
+    "2000mm;-7;-17;-30;-50;-50;-50;-30;-20",
+    "2250mm;-8;-18;-33;-50;-50;-50;-32;-21",
+    "2500mm;-8;-19;-36;-50;-50;-50;-35;-22",
+    "2750mm;-8;-20;-38;-50;-50;-50;-37;-23",
+    "3000mm;-9;-21;-39;-50;-50;-50;-38;-23"}
+
+
+    'Sound Power reduction fan inlet in suction diameter smaller 40% impeller diameter
+    'zoekgetal,n max,n min,z,63Hz,125Hz,250Hz,500Hz,1kHz,2kHz,4kHz,8 kHz
+    Public Shared zuig_smaller40() As String = {
+    "2499848;559;280;8;-2;-5,5;-11;-16;-24;-30;-40;-48",
+    "3124810;559;280;10;-2;-5,5;-10;-15;-22;-29;-37;-46",
+    "3749772;559;280;12;-1;-4,5;-9;-14;-21;-28;-36;-44",
+    "6249620;559;280;20;-1;-4,5;-9;-12;-20;-26;-34;-42",
+    "10107008;1124;560;8;-3;-4;-9;-14;-19;-27;-33;-43",
+    "12633760;1124;560;10;-3;-4;-9;-13;-18;-25;-32;-40",
+    "15160512;1124;560;12;-3;-3;-8;-12;-17;-24;-31;-39",
+    "25267520;1124;560;20;-3;-3;-8;-12;-16;-23;-30;-37",
+    "40464008;2249;1125;8;-5;-5;-4,5;-10;-17;-25;-36;-48",
+    "50580010;2249;1125;10;-5;-5;-4,5;-10;-16;-24;-34;-47",
+    "60696012;2249;1125;12;-6;-5;-4,5;-9;-15;-23;-33;-46",
+    "101160020;2249;1125;20;-6;-5;-4,5;-9;-15;-22;-32;-44",
+    "162000000;4500;2250;8;-8;-6;-5,5;-5,5;-11;-19;-27;-38",
+    "202500000;4500;2250;10;-8;-6;-5,5;-5,5;-11;-18;-26;-36",
+    "243000000;4500;2250;12;-9;-6;-5,5;-4,5;-10;-17;-25;-35",
+    "405000000;4500;2250;20;-9;-6;-5,5;-4,5;-10;-17;-24;-34"}
+
+
+    'Sound Power reduction fan inlet in suction diameter equal of bigger 40% impeller diameter
+    'zoekgetal,n max,n min,z,63Hz,125Hz,250Hz,500Hz,1kHz,2kHz,4kHz,8 kHz
+    Public Shared zuig_bigger40() As String = {
+    "2499848;559;280;8;-2;-5,5;-11;-16;-24;-30;-40;-48",
+    "3124810;559;280;10;-2;-5,5;-10;-15;-22;-29;-37;-46",
+    "3749772;559;280;12;-1;-4,5;-9;-14;-21;-28;-36;-44",
+    "6249620;559;280;20;-1;-4,5;-9;-12;-20;-26;-34;-42",
+    "10107008;1124;560;8;-3;-4;-9;-14;-19;-27;-33;-43",
+    "12633760;1124;560;10;-3;-4;-9;-13;-18;-25;-32;-40",
+    "15160512;1124;560;12;-3;-3;-8;-12;-17;-24;-31;-39",
+    "25267520;1124;560;20;-3;-3;-8;-12;-16;-23;-30;-37",
+    "40464008;2249;1125;8;-4;-5,5;-5,5;-11;-17;-22;-29;-35",
+    "50580010;2249;1125;10;-4;-5,5;-5,5;-11;-16;-21;-27;-34",
+    "60696012;2249;1125;12;-5;-5,5;-5,5;-10;-15;-20;-26;-33",
+    "101160020;2249;1125;20;-5;-5,5;-5,5;-10;-15;-19;-25;-31",
+    "162000000;4500;2250;8;-4;-5,5;-7;-7;-13;-19;-25;-32",
+    "202500000;4500;2250;10;-4;-5,5;-7;-7;-13;-18;-24;-30",
+    "243000000;4500;2250;12;-5;-5,5;-7;-6;-12;-17;-23;-29",
+    "405000000;4500;2250;20;-5;-5,5;-7;-6;-12;-17;-22;-28"}
+
 
 
     Dim flenzen() As Double = {71, 80, 90, 100, 112, 125, 140, 160, 180, 200, 224, 250, 280, 315, 355, 400, 450, 500, 560, 630, 710, 800, 900, 1000, 1120, 1250, 1400, 1600, 1800, 2000}
@@ -324,6 +417,8 @@ Public Class Form1
         ComboBox5.Items.Clear()                     'Note Combobox1 contains"startup" to prevent exceptions
         ComboBox6.Items.Clear()                     'Note Combobox1 contains"startup" to prevent exceptions
         ComboBox7.Items.Clear()                     'Note Combobox1 contains"startup" to prevent exceptions
+        ComboBox9.Items.Clear()                     'Note Combobox1 contains"startup" to prevent exceptions
+        ComboBox10.Items.Clear()                    'Note Combobox1 contains"startup" to prevent exceptions
 
         For hh = 0 To (Tschets.Length - 2)            'Fill combobox 1, 2 +5 met Fan Types
             ComboBox1.Items.Add(Tschets(hh).Tname)
@@ -350,6 +445,17 @@ Public Class Form1
             words = TLout(hh).Split(";")
             ComboBox5.Items.Add(words(0))
         Next hh
+
+        For hh = 0 To (insulation_casing.Length - 1)  'Fill combobox 9 Insulation data
+            words = insulation_casing(hh).Split(";")
+            ComboBox9.Items.Add(words(0))
+        Next hh
+
+        For hh = 0 To (inlet_damper.Length - 1)  'Fill combobox 10 inlet damper
+            words = inlet_damper(hh).Split(";")
+            ComboBox10.Items.Add(words(0))
+        Next hh
+
 
         '----------------- prevent out of bounds------------------
         If ComboBox1.Items.Count > 0 Then
@@ -381,6 +487,13 @@ Public Class Form1
 
         ComboBox8.SelectedIndex = 0                     'SKF a1 factor
 
+        If ComboBox9.Items.Count > 0 Then
+            ComboBox9.SelectedIndex = 4                 'Select 100m Rockwool Alu
+        End If
+
+        If ComboBox10.Items.Count > 0 Then
+            ComboBox10.SelectedIndex = 0                 'Select Inlet damer
+        End If
     End Sub
 
     Private Sub Selectie_1()
@@ -857,9 +970,8 @@ Public Class Form1
 
         '--------Gewichten------------
         If T_type > -1 Then '------- schoepgewicht berekenen-----------
-            Label128.Text = "Waaier type" & Tschets(T_type).Tname
-            Label47.Text = "Waaier type" & Tschets(T_type).Tname
-            Label152.Text = "Waaier type" & Tschets(T_type).Tname
+            Label128.Text = "Waaier type " & Tschets(T_type).Tname
+            Label47.Text = "Waaier type " & Tschets(T_type).Tname
             aantal_schoep = Tschets(T_type).Tdata(13)
             Voorplaat_keel = Tschets(T_type).Tdata(16) / 1000 * (Waaier_dia / 1.0)      'Keel diam [m]
             inw_schoep_dia = Tschets(T_type).Tdata(17) / 1000 * (Waaier_dia / 1.0)      'inwendige schoep diameter [m]
@@ -1705,7 +1817,7 @@ Public Class Form1
         oTable.Cell(1, 2).Range.Text = TextBox283.Text
         oTable.Cell(2, 1).Range.Text = "Item number"
         oTable.Cell(2, 2).Range.Text = TextBox284.Text
-        oTable.Cell(3, 1).Range.Text = "Auther "
+        oTable.Cell(3, 1).Range.Text = "Author "
         oTable.Cell(3, 2).Range.Text = Environment.UserName
         oTable.Cell(4, 1).Range.Text = "Date "
         oTable.Cell(4, 2).Range.Text = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
@@ -2427,21 +2539,42 @@ Public Class Form1
         Scale_rules_applied(ComboBox1.SelectedIndex, NumericUpDown9.Value, NumericUpDown10.Value, NumericUpDown12.Value)
         Selectie_1()
     End Sub
-    Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click, TabPage4.Enter, RadioButton6.CheckedChanged, NumericUpDown42.ValueChanged, ComboBox5.SelectedIndexChanged
-        Dim spez_drehz, p_stat, Act_flow As Double
+    'Calculate the noise tab
+    Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click, TabPage4.Enter, RadioButton6.CheckedChanged, NumericUpDown42.ValueChanged, ComboBox5.SelectedIndexChanged, NumericUpDown7.ValueChanged
+        Dim spez_drehz, p_stat, P_tot, Act_flow_sec, roww As Double
         Dim Ltot, eff, n_imp, no_schoepen As Double
-        Dim Kw, BFI, Cn, bpf, diameter, Area_duct, Surface_area As Double
+        Dim Kw, BFI, Cn, bpf, dia_fan_inlet, diameter_imp As Double
         Dim lp(9), duct_in(9) As Double
         Dim hh As Integer
         Dim words() As String
         Dim Tlout_fact(8) As Double
+        Dim DzDw As Double                          'Diameter zuig/diameter waaier
+        Dim Area_casing, casing_dikte, area_measure As Double     'Estimated Area casing one side!!
+        Dim nq As Double     '
 
         If (ComboBox5.SelectedIndex > -1) Then      'Prevent exceptions
 
+            Label152.Text = "Waaier type " & Label1.Text
             Double.TryParse(TextBox123.Text, spez_drehz)
-            p_stat = NumericUpDown37.Value * 100                             '[Pa] static  
-            Double.TryParse(TextBox22.Text, Act_flow)                        '[m3/hr]        
-            ' Label152.Text = "Waaier type        " & Tschets(ComboBox1.SelectedIndex).Tname
+            p_stat = NumericUpDown37.Value * 100                            '[mBar]->[Pa] static 
+            Double.TryParse(TextBox273.Text, P_tot)                         '[mBar]
+            P_tot *= 100                                                    '[mBar]->[Pa]
+            Double.TryParse(TextBox22.Text, Act_flow_sec)                   '[m3/hr]
+            Act_flow_sec /= 3600                                            '[m3/sec]
+            Double.TryParse(TextBox58.Text, Kw)                             'as vermogen
+            Double.TryParse(TextBox74.Text, eff)                            'Efficiency [%]
+            eff /= 100                                                      'Efficiency [-]
+            roww = NumericUpDown12.Value                                    'Density [kg/Am3]
+            n_imp = NumericUpDown13.Value                                   'toerental
+            no_schoepen = Tschets(ComboBox1.SelectedIndex).Tdata(13)        'aantal schoepen.    
+
+            Double.TryParse(TextBox159.Text, dia_fan_inlet)                 'Diameter suction
+            dia_fan_inlet /= 1000                                           '[m]
+            diameter_imp = NumericUpDown33.Value / 1000                     'Diam impeller    
+            DzDw = dia_fan_inlet / diameter_imp                             'Dia zuig / dia waaier
+            Area_casing = (diameter_imp * 2) ^ 2                            '[m2] Estimeted area casing, one side
+            area_measure = (Sqrt(Area_casing) + 2) ^ 2                      'Meet oppervlak Hoogte+2m, Breed+2m
+            casing_dikte = NumericUpDown7.Value                             'Casing plaat dikte
 
             'Sound power level
             'Lws = 2.9513409 * Log(spez_drehz) + 26.0752394                  'Willi Bohl pagina 45 and 51 for check
@@ -2449,45 +2582,103 @@ Public Class Form1
             'Ltot = 27 + 10 * Log10(Act_flow / 3600) + 20 * Log10(p_stat)     ' http://www.schweizer-fn.de/lueftung/ventilator/ventilator.php
             'Ltot = 40 + 10 * Log10(Act_flow / 3600) + 20 * Log10(p_stat)     ' http://www.engineeringtoolbox.com/fan-noise-d_61.html
 
+            '------------------------------------------------------
+            '------------------------------------------------------
+            Dim pppz, kappa, zet, kp, rend, fBA, Lws, Lwi, Lv, deltaLA, Rv, n_ref, Zoek_freq, inlet_red As Double
+
+            '-------------- VTK calculatie---------------
+            nq = n_imp * Sqrt(Act_flow_sec) / (p_stat / roww) ^ 0.75
+
+            '-------------- redendement---------------
+            pppz = (P_tot + 101325) / 101325
+            kappa = 1.4              'Compressiboliteit ?
+            zet = (kappa - 1) * roww * Kw * 1000 / kappa / (Act_flow_sec * roww) / P_tot
+            kp = zet * Log(pppz) / Log(1 + zet * (pppz - 1))
+            rend = Act_flow_sec * P_tot / Kw / 1000 * kp
+
+            'MessageBox.Show("pppz= " & pppz.ToString & "  zet= " & zet.ToString & " kp= " & kp.ToString & " act_flow = " & Act_flow_sec.ToString)
+
+            '-------------- fBA---------------
+            fBA = 1 + (0.5 * (0.82 / rend - 1))
+            If fBA > 1.2 Then fBA = 1.2
+            Lws = (55 + 0.1885 * nq) * fBA                                          '[dB]
+            Lwi = Lws - 19.83 + 8.8686 * Log(P_tot) + 4.343 * Log(Act_flow_sec)     '[dB]
+            Lv = 4.343 * Log(Area_casing)                                           '[m2] eenzijdig oppervlak
+            deltaLA = 4.343 * Log(area_measure)                                     '[m2] meet oppervlak
+            Rv = 17.71 + 5.86 * Log(casing_dikte)                                   '[mm] casing plaat dikte
+
+            Select Case n_imp
+                Case n_imp > 2249
+                    n_ref = 4500
+                Case n_imp > 1124
+                    n_ref = 2249
+                Case n_imp > 559
+                    n_ref = 1124
+                Case Else
+                    n_ref = 559
+            End Select
+            Zoek_freq = n_ref ^ 2 * no_schoepen
+            inlet_red = -1 * 20 * Log10(diameter_imp / dia_fan_inlet) * Sqrt(2) + 1
+
+            '----------- find the reduction on fan inlet-----------
+            ' MessageBox.Show(zuig_smaller40.Length.ToString)
+            For i = 0 To (zuig_smaller40.Length - 1)
+                If (DzDw <= 0.4) Then
+                    words = zuig_smaller40(i).Split(";")
+                Else
+                    words = zuig_bigger40(i).Split(";")
+                End If
+                If Zoek_freq > Convert.ToDouble(words(0)) Then
+                    lp(0) = words(4)    'Lp63
+                    lp(1) = words(5)    'Lp125
+                    lp(2) = words(6)    'Lp250
+                    lp(3) = words(7)    'Lp500  
+                    lp(4) = words(8)    'Lp1000
+                    lp(5) = words(9)    'Lp2000  
+                    lp(6) = words(10)   'Lp4000
+                    lp(7) = words(11)   'Lp8000
+                    'MessageBox.Show(i.ToString & " Zoek_freq= " & Zoek_freq.ToString & " words(0)= " & words(0))
+                End If
+            Next
+
+
             '---------------- ASHRAE Handbook----------
-            Double.TryParse(TextBox58.Text, Kw)     'as vermogen
-            Double.TryParse(TextBox74.Text, eff)    'Efficiency [%]
-            eff /= 100                              'Efficiency [-]
-            n_imp = NumericUpDown13.Value           'toerental
-            no_schoepen = Tschets(ComboBox1.SelectedIndex).Tdata(13)        'aantal schoepen.    
-            bpf = no_schoepen * n_imp / 60                                  'schoepen per seconde
-            BFI = 3
-            Cn = 10 + 10 * Log10(1 - eff) / eff
+            '------------------------------------------
+
+            'bpf = no_schoepen * n_imp / 60                                  'schoepen per seconde
+            '    BFI = 3
+            '    Cn = 10 + 10 * Log10(1 - eff) / eff
 
 
-            lp(0) = 35 + 10 * Log10(Act_flow / 3600 * 2119) + 20 * Log10(p_stat * 0.00401325) + BFI + Cn    'Lp63
-            lp(1) = 35 + 10 * Log10(Act_flow / 3600 * 2119) + 20 * Log10(p_stat * 0.00401325) + BFI + Cn    'Lp125
-            lp(2) = 34 + 10 * Log10(Act_flow / 3600 * 2119) + 20 * Log10(p_stat * 0.00401325) + BFI + Cn    'Lp250
-            lp(3) = 32 + 10 * Log10(Act_flow / 3600 * 2119) + 20 * Log10(p_stat * 0.00401325) + BFI + Cn    'Lp500  
-            lp(4) = 31 + 10 * Log10(Act_flow / 3600 * 2119) + 20 * Log10(p_stat * 0.00401325) + BFI + Cn    'Lp1000
-            lp(5) = 24 + 10 * Log10(Act_flow / 3600 * 2119) + 20 * Log10(p_stat * 0.00401325) + BFI + Cn    'Lp2000  
-            lp(6) = 18 + 10 * Log10(Act_flow / 3600 * 2119) + 20 * Log10(p_stat * 0.00401325) + BFI + Cn    'Lp4000
-            lp(7) = 10 + 10 * Log10(Act_flow / 3600 * 2119) + 20 * Log10(p_stat * 0.00401325) + BFI + Cn    'Lp8000
+            'lp(0) = 35 + 10 * Log10(Act_flow_sec * 2119) + 20 * Log10(p_stat * 0.00401325) + BFI + Cn    'Lp63
+            'lp(1) = 35 + 10 * Log10(Act_flow_sec * 2119) + 20 * Log10(p_stat * 0.00401325) + BFI + Cn    'Lp125
+            'lp(2) = 34 + 10 * Log10(Act_flow_sec * 2119) + 20 * Log10(p_stat * 0.00401325) + BFI + Cn    'Lp250
+            'lp(3) = 32 + 10 * Log10(Act_flow_sec * 2119) + 20 * Log10(p_stat * 0.00401325) + BFI + Cn    'Lp500  
+            'lp(4) = 31 + 10 * Log10(Act_flow_sec * 2119) + 20 * Log10(p_stat * 0.00401325) + BFI + Cn    'Lp1000
+            'lp(5) = 24 + 10 * Log10(Act_flow_sec * 2119) + 20 * Log10(p_stat * 0.00401325) + BFI + Cn    'Lp2000  
+            'lp(6) = 18 + 10 * Log10(Act_flow_sec * 2119) + 20 * Log10(p_stat * 0.00401325) + BFI + Cn    'Lp4000
+            'lp(7) = 10 + 10 * Log10(Act_flow_sec * 2119) + 20 * Log10(p_stat * 0.00401325) + BFI + Cn    'Lp8000
 
-            If bpf >= 0 And bpf < 88 Then lp(0) += 3
-            If bpf >= 88 And bpf < 177 Then lp(1) += 3
-            If bpf >= 177 And bpf < 355 Then lp(2) += 3
-            If bpf >= 355 And bpf < 710 Then lp(3) += 3
-            If bpf >= 710 And bpf < 1420 Then lp(4) += 3
-            If bpf >= 1420 And bpf < 2840 Then lp(5) += 3
-            If bpf >= 2840 And bpf < 5680 Then lp(6) += 3
-            If bpf >= 5680 And bpf < 11360 Then lp(7) += 3
+            'If bpf >= 0 And bpf < 88 Then lp(0) += 3
+            '    If bpf >= 88 And bpf < 177 Then lp(1) += 3
+            '    If bpf >= 177 And bpf < 355 Then lp(2) += 3
+            '    If bpf >= 355 And bpf < 710 Then lp(3) += 3
+            '    If bpf >= 710 And bpf < 1420 Then lp(4) += 3
+            '    If bpf >= 1420 And bpf < 2840 Then lp(5) += 3
+            '    If bpf >= 2840 And bpf < 5680 Then lp(6) += 3
+            '    If bpf >= 5680 And bpf < 11360 Then lp(7) += 3
 
-            '--------------- Duct break out Noise, ASHREA 1999, Chapter 46.19, Table 21--------------------
-            diameter = ComboBox5.SelectedItem / 1000
-            Surface_area = diameter * PI * NumericUpDown42.Value     'Noise emitting area
-            Area_duct = PI / 4 * diameter ^ 2                        'Cross section
+            '    '--------------- Duct break out Noise, ASHREA 1999, Chapter 46.19, Table 21--------------------
 
-            words = TLout(ComboBox5.SelectedIndex).Split(";")
-            For hh = 0 To 7
-                Tlout_fact(hh) = words(hh + 3)
-                duct_in(hh) = lp(hh) + Log10(Surface_area / Area_duct) - Tlout_fact(hh)
-            Next hh
+            '    Surface_area = ComboBox5.SelectedItem / 1000 * PI * NumericUpDown42.Value       'Noise emitting area
+            '    Area_suc_duct = PI / 4 * ComboBox5.SelectedItem / 1000 ^ 2                      'Cross section suction duct
+
+
+            '    words = TLout(ComboBox5.SelectedIndex).Split(";")
+            '    For hh = 0 To 7
+            '        Tlout_fact(hh) = words(hh + 3)
+            '        duct_in(hh) = lp(hh) + Log10(Surface_area / Area_suc_duct) - Tlout_fact(hh)
+            '    Next hh
 
             If RadioButton6.Checked Then    'dBA correction
                 lp(0) += -26
@@ -2507,23 +2698,35 @@ Public Class Form1
             TextBox235.Text = Round(eff, 2).ToString            'Efficiency [-]
             TextBox236.Text = Round(no_schoepen, 1).ToString    'Aantal Schoepen
             TextBox237.Text = Round(bpf, 0).ToString            'Blade passing Frequency
+            TextBox321.Text = Round(DzDw, 2).ToString           'Dzuig/Dia waaier
+            TextBox322.Text = Round(Area_casing, 1).ToString    'Estimated area fan casing one side [m2]
+            TextBox317.Text = Round(nq, 3).ToString             'Sound calcu variable
+            TextBox318.Text = Round(rend, 2).ToString           'Sound calcu rendement
+            TextBox320.Text = Round(fBA, 2).ToString            'Sound calcu rendement
+            TextBox319.Text = Round(Lws, 2).ToString            'Sound power [dB]
+            TextBox312.Text = Round(Lwi, 2).ToString            'Sound power discharge [dB]
+            TextBox316.Text = Round(Lv, 3).ToString             'Casing area [m2] 
+            TextBox315.Text = Round(deltaLA, 3).ToString        'Meet area [m2] 
+            TextBox314.Text = Round(Rv, 3).ToString             'Plaat dikte isolatie 
+            TextBox313.Text = Round(n_ref, 0).ToString          'Referentie toerental 
+            TextBox323.Text = Round(inlet_red, 3).ToString      'Suction noise reduction [dB] 
 
             '---------------- Sound pressure level @ 1 meter -----------------------
-            TextBox225.Text = Round(power_to_pressure(Ltot), 0).ToString             'Sound Pressure [dB]
-            TextBox233.Text = Round(power_to_pressure(lp(0)), 0).ToString            'Sound Pressure [dB]
-            TextBox232.Text = Round(power_to_pressure(lp(1)), 0).ToString            'Sound Pressure [dB]
-            TextBox231.Text = Round(power_to_pressure(lp(2)), 0).ToString            'Sound Pressure [dB]
-            TextBox230.Text = Round(power_to_pressure(lp(3)), 0).ToString            'Sound Pressure [dB]
-            TextBox229.Text = Round(power_to_pressure(lp(4)), 0).ToString            'Sound Pressure [dB]
-            TextBox228.Text = Round(power_to_pressure(lp(5)), 0).ToString            'Sound Pressure [dB]
-            TextBox227.Text = Round(power_to_pressure(lp(6)), 0).ToString            'Sound Pressure [dB]
-            TextBox226.Text = Round(power_to_pressure(lp(7)), 0).ToString            'Sound Pressure [dB]
+            TextBox225.Text = Round(power_to_pressure(Ltot), 0).ToString            'Sound Pressure [dB]
+            TextBox233.Text = Round(power_to_pressure(lp(0)), 0).ToString           'Sound Pressure [dB]
+            TextBox232.Text = Round(power_to_pressure(lp(1)), 0).ToString           'Sound Pressure [dB]
+            TextBox231.Text = Round(power_to_pressure(lp(2)), 0).ToString           'Sound Pressure [dB]
+            TextBox230.Text = Round(power_to_pressure(lp(3)), 0).ToString           'Sound Pressure [dB]
+            TextBox229.Text = Round(power_to_pressure(lp(4)), 0).ToString           'Sound Pressure [dB]
+            TextBox228.Text = Round(power_to_pressure(lp(5)), 0).ToString           'Sound Pressure [dB]
+            TextBox227.Text = Round(power_to_pressure(lp(6)), 0).ToString           'Sound Pressure [dB]
+            TextBox226.Text = Round(power_to_pressure(lp(7)), 0).ToString           'Sound Pressure [dB]
 
             '---------------- input data--------------------------
-            TextBox112.Text = Round(Act_flow, 0).ToString           'Debiet [m3/hr]
-            TextBox127.Text = Round(Act_flow / 3600, 2).ToString    'Debiet [m3/s]
-            TextBox113.Text = Round(p_stat / 100, 0).ToString       'Dp static [mbar]
-            TextBox126.Text = Round(p_stat, 0).ToString             'Dp static [Pa]
+            TextBox112.Text = Round(Act_flow_sec * 3600, 0).ToString        'Debiet [m3/hr]
+            TextBox127.Text = Round(Act_flow_sec, 2).ToString               'Debiet [m3/s]
+            TextBox113.Text = Round(p_stat / 100, 0).ToString               'Dp static [mbar]
+            TextBox126.Text = Round(p_stat, 0).ToString                     'Dp static [Pa]
 
             '---------- results----------------------------
             TextBox125.Text = Round(Ltot, 0).ToString
@@ -3277,7 +3480,6 @@ Public Class Form1
 
         TextBox78.Text = Round(ambient_mbar, 2).ToString
     End Sub
-
 
     Private Sub calc_emotor_4P()
         'see http://ecatalog.weg.net/files/wegnet/WEG-specification-of-electric-motors-50039409-manual-english.pdf
