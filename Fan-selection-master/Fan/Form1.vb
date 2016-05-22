@@ -235,8 +235,8 @@ Public Class Form1
 
     'Sound insulation casing
     'Beschrijving,63,125,25,500,1000,2000,4000,8000
-
     Public Shared insulation_casing() As String = {
+    "NO insulation;0;0;0;0;0;0;0;0;0",
     "50mm Rockwool, Al-plate;0;0;0;2;7;12;12;12;12",
     "50mm Rockwool, Fe-plate;0;0;0;3;10;15;16;16;16",
     "75mm Rockwool, Al-plate;0;0;0;3;8;13;13;13;13",
@@ -251,78 +251,79 @@ Public Class Form1
     "175mm Rockwool, Fe-plate;0;7;12;17;22;24;24;24;24",
     "200mm Rockwool, Al-plate;0;5;10;17;24;25;25;25;25",
     "200mm Rockwool, Fe-plate;0;8;13;19;24;25;25;25;25",
-    "50mm Rockwool, Al-plate;2,6;0;3;7;12;17;19;19;19",
-    "50mm Rockwool, Fe-plate;2,6;3;7;12;17;20;21;21;21",
-    "75mm Rockwool, Al-plate;2,6;1;3;10;15;18;20;20;20",
-    "75mm Rockwool, Fe-plate;2,6;4;8;15;20;21;21;22;22",
-    "100mm Rockwool, Al-plate;2,6;1;4;11;16;19;21;21;21",
-    "100mm Rockwool, Fe-plate;2,6;5;9;16;21;22;22;22;22",
-    "125mm Rockwool, Al-plate;2,6;2;7;13;19;22;23;23;23",
-    "125mm Rockwool, Fe-plate;2,6;6;14;19;22;23;23;23;23",
-    "150mm Rockwool, Al-plate;2,6;4;10;15;20;23;24;24;24",
-    "150mm Rockwool, Fe-plate;2,6;8;15;21;24;25;25;25;25",
-    "175mm Rockwool, Al-plate;2,6;5;12;17;21;23;24;24;24",
-    "175mm Rockwool, Fe-plate;2,6;9;16;22;25;26;26;26;26",
-    "200mm Rockwool, Al-plate;2,6;6;14;18;22;24;25;25;25",
-    "200mm Rockwool, Fe-plate;2,6;10;17;24;25;26;27;27;27"}
+    "50mm Rockw., Al-plate, 2.6mm Foil;2,6;0;3;7;12;17;19;19;19",
+    "50mm Rockw., Fe-plate, 2.6mm Foil;2,6;3;7;12;17;20;21;21;21",
+    "75mm Rockw., Al-plate, 2.6mm Foil;2,6;1;3;10;15;18;20;20;20",
+    "75mm Rockw., Fe-plate, 2.6mm Foil;2,6;4;8;15;20;21;21;22;22",
+    "100mm Rockw., Al-plate, 2.6mm Foil;2,6;1;4;11;16;19;21;21;21",
+    "100mm Rockw., Fe-plate, 2.6mm Foil;2,6;5;9;16;21;22;22;22;22",
+    "125mm Rockw., Al-plate, 2.6mm Foil;2,6;2;7;13;19;22;23;23;23",
+    "125mm Rockw., Fe-plate, 2.6mm Foil;2,6;6;14;19;22;23;23;23;23",
+    "150mm Rockw., Al-plate, 2.6mm Foil;2,6;4;10;15;20;23;24;24;24",
+    "150mm Rockw., Fe-plate, 2.6mm Foil;2,6;8;15;21;24;25;25;25;25",
+    "175mm Rockw., Al-plate, 2.6mm Foil;2,6;5;12;17;21;23;24;24;24",
+    "175mm Rockw., Fe-plate, 2.6mm Foil;2,6;9;16;22;25;26;26;26;26",
+    "200mm Rockw., Al-plate, 2.6mm Foil;2,6;6;14;18;22;24;25;25;25",
+    "200mm Rockw., Fe-plate, 2.6mm Foil;2,6;10;17;24;25;26;27;27;27"}
 
 
     'Inlet noise dempers
     'Lengte;63;125;250;500;1000;2000;4000;8000,
     Public Shared inlet_damper() As String = {
-    "500mm;-3;-5;-10;-17;-24;-20;-14;-11",
-    "750mm;-3;-6;-13;-24;-32;-26;-16;-12",
-    "1000mm;-4;-8;-17;-30;-40;-32;-19;-13",
-    "1250mm;-5;-10;-20;-35;-49;-38;-22;-15",
-    "1500mm;-6;-14;-23;-41;-50;-44;-25;-17",
-    "1750mm;-7;-16;-27;-47;-50;-50;-27;-18",
-    "2000mm;-7;-17;-30;-50;-50;-50;-30;-20",
-    "2250mm;-8;-18;-33;-50;-50;-50;-32;-21",
-    "2500mm;-8;-19;-36;-50;-50;-50;-35;-22",
-    "2750mm;-8;-20;-38;-50;-50;-50;-37;-23",
-    "3000mm;-9;-21;-39;-50;-50;-50;-38;-23"}
+    "NO damper;0;0;0;0;0;0;0;0",
+    "L=500 mm;-3;-5;-10;-17;-24;-20;-14;-11",
+    "L=750 mm;-3;-6;-13;-24;-32;-26;-16;-12",
+    "L=1000 mm;-4;-8;-17;-30;-40;-32;-19;-13",
+    "L=1250 mm;-5;-10;-20;-35;-49;-38;-22;-15",
+    "L=1500 mm;-6;-14;-23;-41;-50;-44;-25;-17",
+    "L=1750 mm;-7;-16;-27;-47;-50;-50;-27;-18",
+    "L=2000 mm;-7;-17;-30;-50;-50;-50;-30;-20",
+    "L=2250 mm;-8;-18;-33;-50;-50;-50;-32;-21",
+    "L=2500 mm;-8;-19;-36;-50;-50;-50;-35;-22",
+    "L=2750 mm;-8;-20;-38;-50;-50;-50;-37;-23",
+    "L=3000 mm;-9;-21;-39;-50;-50;-50;-38;-23"}
 
 
     'Sound Power reduction fan inlet in suction diameter smaller 40% impeller diameter
     'zoekgetal,n max,n min,z,63Hz,125Hz,250Hz,500Hz,1kHz,2kHz,4kHz,8 kHz
     Public Shared zuig_smaller40() As String = {
-    "2499848;559;280;8;-2;-5,5;-11;-16;-24;-30;-40;-48",
-    "3124810;559;280;10;-2;-5,5;-10;-15;-22;-29;-37;-46",
-    "3749772;559;280;12;-1;-4,5;-9;-14;-21;-28;-36;-44",
-    "6249620;559;280;20;-1;-4,5;-9;-12;-20;-26;-34;-42",
+    "2499848;559;280;8;-2;-5.5;-11;-16;-24;-30;-40;-48",
+    "3124810;559;280;10;-2;-5.5;-10;-15;-22;-29;-37;-46",
+    "3749772;559;280;12;-1;-4.5;-9;-14;-21;-28;-36;-44",
+    "6249620;559;280;20;-1;-4.5;-9;-12;-20;-26;-34;-42",
     "10107008;1124;560;8;-3;-4;-9;-14;-19;-27;-33;-43",
     "12633760;1124;560;10;-3;-4;-9;-13;-18;-25;-32;-40",
     "15160512;1124;560;12;-3;-3;-8;-12;-17;-24;-31;-39",
     "25267520;1124;560;20;-3;-3;-8;-12;-16;-23;-30;-37",
-    "40464008;2249;1125;8;-5;-5;-4,5;-10;-17;-25;-36;-48",
-    "50580010;2249;1125;10;-5;-5;-4,5;-10;-16;-24;-34;-47",
-    "60696012;2249;1125;12;-6;-5;-4,5;-9;-15;-23;-33;-46",
-    "101160020;2249;1125;20;-6;-5;-4,5;-9;-15;-22;-32;-44",
-    "162000000;4500;2250;8;-8;-6;-5,5;-5,5;-11;-19;-27;-38",
-    "202500000;4500;2250;10;-8;-6;-5,5;-5,5;-11;-18;-26;-36",
-    "243000000;4500;2250;12;-9;-6;-5,5;-4,5;-10;-17;-25;-35",
-    "405000000;4500;2250;20;-9;-6;-5,5;-4,5;-10;-17;-24;-34"}
+    "40464008;2249;1125;8;-5;-5;-4.5;-10;-17;-25;-36;-48",
+    "50580010;2249;1125;10;-5;-5;-4.5;-10;-16;-24;-34;-47",
+    "60696012;2249;1125;12;-6;-5;-4.5;-9;-15;-23;-33;-46",
+    "101160020;2249;1125;20;-6;-5;-4.5;-9;-15;-22;-32;-44",
+    "162000000;4500;2250;8;-8;-6;-5.5;-5.5;-11;-19;-27;-38",
+    "202500000;4500;2250;10;-8;-6;-5.5;-5.5;-11;-18;-26;-36",
+    "243000000;4500;2250;12;-9;-6;-5.5;-4.5;-10;-17;-25;-35",
+    "405000000;4500;2250;20;-9;-6;-5.5;-4.5;-10;-17;-24;-34"}
 
 
     'Sound Power reduction fan inlet in suction diameter equal of bigger 40% impeller diameter
     'zoekgetal,n max,n min,z,63Hz,125Hz,250Hz,500Hz,1kHz,2kHz,4kHz,8 kHz
     Public Shared zuig_bigger40() As String = {
-    "2499848;559;280;8;-2;-5,5;-11;-16;-24;-30;-40;-48",
-    "3124810;559;280;10;-2;-5,5;-10;-15;-22;-29;-37;-46",
-    "3749772;559;280;12;-1;-4,5;-9;-14;-21;-28;-36;-44",
-    "6249620;559;280;20;-1;-4,5;-9;-12;-20;-26;-34;-42",
+    "2499848;559;280;8;-2;-5.5;-11;-16;-24;-30;-40;-48",
+    "3124810;559;280;10;-2;-5.5;-10;-15;-22;-29;-37;-46",
+    "3749772;559;280;12;-1;-4.5;-9;-14;-21;-28;-36;-44",
+    "6249620;559;280;20;-1;-4.5;-9;-12;-20;-26;-34;-42",
     "10107008;1124;560;8;-3;-4;-9;-14;-19;-27;-33;-43",
     "12633760;1124;560;10;-3;-4;-9;-13;-18;-25;-32;-40",
     "15160512;1124;560;12;-3;-3;-8;-12;-17;-24;-31;-39",
     "25267520;1124;560;20;-3;-3;-8;-12;-16;-23;-30;-37",
-    "40464008;2249;1125;8;-4;-5,5;-5,5;-11;-17;-22;-29;-35",
-    "50580010;2249;1125;10;-4;-5,5;-5,5;-11;-16;-21;-27;-34",
-    "60696012;2249;1125;12;-5;-5,5;-5,5;-10;-15;-20;-26;-33",
-    "101160020;2249;1125;20;-5;-5,5;-5,5;-10;-15;-19;-25;-31",
-    "162000000;4500;2250;8;-4;-5,5;-7;-7;-13;-19;-25;-32",
-    "202500000;4500;2250;10;-4;-5,5;-7;-7;-13;-18;-24;-30",
-    "243000000;4500;2250;12;-5;-5,5;-7;-6;-12;-17;-23;-29",
-    "405000000;4500;2250;20;-5;-5,5;-7;-6;-12;-17;-22;-28"}
+    "40464008;2249;1125;8;-4;-5.5;-5.5;-11;-17;-22;-29;-35",
+    "50580010;2249;1125;10;-4;-5.5;-5.5;-11;-16;-21;-27;-34",
+    "60696012;2249;1125;12;-5;-5.5;-5.5;-10;-15;-20;-26;-33",
+    "101160020;2249;1125;20;-5;-5.5;-5.5;-10;-15;-19;-25;-31",
+    "162000000;4500;2250;8;-4;-5.5;-7;-7;-13;-19;-25;-32",
+    "202500000;4500;2250;10;-4;-5.5;-7;-7;-13;-18;-24;-30",
+    "243000000;4500;2250;12;-5;-5.5;-7;-6;-12;-17;-23;-29",
+    "405000000;4500;2250;20;-5;-5.5;-7;-6;-12;-17;-22;-28"}
 
 
 
@@ -427,7 +428,7 @@ Public Class Form1
         Next hh
 
         '-------Fill combobox3, Steel selection------------------
-        For hh = 0 To (steel.Length - 2)            'Fill combobox 3 with steel data
+        For hh = 0 To (steel.Length - 2)            'Fill combobox3 with steel data
             words = steel(hh).Split(";")
             ComboBox3.Items.Add(words(0))
         Next hh
@@ -435,23 +436,24 @@ Public Class Form1
         Label34.Text = ChrW(963) & " 0.2 @ T bedrijf [N/mm]"
 
         '-------Fill combobox4, Motor selection------------------
-        For hh = 0 To (emotor_4P.Length - 1)         'Fill combobox 4 electric motor data
+        For hh = 0 To (emotor_4P.Length - 1)         'Fill combobox4 electric motor data
             words = emotor_4P(hh).Split(";")
             ComboBox4.Items.Add(words(0))
             ComboBox6.Items.Add(words(0))
         Next hh
 
-        For hh = 0 To (TLout.Length - 1)             'Fill combobox 5 Duct diameters
+        For hh = 0 To (TLout.Length - 1)             'Fill combobox5 Duct diameters
             words = TLout(hh).Split(";")
             ComboBox5.Items.Add(words(0))
         Next hh
 
-        For hh = 0 To (insulation_casing.Length - 1)  'Fill combobox 9 Insulation data
+
+        For hh = 0 To (insulation_casing.Length - 1)  'Fill combobox9 Insulation data
             words = insulation_casing(hh).Split(";")
             ComboBox9.Items.Add(words(0))
         Next hh
 
-        For hh = 0 To (inlet_damper.Length - 1)  'Fill combobox 10 inlet damper
+        For hh = 0 To (inlet_damper.Length - 1)     'Fill combobox10 inlet damper
             words = inlet_damper(hh).Split(";")
             ComboBox10.Items.Add(words(0))
         Next hh
@@ -488,7 +490,7 @@ Public Class Form1
         ComboBox8.SelectedIndex = 0                     'SKF a1 factor
 
         If ComboBox9.Items.Count > 0 Then
-            ComboBox9.SelectedIndex = 4                 'Select 100m Rockwool Alu
+            ComboBox9.SelectedIndex = 3                 'Select 100m Rockwool Alu
         End If
 
         If ComboBox10.Items.Count > 0 Then
@@ -2540,16 +2542,18 @@ Public Class Form1
         Selectie_1()
     End Sub
     'Calculate the noise tab
-    Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click, TabPage4.Enter, RadioButton6.CheckedChanged, NumericUpDown42.ValueChanged, ComboBox5.SelectedIndexChanged, NumericUpDown7.ValueChanged
+    Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click, TabPage4.Enter, RadioButton6.CheckedChanged, NumericUpDown42.ValueChanged, ComboBox5.SelectedIndexChanged, NumericUpDown7.ValueChanged, ComboBox9.SelectedIndexChanged, ComboBox10.SelectedIndexChanged
         Dim spez_drehz, p_stat, P_tot, Act_flow_sec, roww As Double
-        Dim Ltot, eff, n_imp, no_schoepen As Double
-        Dim Kw, BFI, Cn, bpf, dia_fan_inlet, diameter_imp As Double
-        Dim lp(9), duct_in(9) As Double
+        Dim eff, n_imp, no_schoepen As Double
+        Dim Kw, bpf, dia_fan_inlet, diameter_imp As Double
+        Dim Suction_raw(9), Suction_damper(9), Suction_clean(9) As Double    'Suction fan
+        Dim Discharge_raw(9) As Double                                      'Discharge fan
+        Dim duct_in(9) As Double                                            'Ducting
+        Dim casing_raw(9), casing_insulation(9), casing_clean(9) As Double  'Casing
         Dim hh As Integer
         Dim words() As String
-        Dim Tlout_fact(8) As Double
-        Dim DzDw As Double                          'Diameter zuig/diameter waaier
-        Dim Area_casing, casing_dikte, area_measure As Double     'Estimated Area casing one side!!
+        Dim DzDw As Double                                                  'Diameter zuig/diameter waaier
+        Dim Area_casing, casing_dikte, area_measure As Double               'Estimated Area casing one side!!
         Dim nq As Double     '
 
         If (ComboBox5.SelectedIndex > -1) Then      'Prevent exceptions
@@ -2576,7 +2580,40 @@ Public Class Form1
             area_measure = (Sqrt(Area_casing) + 2) ^ 2                      'Meet oppervlak Hoogte+2m, Breed+2m
             casing_dikte = NumericUpDown7.Value                             'Casing plaat dikte
 
-            'Sound power level
+            '------------------------ casing insulation--------------------       
+            If (ComboBox9.SelectedIndex > -1) Then      'Prevent exceptions
+                words = insulation_casing(ComboBox9.SelectedIndex).Split(";")
+                For hh = 0 To 7
+                    casing_insulation(hh) = words(hh + 2)
+                Next
+                TextBox293.Text = Round(casing_insulation(0), 0).ToString
+                TextBox290.Text = Round(casing_insulation(1), 0).ToString
+                TextBox292.Text = Round(casing_insulation(2), 0).ToString
+                TextBox291.Text = Round(casing_insulation(3), 0).ToString
+                TextBox289.Text = Round(casing_insulation(4), 0).ToString
+                TextBox288.Text = Round(casing_insulation(5), 0).ToString
+                TextBox286.Text = Round(casing_insulation(6), 0).ToString
+                TextBox285.Text = Round(casing_insulation(7), 0).ToString
+            End If
+
+            '----------------------- inlet damper--------------------------
+            If (ComboBox10.SelectedIndex > -1) Then      'Prevent exceptions
+                words = inlet_damper(ComboBox10.SelectedIndex).Split(";")
+                For hh = 0 To 7
+                    Suction_damper(hh) = words(hh + 1)
+                Next
+                TextBox332.Text = Round(Suction_damper(0), 0).ToString
+                TextBox331.Text = Round(Suction_damper(1), 0).ToString
+                TextBox330.Text = Round(Suction_damper(2), 0).ToString
+                TextBox329.Text = Round(Suction_damper(3), 0).ToString
+                TextBox328.Text = Round(Suction_damper(4), 0).ToString
+                TextBox327.Text = Round(Suction_damper(5), 0).ToString
+                TextBox326.Text = Round(Suction_damper(6), 0).ToString
+                TextBox325.Text = Round(Suction_damper(7), 0).ToString
+            End If
+
+
+            'Sound power level-------------------------------------
             'Lws = 2.9513409 * Log(spez_drehz) + 26.0752394                  'Willi Bohl pagina 45 and 51 for check
             'Ltot = Lws + 10 * Log10(Act_flow / 3600) + 20 * Log10(p_stat)    ' +/- 5 db
             'Ltot = 27 + 10 * Log10(Act_flow / 3600) + 20 * Log10(p_stat)     ' http://www.schweizer-fn.de/lueftung/ventilator/ventilator.php
@@ -2595,8 +2632,6 @@ Public Class Form1
             zet = (kappa - 1) * roww * Kw * 1000 / kappa / (Act_flow_sec * roww) / P_tot
             kp = zet * Log(pppz) / Log(1 + zet * (pppz - 1))
             rend = Act_flow_sec * P_tot / Kw / 1000 * kp
-
-            'MessageBox.Show("pppz= " & pppz.ToString & "  zet= " & zet.ToString & " kp= " & kp.ToString & " act_flow = " & Act_flow_sec.ToString)
 
             '-------------- fBA---------------
             fBA = 1 + (0.5 * (0.82 / rend - 1))
@@ -2621,7 +2656,6 @@ Public Class Form1
             inlet_red = -1 * 20 * Log10(diameter_imp / dia_fan_inlet) * Sqrt(2) + 1
 
             '----------- find the reduction on fan inlet-----------
-            ' MessageBox.Show(zuig_smaller40.Length.ToString)
             For i = 0 To (zuig_smaller40.Length - 1)
                 If (DzDw <= 0.4) Then
                     words = zuig_smaller40(i).Split(";")
@@ -2629,98 +2663,78 @@ Public Class Form1
                     words = zuig_bigger40(i).Split(";")
                 End If
                 If Zoek_freq > Convert.ToDouble(words(0)) Then
-                    lp(0) = words(4)    'Lp63
-                    lp(1) = words(5)    'Lp125
-                    lp(2) = words(6)    'Lp250
-                    lp(3) = words(7)    'Lp500  
-                    lp(4) = words(8)    'Lp1000
-                    lp(5) = words(9)    'Lp2000  
-                    lp(6) = words(10)   'Lp4000
-                    lp(7) = words(11)   'Lp8000
-                    'MessageBox.Show(i.ToString & " Zoek_freq= " & Zoek_freq.ToString & " words(0)= " & words(0))
+                    Suction_raw(0) = Lwi + inlet_red + words(4)    'Lp63
+                    Suction_raw(1) = Lwi + inlet_red + words(5)    'Lp125
+                    Suction_raw(2) = Lwi + inlet_red + words(6)    'Lp250
+                    Suction_raw(3) = Lwi + inlet_red + words(7)    'LP500  
+                    Suction_raw(4) = Lwi + inlet_red + words(8)    'Lp1000
+                    Suction_raw(5) = Lwi + inlet_red + words(9)    'Lp2000  
+                    Suction_raw(6) = Lwi + inlet_red + words(10)   'Lp4000
+                    Suction_raw(7) = Lwi + inlet_red + words(11)   'Lp8000
+                    '------------------------------------
+                    Discharge_raw(0) = Lwi + words(4)               'Lp63
+                    Discharge_raw(1) = Lwi + words(5)               'Lp125
+                    Discharge_raw(2) = Lwi + words(6)               'Lp250
+                    Discharge_raw(3) = Lwi + words(7)               'LP500  
+                    Discharge_raw(4) = Lwi + words(8)               'Lp1000
+                    Discharge_raw(5) = Lwi + words(9)               'Lp2000  
+                    Discharge_raw(6) = Lwi + words(10)              'Lp4000
+                    Discharge_raw(7) = Lwi + words(11)              'Lp8000
                 End If
             Next
 
 
-            '---------------- ASHRAE Handbook----------
-            '------------------------------------------
 
-            'bpf = no_schoepen * n_imp / 60                                  'schoepen per seconde
-            '    BFI = 3
-            '    Cn = 10 + 10 * Log10(1 - eff) / eff
+            '----------- calc suction clean-----------
+            For i = 0 To (Suction_clean.Length - 1)
+                Suction_clean(i) = Suction_raw(i) + Suction_damper(i)
+            Next
 
+            '----------- Casing RAW-----------
+            For i = 0 To (casing_raw.Length - 1)
+                casing_raw(i) = Discharge_raw(i) - Rv + Lv
+            Next
 
-            'lp(0) = 35 + 10 * Log10(Act_flow_sec * 2119) + 20 * Log10(p_stat * 0.00401325) + BFI + Cn    'Lp63
-            'lp(1) = 35 + 10 * Log10(Act_flow_sec * 2119) + 20 * Log10(p_stat * 0.00401325) + BFI + Cn    'Lp125
-            'lp(2) = 34 + 10 * Log10(Act_flow_sec * 2119) + 20 * Log10(p_stat * 0.00401325) + BFI + Cn    'Lp250
-            'lp(3) = 32 + 10 * Log10(Act_flow_sec * 2119) + 20 * Log10(p_stat * 0.00401325) + BFI + Cn    'Lp500  
-            'lp(4) = 31 + 10 * Log10(Act_flow_sec * 2119) + 20 * Log10(p_stat * 0.00401325) + BFI + Cn    'Lp1000
-            'lp(5) = 24 + 10 * Log10(Act_flow_sec * 2119) + 20 * Log10(p_stat * 0.00401325) + BFI + Cn    'Lp2000  
-            'lp(6) = 18 + 10 * Log10(Act_flow_sec * 2119) + 20 * Log10(p_stat * 0.00401325) + BFI + Cn    'Lp4000
-            'lp(7) = 10 + 10 * Log10(Act_flow_sec * 2119) + 20 * Log10(p_stat * 0.00401325) + BFI + Cn    'Lp8000
-
-            'If bpf >= 0 And bpf < 88 Then lp(0) += 3
-            '    If bpf >= 88 And bpf < 177 Then lp(1) += 3
-            '    If bpf >= 177 And bpf < 355 Then lp(2) += 3
-            '    If bpf >= 355 And bpf < 710 Then lp(3) += 3
-            '    If bpf >= 710 And bpf < 1420 Then lp(4) += 3
-            '    If bpf >= 1420 And bpf < 2840 Then lp(5) += 3
-            '    If bpf >= 2840 And bpf < 5680 Then lp(6) += 3
-            '    If bpf >= 5680 And bpf < 11360 Then lp(7) += 3
-
-            '    '--------------- Duct break out Noise, ASHREA 1999, Chapter 46.19, Table 21--------------------
-
-            '    Surface_area = ComboBox5.SelectedItem / 1000 * PI * NumericUpDown42.Value       'Noise emitting area
-            '    Area_suc_duct = PI / 4 * ComboBox5.SelectedItem / 1000 ^ 2                      'Cross section suction duct
+            '----------- Casing Clean-----------
+            For i = 0 To (casing_clean.Length - 1)
+                casing_clean(i) = casing_raw(i) - casing_insulation(i)
+            Next
 
 
-            '    words = TLout(ComboBox5.SelectedIndex).Split(";")
-            '    For hh = 0 To 7
-            '        Tlout_fact(hh) = words(hh + 3)
-            '        duct_in(hh) = lp(hh) + Log10(Surface_area / Area_suc_duct) - Tlout_fact(hh)
-            '    Next hh
+            'If RadioButton6.Checked Then    'dBA correction
+            '    lp(0) += -26
+            '    lp(1) += -16
+            '    lp(2) += -9
+            '    lp(3) += -3
+            '    lp(4) += 0
+            '    lp(5) += 1
+            '    lp(6) += 1
+            '    lp(7) += -1
+            'End If
 
-            If RadioButton6.Checked Then    'dBA correction
-                lp(0) += -26
-                lp(1) += -16
-                lp(2) += -9
-                lp(3) += -3
-                lp(4) += 0
-                lp(5) += 1
-                lp(6) += 1
-                lp(7) += -1
-            End If
 
-            Ltot = 10 * Log10(10 ^ (lp(0) / 10) + 10 ^ (lp(1) / 10) + 10 ^ (lp(2) / 10) + 10 ^ (lp(3) / 10) + 10 ^ (lp(4) / 10) + 10 ^ (lp(5) / 10) + 10 ^ (lp(6) / 10) + 10 ^ (lp(7) / 10))
+            ' Ltot = 10 * Log10(10 ^ (lp(0) / 10) + 10 ^ (lp(1) / 10) + 10 ^ (lp(2) / 10) + 10 ^ (lp(3) / 10) + 10 ^ (lp(4) / 10) + 10 ^ (lp(5) / 10) + 10 ^ (lp(6) / 10) + 10 ^ (lp(7) / 10))
 
-            TextBox114.Text = Round(n_imp, 0).ToString          'Toerental [rpm]
-            TextBox234.Text = Round(Kw, 0).ToString             'As vermogen[kW]
-            TextBox235.Text = Round(eff, 2).ToString            'Efficiency [-]
-            TextBox236.Text = Round(no_schoepen, 1).ToString    'Aantal Schoepen
-            TextBox237.Text = Round(bpf, 0).ToString            'Blade passing Frequency
-            TextBox321.Text = Round(DzDw, 2).ToString           'Dzuig/Dia waaier
-            TextBox322.Text = Round(Area_casing, 1).ToString    'Estimated area fan casing one side [m2]
-            TextBox317.Text = Round(nq, 3).ToString             'Sound calcu variable
-            TextBox318.Text = Round(rend, 2).ToString           'Sound calcu rendement
-            TextBox320.Text = Round(fBA, 2).ToString            'Sound calcu rendement
-            TextBox319.Text = Round(Lws, 2).ToString            'Sound power [dB]
-            TextBox312.Text = Round(Lwi, 2).ToString            'Sound power discharge [dB]
-            TextBox316.Text = Round(Lv, 3).ToString             'Casing area [m2] 
-            TextBox315.Text = Round(deltaLA, 3).ToString        'Meet area [m2] 
-            TextBox314.Text = Round(Rv, 3).ToString             'Plaat dikte isolatie 
-            TextBox313.Text = Round(n_ref, 0).ToString          'Referentie toerental 
-            TextBox323.Text = Round(inlet_red, 3).ToString      'Suction noise reduction [dB] 
+            TextBox114.Text = Round(n_imp, 0).ToString              'Toerental [rpm]
+            TextBox234.Text = Round(Kw, 0).ToString                 'As vermogen[kW]
+            TextBox235.Text = Round(eff, 2).ToString                'Efficiency [-]
+            TextBox236.Text = Round(no_schoepen, 1).ToString        'Aantal Schoepen
+            TextBox237.Text = Round(bpf, 0).ToString                'Blade passing Frequency
+            TextBox321.Text = Round(DzDw, 2).ToString               'Dzuig/Dia waaier
+            TextBox322.Text = Round(Area_casing, 1).ToString        'Estimated area fan casing one side [m2]
+            TextBox317.Text = Round(nq, 3).ToString                 'Sound calcu variable
+            TextBox318.Text = Round(rend, 2).ToString               'Sound calcu rendement
+            TextBox320.Text = Round(fBA, 2).ToString                'Sound calcu rendement
+            TextBox319.Text = Round(Lws, 1).ToString                'Sound power [dB]
+            TextBox312.Text = Round(Lwi, 1).ToString                'Sound power discharge [dB]
+            TextBox303.Text = TextBox312.Text                       'Sound power discharge [dB]
 
-            '---------------- Sound pressure level @ 1 meter -----------------------
-            TextBox225.Text = Round(power_to_pressure(Ltot), 0).ToString            'Sound Pressure [dB]
-            TextBox233.Text = Round(power_to_pressure(lp(0)), 0).ToString           'Sound Pressure [dB]
-            TextBox232.Text = Round(power_to_pressure(lp(1)), 0).ToString           'Sound Pressure [dB]
-            TextBox231.Text = Round(power_to_pressure(lp(2)), 0).ToString           'Sound Pressure [dB]
-            TextBox230.Text = Round(power_to_pressure(lp(3)), 0).ToString           'Sound Pressure [dB]
-            TextBox229.Text = Round(power_to_pressure(lp(4)), 0).ToString           'Sound Pressure [dB]
-            TextBox228.Text = Round(power_to_pressure(lp(5)), 0).ToString           'Sound Pressure [dB]
-            TextBox227.Text = Round(power_to_pressure(lp(6)), 0).ToString           'Sound Pressure [dB]
-            TextBox226.Text = Round(power_to_pressure(lp(7)), 0).ToString           'Sound Pressure [dB]
+            TextBox125.Text = Round(Lwi + inlet_red, 1).ToString    'Sound power inlet [dB]
+            TextBox316.Text = Round(Lv, 3).ToString                 'Casing area [m2] 
+            TextBox315.Text = Round(deltaLA, 3).ToString            'Meet area [m2] 
+            TextBox314.Text = Round(Rv, 3).ToString                 'Plaat dikte isolatie 
+            TextBox313.Text = Round(n_ref, 0).ToString              'Referentie toerental 
+            TextBox323.Text = Round(inlet_red, 3).ToString          'Suction noise reduction [dB] 
 
             '---------------- input data--------------------------
             TextBox112.Text = Round(Act_flow_sec * 3600, 0).ToString        'Debiet [m3/hr]
@@ -2728,31 +2742,88 @@ Public Class Form1
             TextBox113.Text = Round(p_stat / 100, 0).ToString               'Dp static [mbar]
             TextBox126.Text = Round(p_stat, 0).ToString                     'Dp static [Pa]
 
-            '---------- results----------------------------
-            TextBox125.Text = Round(Ltot, 0).ToString
 
-            '----------opgesplits in banden--------------
-            TextBox115.Text = Round(lp(0), 0).ToString       '
-            TextBox116.Text = Round(lp(1), 0).ToString
-            TextBox117.Text = Round(lp(2), 0).ToString
-            TextBox118.Text = Round(lp(3), 0).ToString
-            TextBox119.Text = Round(lp(4), 0).ToString
-            TextBox120.Text = Round(lp(5), 0).ToString
-            TextBox121.Text = Round(lp(6), 0).ToString
-            TextBox122.Text = Round(lp(7), 0).ToString
+            '----------Suction RAW induct opgesplits in banden--------------
+            TextBox115.Text = Round(Suction_raw(0), 1).ToString       '
+            TextBox116.Text = Round(Suction_raw(1), 1).ToString
+            TextBox117.Text = Round(Suction_raw(2), 1).ToString
+            TextBox118.Text = Round(Suction_raw(3), 1).ToString
+            TextBox119.Text = Round(Suction_raw(4), 1).ToString
+            TextBox120.Text = Round(Suction_raw(5), 1).ToString
+            TextBox121.Text = Round(Suction_raw(6), 1).ToString
+            TextBox122.Text = Round(Suction_raw(7), 1).ToString
+
+            '----------Suction Clean induct opgesplits in banden--------------
+            TextBox333.Text = Round(add_decibels(Suction_clean), 1).ToString
+            TextBox341.Text = Round(Suction_clean(0), 1).ToString       '
+            TextBox340.Text = Round(Suction_clean(1), 1).ToString
+            TextBox339.Text = Round(Suction_clean(2), 1).ToString
+            TextBox338.Text = Round(Suction_clean(3), 1).ToString
+            TextBox337.Text = Round(Suction_clean(4), 1).ToString
+            TextBox336.Text = Round(Suction_clean(5), 1).ToString
+            TextBox335.Text = Round(Suction_clean(6), 1).ToString
+            TextBox334.Text = Round(Suction_clean(7), 1).ToString
+
+            '----------Discharge RAW induct opgesplits in banden--------------
+            TextBox311.Text = Round(Discharge_raw(0), 1).ToString       '
+            TextBox310.Text = Round(Discharge_raw(1), 1).ToString
+            TextBox309.Text = Round(Discharge_raw(2), 1).ToString
+            TextBox308.Text = Round(Discharge_raw(3), 1).ToString
+            TextBox307.Text = Round(Discharge_raw(4), 1).ToString
+            TextBox306.Text = Round(Discharge_raw(5), 1).ToString
+            TextBox305.Text = Round(Discharge_raw(6), 1).ToString
+            TextBox304.Text = Round(Discharge_raw(7), 1).ToString
+
+            '---------------- Casing raw -----------------------
+            TextBox225.Text = Round(add_decibels(casing_raw), 1).ToString   'Sound Pressure [dB]
+            TextBox233.Text = Round(casing_raw(0), 1).ToString              'Sound Pressure [dB]
+            TextBox232.Text = Round(casing_raw(1), 1).ToString              'Sound Pressure [dB]
+            TextBox231.Text = Round(casing_raw(2), 1).ToString              'Sound Pressure [dB]
+            TextBox230.Text = Round(casing_raw(3), 1).ToString              'Sound Pressure [dB]
+            TextBox229.Text = Round(casing_raw(4), 1).ToString               'Sound Pressure [dB]
+            TextBox228.Text = Round(casing_raw(5), 1).ToString               'Sound Pressure [dB]
+            TextBox227.Text = Round(casing_raw(6), 1).ToString              'Sound Pressure [dB]
+            TextBox226.Text = Round(casing_raw(7), 1).ToString              'Sound Pressure [dB]
+
+            '---------------- Casing clean -----------------------
+            TextBox296.Text = Round(add_decibels(casing_clean), 1).ToString     'Sound Pressure [dB]
+            TextBox302.Text = Round(casing_clean(0), 1).ToString                'Sound Pressure [dB]
+            TextBox299.Text = Round(casing_clean(1), 1).ToString                'Sound Pressure [dB]
+            TextBox301.Text = Round(casing_clean(2), 1).ToString                'Sound Pressure [dB]
+            TextBox300.Text = Round(casing_clean(3), 1).ToString                'Sound Pressure [dB]
+            TextBox298.Text = Round(casing_clean(4), 1).ToString                'Sound Pressure [dB]
+            TextBox297.Text = Round(casing_clean(5), 1).ToString                'Sound Pressure [dB]
+            TextBox295.Text = Round(casing_clean(6), 1).ToString                'Sound Pressure [dB]
+            TextBox294.Text = Round(casing_clean(7), 1).ToString                'Sound Pressure [dB]
+
+            '----------Inlet duct break out Noise in banden--------------
+            'TextBox244.Text = Round(duct_in(0), 1).ToString       '
+            'TextBox242.Text = Round(duct_in(1), 1).ToString
+            'TextBox246.Text = Round(duct_in(2), 1).ToString
+            'TextBox245.Text = Round(duct_in(3), 1).ToString
+            'TextBox243.Text = Round(duct_in(4), 1).ToString
+            'TextBox241.Text = Round(duct_in(5), 1).ToString
+            'TextBox240.Text = Round(duct_in(6), 1).ToString
+            'TextBox238.Text = Round(duct_in(7), 1).ToString
 
 
-            '----------Inlet duct brak out Noise in banden--------------
-            TextBox244.Text = Round(duct_in(0), 1).ToString       '
-            TextBox242.Text = Round(duct_in(1), 0).ToString
-            TextBox246.Text = Round(duct_in(2), 0).ToString
-            TextBox245.Text = Round(duct_in(3), 0).ToString
-            TextBox243.Text = Round(duct_in(4), 0).ToString
-            TextBox241.Text = Round(duct_in(5), 0).ToString
-            TextBox240.Text = Round(duct_in(6), 0).ToString
-            TextBox238.Text = Round(duct_in(7), 0).ToString
         End If
     End Sub
+    'Convert Sound power to pressure
+    Private Function add_decibels(snd As Double())
+        Dim Ltot As Double = 0
+        Dim i As Integer
+
+        For i = 0 To 7
+            Ltot += 10 ^ (snd(i) / 10)
+        Next
+        'Ltot = 10 * Log10(10 ^ (snd(0) / 10) + 10 ^ (snd(1) / 10) + 10 ^ (snd(2) / 10) + 10 ^ (snd(3) / 10) + 10 ^ (snd(4) / 10) + 10 ^ (snd(5) / 10) + 10 ^ (snd(6) / 10) + 10 ^ (snd(7) / 10))
+        Ltot = 10 * Log10(Ltot)
+
+        Return (Ltot)
+    End Function
+
+
     'Convert Sound power to pressure
     Private Function power_to_pressure(sound_power As Double)
         Dim distance As Double
@@ -3480,6 +3551,7 @@ Public Class Form1
 
         TextBox78.Text = Round(ambient_mbar, 2).ToString
     End Sub
+
 
     Private Sub calc_emotor_4P()
         'see http://ecatalog.weg.net/files/wegnet/WEG-specification-of-electric-motors-50039409-manual-english.pdf
