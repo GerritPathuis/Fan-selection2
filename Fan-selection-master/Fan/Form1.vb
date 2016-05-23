@@ -490,7 +490,7 @@ Public Class Form1
         ComboBox8.SelectedIndex = 0                     'SKF a1 factor
 
         If ComboBox9.Items.Count > 0 Then
-            ComboBox9.SelectedIndex = 3                 'Select 100m Rockwool Alu
+            ComboBox9.SelectedIndex = 5                 'Select 100m Rockwool Alu
         End If
 
         If ComboBox10.Items.Count > 0 Then
@@ -2542,14 +2542,14 @@ Public Class Form1
         Selectie_1()
     End Sub
     'Calculate the noise tab
-    Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click, TabPage4.Enter, RadioButton6.CheckedChanged, NumericUpDown42.ValueChanged, ComboBox5.SelectedIndexChanged, NumericUpDown7.ValueChanged, ComboBox9.SelectedIndexChanged, ComboBox10.SelectedIndexChanged
+    Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click, TabPage4.Enter, NumericUpDown42.ValueChanged, ComboBox5.SelectedIndexChanged, NumericUpDown7.ValueChanged, ComboBox9.SelectedIndexChanged, ComboBox10.SelectedIndexChanged
         Dim spez_drehz, p_stat, P_tot, Act_flow_sec, roww As Double
         Dim eff, n_imp, no_schoepen As Double
         Dim Kw, bpf, dia_fan_inlet, diameter_imp As Double
-        Dim Suction_raw(9), Suction_damper(9), Suction_clean(9) As Double    'Suction fan
+        Dim Suction_raw(9), Suction_damper(9), Suction_clean(9) As Double   'Suction fan
         Dim Discharge_raw(9) As Double                                      'Discharge fan
         Dim duct_in(9) As Double                                            'Ducting
-        Dim casing_raw(9), casing_insulation(9), casing_clean(9) As Double  'Casing
+        Dim casing_raw(9), casing_insulation(9), casing_clean(9), casing_dba(9) As Double  'Casing
         Dim hh As Integer
         Dim words() As String
         Dim DzDw As Double                                                  'Diameter zuig/diameter waaier
@@ -2637,23 +2637,26 @@ Public Class Form1
             fBA = 1 + (0.5 * (0.82 / rend - 1))
             If fBA > 1.2 Then fBA = 1.2
             Lws = (55 + 0.1885 * nq) * fBA                                          '[dB]
-            Lwi = Lws - 19.83 + 8.8686 * Log(P_tot) + 4.343 * Log(Act_flow_sec)     '[dB]
+            Lwi = Lws - 19.83 + 8.686 * Log(P_tot) + 4.343 * Log(Act_flow_sec)     '[dB]
             Lv = 4.343 * Log(Area_casing)                                           '[m2] eenzijdig oppervlak
             deltaLA = 4.343 * Log(area_measure)                                     '[m2] meet oppervlak
             Rv = 17.71 + 5.86 * Log(casing_dikte)                                   '[mm] casing plaat dikte
 
             Select Case n_imp
-                Case n_imp > 2249
+                Case 2249 To 50000
                     n_ref = 4500
-                Case n_imp > 1124
+                Case 1124 To 2249
                     n_ref = 2249
-                Case n_imp > 559
+                Case 559 To 1124
                     n_ref = 1124
-                Case Else
+                Case 0 To 559
                     n_ref = 559
             End Select
+
             Zoek_freq = n_ref ^ 2 * no_schoepen
-            inlet_red = -1 * 20 * Log10(diameter_imp / dia_fan_inlet) * Sqrt(2) + 1
+            inlet_red = -1 * 20 * Log10(diameter_imp / dia_fan_inlet) / Sqrt(2) + 1
+            TextBox324.Text = Round(Zoek_freq, 0).ToString
+
 
             '----------- find the reduction on fan inlet-----------
             For i = 0 To (zuig_smaller40.Length - 1)
@@ -2695,22 +2698,21 @@ Public Class Form1
                 casing_raw(i) = Discharge_raw(i) - Rv + Lv
             Next
 
-            '----------- Casing Clean-----------
+            '----------- Casing Clean [dB]-----------
             For i = 0 To (casing_clean.Length - 1)
                 casing_clean(i) = casing_raw(i) - casing_insulation(i)
             Next
 
+            '----------- Casing Clean [dBA]-----------
+            casing_dba(0) = casing_clean(0) - 26
+            casing_dba(1) = casing_clean(1) - 16
+            casing_dba(2) = casing_clean(2) - 9
+            casing_dba(3) = casing_clean(3) - 3
+            casing_dba(4) = casing_clean(4) + 0
+            casing_dba(5) = casing_clean(5) + 1
+            casing_dba(6) = casing_clean(6) + 1
+            casing_dba(7) = casing_clean(7) - 1
 
-            'If RadioButton6.Checked Then    'dBA correction
-            '    lp(0) += -26
-            '    lp(1) += -16
-            '    lp(2) += -9
-            '    lp(3) += -3
-            '    lp(4) += 0
-            '    lp(5) += 1
-            '    lp(6) += 1
-            '    lp(7) += -1
-            'End If
 
 
             ' Ltot = 10 * Log10(10 ^ (lp(0) / 10) + 10 ^ (lp(1) / 10) + 10 ^ (lp(2) / 10) + 10 ^ (lp(3) / 10) + 10 ^ (lp(4) / 10) + 10 ^ (lp(5) / 10) + 10 ^ (lp(6) / 10) + 10 ^ (lp(7) / 10))
@@ -2785,7 +2787,7 @@ Public Class Form1
             TextBox227.Text = Round(casing_raw(6), 1).ToString              'Sound Pressure [dB]
             TextBox226.Text = Round(casing_raw(7), 1).ToString              'Sound Pressure [dB]
 
-            '---------------- Casing clean -----------------------
+            '---------------- Casing clean [dB]-----------------------
             TextBox296.Text = Round(add_decibels(casing_clean), 1).ToString     'Sound Pressure [dB]
             TextBox302.Text = Round(casing_clean(0), 1).ToString                'Sound Pressure [dB]
             TextBox299.Text = Round(casing_clean(1), 1).ToString                'Sound Pressure [dB]
@@ -2795,6 +2797,17 @@ Public Class Form1
             TextBox297.Text = Round(casing_clean(5), 1).ToString                'Sound Pressure [dB]
             TextBox295.Text = Round(casing_clean(6), 1).ToString                'Sound Pressure [dB]
             TextBox294.Text = Round(casing_clean(7), 1).ToString                'Sound Pressure [dB]
+
+            '---------------- Casing clean [dBA] -----------------------
+            TextBox344.Text = Round(add_decibels(casing_dba), 1).ToString     'Sound Pressure [dB]
+            TextBox350.Text = Round(casing_dba(0), 1).ToString                'Sound Pressure [dB]
+            TextBox347.Text = Round(casing_dba(1), 1).ToString                'Sound Pressure [dB]
+            TextBox349.Text = Round(casing_dba(2), 1).ToString                'Sound Pressure [dB]
+            TextBox348.Text = Round(casing_dba(3), 1).ToString                'Sound Pressure [dB]
+            TextBox346.Text = Round(casing_dba(4), 1).ToString                'Sound Pressure [dB]
+            TextBox345.Text = Round(casing_dba(5), 1).ToString                'Sound Pressure [dB]
+            TextBox343.Text = Round(casing_dba(6), 1).ToString                'Sound Pressure [dB]
+            TextBox342.Text = Round(casing_dba(7), 1).ToString                'Sound Pressure [dB]
 
             '----------Inlet duct break out Noise in banden--------------
             'TextBox244.Text = Round(duct_in(0), 1).ToString       '
@@ -3552,11 +3565,16 @@ Public Class Form1
         TextBox78.Text = Round(ambient_mbar, 2).ToString
     End Sub
 
+    Private Sub Button21_Click(sender As Object, e As EventArgs) Handles Button21.Click, NumericUpDown79.VisibleChanged, NumericUpDown78.ValueChanged
+        Dim Total As Double
+        Total = 10 * Log10(10 ^ (NumericUpDown78.Value / 10) + 10 ^ (NumericUpDown79.Value / 10))
+        TextBox287.Text = Round(Total, 2).ToString
+    End Sub
 
     Private Sub calc_emotor_4P()
         'see http://ecatalog.weg.net/files/wegnet/WEG-specification-of-electric-motors-50039409-manual-english.pdf
         'see http://electrical-engineering-portal.com/calculation-of-motor-starting-time-as-first-approximation
-        Dim Ins_power, required_power, aanlooptijd, n_actual, rad As Double
+        Dim Ins_power, required_power, aanlooptijd, n_actual, rad, shaft_power As Double
         Dim m_torque_inrush, m_torque_max, m_torque_rated, m_torque_average As Double
         Dim impellar_inertia, motor_inertia, total_inertia As Double
         Dim ang_acceleration, C_acc, inertia_torque, fan_load_torque As Double
@@ -3634,8 +3652,19 @@ Public Class Form1
         TextBox146.Text = Round(aanlooptijd, 1).ToString            'Aanlooptijd [s]
 
 
+
+        '------- check geinstalleerd vermogen 15% safety --------------------
+        Double.TryParse(TextBox274.Text, shaft_power)
+
+        If (Ins_power < (shaft_power * 1000 * 1.15)) Then        '15% safety
+            Label254.Visible = True
+        Else
+            Label254.Visible = False
+        End If
+        ' MessageBox.Show(Ins_power.ToString & " " & shaft_power * 1000 * 1.15.ToString)
+
         '------- check aanlooptijd --------------------
-        If aanlooptijd > 20 Or aanlooptijd <= 0 Then
+        If aanlooptijd > 45 Or aanlooptijd <= 0 Then
             TextBox146.BackColor = Color.Red
         Else
             TextBox146.BackColor = Color.LightGreen
