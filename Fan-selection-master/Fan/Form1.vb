@@ -442,12 +442,6 @@ Public Class Form1
             ComboBox6.Items.Add(words(0))
         Next hh
 
-        For hh = 0 To (TLout.Length - 1)             'Fill combobox5 Duct diameters
-            words = TLout(hh).Split(";")
-            ComboBox5.Items.Add(words(0))
-        Next hh
-
-
         For hh = 0 To (insulation_casing.Length - 1)  'Fill combobox9 Insulation data
             words = insulation_casing(hh).Split(";")
             ComboBox9.Items.Add(words(0))
@@ -455,6 +449,7 @@ Public Class Form1
 
         For hh = 0 To (inlet_damper.Length - 1)     'Fill combobox10 inlet damper
             words = inlet_damper(hh).Split(";")
+            ComboBox5.Items.Add(words(0))
             ComboBox10.Items.Add(words(0))
         Next hh
 
@@ -475,9 +470,7 @@ Public Class Form1
             ComboBox4.SelectedIndex = 12                'Selecteer de motor 90kW
         End If
 
-        If ComboBox5.Items.Count > 0 Then
-            ComboBox5.SelectedIndex = 1                 'Select diameter duct
-        End If
+
 
         If ComboBox6.Items.Count > 0 Then
             ComboBox6.SelectedIndex = 12                'Selecteer de motor 90kW
@@ -494,7 +487,8 @@ Public Class Form1
         End If
 
         If ComboBox10.Items.Count > 0 Then
-            ComboBox10.SelectedIndex = 0                 'Select Inlet damer
+            ComboBox5.SelectedIndex = 0                 'Select Inlet damer
+            ComboBox10.SelectedIndex = 0                'Select Inlet damer
         End If
     End Sub
 
@@ -2542,21 +2536,21 @@ Public Class Form1
         Selectie_1()
     End Sub
     'Calculate the noise tab
-    Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click, TabPage4.Enter, NumericUpDown42.ValueChanged, ComboBox5.SelectedIndexChanged, NumericUpDown7.ValueChanged, ComboBox9.SelectedIndexChanged, ComboBox10.SelectedIndexChanged
+    Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click, TabPage4.Enter, NumericUpDown7.ValueChanged, ComboBox9.SelectedIndexChanged, ComboBox10.SelectedIndexChanged, ComboBox5.SelectedIndexChanged
         Dim spez_drehz, p_stat, P_tot, Act_flow_sec, roww As Double
         Dim eff, n_imp, no_schoepen As Double
         Dim Kw, bpf, dia_fan_inlet, diameter_imp As Double
-        Dim Suction_raw(9), Suction_damper(9), Suction_clean(9) As Double   'Suction fan
-        Dim Discharge_raw(9) As Double                                      'Discharge fan
-        Dim duct_in(9) As Double                                            'Ducting
-        Dim casing_raw(9), casing_insulation(9), casing_clean(9), casing_dba(9) As Double  'Casing
+        Dim Suction_raw(9), Suction_damper(9), Suction_clean(9), Suction_dba(9) As Double           'Suction fan
+        Dim Discharge_raw(9), Discharge_damper(9), Discharge_clean(9), discharge_dba(9) As Double   'Discharge fan
+        ' Dim duct_in(9) As Double                                                                    'Ducting
+        Dim casing_raw(9), casing_insulation(9), casing_clean(9), casing_dba(9) As Double           'Casing
         Dim hh As Integer
         Dim words() As String
         Dim DzDw As Double                                                  'Diameter zuig/diameter waaier
         Dim Area_casing, casing_dikte, area_measure As Double               'Estimated Area casing one side!!
         Dim nq As Double     '
 
-        If (ComboBox5.SelectedIndex > -1) Then      'Prevent exceptions
+        If (ComboBox1.SelectedIndex > -1) Then      'Prevent exceptions
 
             Label152.Text = "Waaier type " & Label1.Text
             Double.TryParse(TextBox123.Text, spez_drehz)
@@ -2611,6 +2605,24 @@ Public Class Form1
                 TextBox326.Text = Round(Suction_damper(6), 0).ToString
                 TextBox325.Text = Round(Suction_damper(7), 0).ToString
             End If
+
+            '----------------------- Discharge damper--------------------------
+            If (ComboBox5.SelectedIndex > -1) Then      'Prevent exceptions
+                words = inlet_damper(ComboBox5.SelectedIndex).Split(";")
+                For hh = 0 To 7
+                    Discharge_damper(hh) = words(hh + 1)
+                Next
+                TextBox351.Text = Round(Discharge_damper(0), 0).ToString
+                TextBox246.Text = Round(Discharge_damper(1), 0).ToString
+                TextBox245.Text = Round(Discharge_damper(2), 0).ToString
+                TextBox244.Text = Round(Discharge_damper(3), 0).ToString
+                TextBox243.Text = Round(Discharge_damper(4), 0).ToString
+                TextBox242.Text = Round(Discharge_damper(5), 0).ToString
+                TextBox241.Text = Round(Discharge_damper(6), 0).ToString
+                TextBox240.Text = Round(Discharge_damper(7), 0).ToString
+            End If
+
+
 
 
             'Sound power level-------------------------------------
@@ -2686,6 +2698,10 @@ Public Class Form1
                 End If
             Next
 
+            '----------- calc discharge clean-----------
+            For i = 0 To (Discharge_clean.Length - 1)
+                Discharge_clean(i) = Discharge_raw(i) + Discharge_damper(i)
+            Next
 
 
             '----------- calc suction clean-----------
@@ -2713,9 +2729,25 @@ Public Class Form1
             casing_dba(6) = casing_clean(6) + 1
             casing_dba(7) = casing_clean(7) - 1
 
+            '----------- Suction Clean [dBA]-----------
+            Suction_dba(0) = Suction_clean(0) - 26
+            Suction_dba(1) = Suction_clean(1) - 16
+            Suction_dba(2) = Suction_clean(2) - 9
+            Suction_dba(3) = Suction_clean(3) - 3
+            Suction_dba(4) = Suction_clean(4) + 0
+            Suction_dba(5) = Suction_clean(5) + 1
+            Suction_dba(6) = Suction_clean(6) + 1
+            Suction_dba(7) = Suction_clean(7) - 1
 
-
-            ' Ltot = 10 * Log10(10 ^ (lp(0) / 10) + 10 ^ (lp(1) / 10) + 10 ^ (lp(2) / 10) + 10 ^ (lp(3) / 10) + 10 ^ (lp(4) / 10) + 10 ^ (lp(5) / 10) + 10 ^ (lp(6) / 10) + 10 ^ (lp(7) / 10))
+            '----------- Discharge [dBA]-----------
+            discharge_dba(0) = Discharge_clean(0) - 26
+            discharge_dba(1) = Discharge_clean(1) - 16
+            discharge_dba(2) = Discharge_clean(2) - 9
+            discharge_dba(3) = Discharge_clean(3) - 3
+            discharge_dba(4) = Discharge_clean(4) + 0
+            discharge_dba(5) = Discharge_clean(5) + 1
+            discharge_dba(6) = Discharge_clean(6) + 1
+            discharge_dba(7) = Discharge_clean(7) - 1
 
             TextBox114.Text = Round(n_imp, 0).ToString              'Toerental [rpm]
             TextBox234.Text = Round(Kw, 0).ToString                 'As vermogen[kW]
@@ -2756,7 +2788,6 @@ Public Class Form1
             TextBox122.Text = Round(Suction_raw(7), 1).ToString
 
             '----------Suction Clean induct opgesplits in banden--------------
-            TextBox333.Text = Round(add_decibels(Suction_clean), 1).ToString
             TextBox341.Text = Round(Suction_clean(0), 1).ToString       '
             TextBox340.Text = Round(Suction_clean(1), 1).ToString
             TextBox339.Text = Round(Suction_clean(2), 1).ToString
@@ -2765,6 +2796,18 @@ Public Class Form1
             TextBox336.Text = Round(Suction_clean(5), 1).ToString
             TextBox335.Text = Round(Suction_clean(6), 1).ToString
             TextBox334.Text = Round(Suction_clean(7), 1).ToString
+            TextBox333.Text = Round(add_decibels(Suction_clean), 1).ToString
+
+            '----------Suction Clean dba--------------
+            TextBox360.Text = Round(Suction_dba(0), 1).ToString       '
+            TextBox359.Text = Round(Suction_dba(1), 1).ToString
+            TextBox358.Text = Round(Suction_dba(2), 1).ToString
+            TextBox357.Text = Round(Suction_dba(3), 1).ToString
+            TextBox356.Text = Round(Suction_dba(4), 1).ToString
+            TextBox355.Text = Round(Suction_dba(5), 1).ToString
+            TextBox354.Text = Round(Suction_dba(6), 1).ToString
+            TextBox353.Text = Round(Suction_dba(7), 1).ToString
+            TextBox352.Text = Round(add_decibels(Suction_dba), 1).ToString
 
             '----------Discharge RAW induct opgesplits in banden--------------
             TextBox311.Text = Round(Discharge_raw(0), 1).ToString       '
@@ -2775,6 +2818,28 @@ Public Class Form1
             TextBox306.Text = Round(Discharge_raw(5), 1).ToString
             TextBox305.Text = Round(Discharge_raw(6), 1).ToString
             TextBox304.Text = Round(Discharge_raw(7), 1).ToString
+
+            '----------Discharge Clean induct opgesplits in banden--------------
+            TextBox369.Text = Round(Discharge_clean(0), 1).ToString       '
+            TextBox368.Text = Round(Discharge_clean(1), 1).ToString
+            TextBox367.Text = Round(Discharge_clean(2), 1).ToString
+            TextBox366.Text = Round(Discharge_clean(3), 1).ToString
+            TextBox365.Text = Round(Discharge_clean(4), 1).ToString
+            TextBox364.Text = Round(Discharge_clean(5), 1).ToString
+            TextBox363.Text = Round(Discharge_clean(6), 1).ToString
+            TextBox362.Text = Round(Discharge_clean(7), 1).ToString
+            TextBox361.Text = Round(add_decibels(Discharge_clean), 1).ToString     'Sound Pressure [dB]
+
+            '----------Discharge Clean induct opgesplits in banden--------------
+            TextBox378.Text = Round(discharge_dba(0), 1).ToString       '
+            TextBox377.Text = Round(discharge_dba(1), 1).ToString
+            TextBox376.Text = Round(discharge_dba(2), 1).ToString
+            TextBox375.Text = Round(discharge_dba(3), 1).ToString
+            TextBox374.Text = Round(discharge_dba(4), 1).ToString
+            TextBox373.Text = Round(discharge_dba(5), 1).ToString
+            TextBox372.Text = Round(discharge_dba(6), 1).ToString
+            TextBox371.Text = Round(discharge_dba(7), 1).ToString
+            TextBox370.Text = Round(add_decibels(discharge_dba), 1).ToString     'Sound Pressure [dB]
 
             '---------------- Casing raw -----------------------
             TextBox225.Text = Round(add_decibels(casing_raw), 1).ToString   'Sound Pressure [dB]
@@ -2808,16 +2873,6 @@ Public Class Form1
             TextBox345.Text = Round(casing_dba(5), 1).ToString                'Sound Pressure [dB]
             TextBox343.Text = Round(casing_dba(6), 1).ToString                'Sound Pressure [dB]
             TextBox342.Text = Round(casing_dba(7), 1).ToString                'Sound Pressure [dB]
-
-            '----------Inlet duct break out Noise in banden--------------
-            'TextBox244.Text = Round(duct_in(0), 1).ToString       '
-            'TextBox242.Text = Round(duct_in(1), 1).ToString
-            'TextBox246.Text = Round(duct_in(2), 1).ToString
-            'TextBox245.Text = Round(duct_in(3), 1).ToString
-            'TextBox243.Text = Round(duct_in(4), 1).ToString
-            'TextBox241.Text = Round(duct_in(5), 1).ToString
-            'TextBox240.Text = Round(duct_in(6), 1).ToString
-            'TextBox238.Text = Round(duct_in(7), 1).ToString
 
 
         End If
@@ -3652,7 +3707,6 @@ Public Class Form1
         TextBox146.Text = Round(aanlooptijd, 1).ToString            'Aanlooptijd [s]
 
 
-
         '------- check geinstalleerd vermogen 15% safety --------------------
         Double.TryParse(TextBox274.Text, shaft_power)
 
@@ -3661,7 +3715,6 @@ Public Class Form1
         Else
             Label254.Visible = False
         End If
-        ' MessageBox.Show(Ins_power.ToString & " " & shaft_power * 1000 * 1.15.ToString)
 
         '------- check aanlooptijd --------------------
         If aanlooptijd > 45 Or aanlooptijd <= 0 Then
