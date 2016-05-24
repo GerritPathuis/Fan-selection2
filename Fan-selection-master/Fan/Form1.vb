@@ -1775,6 +1775,7 @@ Public Class Form1
     'Write data to Word 
     Private Sub write_to_word()
         Dim bmp_tab_page1 As New Bitmap(TabPage1.Width, TabPage1.Height)
+        Dim bmp_grouobox23 As New Bitmap(GroupBox23.Width, GroupBox23.Height)
         Dim oWord As Word.Application
         Dim oDoc As Word.Document
         Dim oTable As Word.Table
@@ -1889,6 +1890,19 @@ Public Class Form1
         oPara4.Range.InlineShapes.Item(1).LockAspectRatio = True
         'oPara4.Range.InlineShapes.Item(1).Width = 400
         oPara4.Range.InsertParagraphAfter()
+
+        '---- save geluid page 1---------------
+        TabPage4.Show()
+        TabPage4.Refresh()
+        GroupBox23.DrawToBitmap(bmp_grouobox23, DisplayRectangle)
+        bmp_grouobox23.Save("c:\Temp\page3.Jpeg", Imaging.ImageFormat.Jpeg)
+        oPara4 = oDoc.Content.Paragraphs.Add
+        oPara4.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter
+        oPara4.Range.InlineShapes.AddPicture("c:\Temp\page3.Jpeg")
+        oPara4.Range.InlineShapes.Item(1).LockAspectRatio = True
+        'oPara4.Range.InlineShapes.Item(1).Width = 400
+        oPara4.Range.InsertParagraphAfter()
+
     End Sub
     'Graphic next model
     Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
