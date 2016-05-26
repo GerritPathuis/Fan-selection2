@@ -517,36 +517,35 @@ Public Class Form1
                 Label1.Text = TextBox159.Text & "/" & NumericUpDown33.Value.ToString & "/" & Tschets(ComboBox1.SelectedIndex).Tname
 
                 '------- get data from database--------------------------
-                TextBox1.Text = Tschets(nrq).Tdata(0)           'Diameter waaier. 
+                TextBox1.Text = Tschets(nrq).Tdata(0)               'Diameter waaier. 
 
-                T_sg_gewicht = Tschets(nrq).Tdata(2)            'soortelijk gewicht lucht .
-                TextBox14.Text = Round(T_sg_gewicht, 2)         'Lucht s.g.[kg/m3]
-                TextBox7.Text = Tschets(nrq).Tdata(3)           'Zuigmond diameter.
-                TextBox2.Text = Tschets(nrq).Tdata(4)           'Uitlaat hoogte inw. 
-                TextBox3.Text = Tschets(nrq).Tdata(5)           'Uitlaat breedte inw.
-                TextBox8.Text = Tschets(nrq).Tdata(6)           'Lengte spiraal
+                T_sg_gewicht = Tschets(nrq).Tdata(2)                'soortelijk gewicht lucht .
+                TextBox14.Text = Round(T_sg_gewicht, 2)             'Lucht s.g.[kg/m3]
+                TextBox7.Text = Tschets(nrq).Tdata(3)               'Zuigmond diameter.
+                TextBox2.Text = Tschets(nrq).Tdata(4)               'Uitlaat hoogte inw. 
+                TextBox3.Text = Tschets(nrq).Tdata(5)               'Uitlaat breedte inw.
+                TextBox8.Text = Tschets(nrq).Tdata(6)               'Lengte spiraal
 
-                TextBox61.Text = Tschets(nrq).Tdata(12)         'schoep lengte.
-                TextBox9.Text = Tschets(nrq).Tdata(13)          'aantal schoepen.
-                TextBox5.Text = Tschets(nrq).Tdata(14)          'Inw schoep breedte.
-                TextBox4.Text = Tschets(nrq).Tdata(15)          'Uitw schoep breedte.
-                TextBox6.Text = Tschets(nrq).Tdata(16)          'Keel diameter
-                TextBox62.Text = Tschets(nrq).Tdata(17)         'inwendige schoep diameter 
-                TextBox59.Text = Tschets(nrq).Tdata(18)         'schoep intrede hoek.
-                TextBox60.Text = Tschets(nrq).Tdata(19)         'schoep uittrede hoek.
-                TextBox53.Text = Tschets(nrq).werkp_opT(3)      'As vermogen
+                TextBox61.Text = Tschets(nrq).Tdata(12)             'schoep lengte.
+                TextBox9.Text = Tschets(nrq).Tdata(13)              'aantal schoepen.
+                TextBox5.Text = Tschets(nrq).Tdata(14)              'Inw schoep breedte.
+                TextBox4.Text = Tschets(nrq).Tdata(15)              'Uitw schoep breedte.
+                TextBox6.Text = Tschets(nrq).Tdata(16)              'Keel diameter
+                TextBox62.Text = Tschets(nrq).Tdata(17)             'inwendige schoep diameter 
+                TextBox59.Text = Tschets(nrq).Tdata(18)             'schoep intrede hoek.
+                TextBox60.Text = Tschets(nrq).Tdata(19)             'schoep uittrede hoek.
+                TextBox342.Text = Round(Tschets(nrq).Tdata(20), 3)  'Oppervlak slakkehuis zijplaat tbv noise calc.[m2]
+                TextBox53.Text = Tschets(nrq).werkp_opT(3)          'As vermogen
 
-                T_hoek_in = Convert.ToDouble(TextBox59.Text)    'schoep intrede hoek
-                T_hoek_uit = Convert.ToDouble(TextBox60.Text)   'schoep uittrede hoek
-                T_eff = Tschets(nrq).werkp_opT(0) / 100         'Rendement[-]
+                T_hoek_in = Convert.ToDouble(TextBox59.Text)        'schoep intrede hoek
+                T_hoek_uit = Convert.ToDouble(TextBox60.Text)       'schoep uittrede hoek
+                T_eff = Tschets(nrq).werkp_opT(0) / 100             'Rendement[-]
 
-                T_Ptot_Pa = Tschets(nrq).werkp_opT(1)           'Pressure totaal [Pa]
-                T_PStat_Pa = Tschets(nrq).werkp_opT(2)          'Pressure statisch [Pa]
-                T_Power_opt = Tschets(nrq).werkp_opT(3)         'AS vermogen [kW]
-                T_Toerental_rpm = Tschets(nrq).Tdata(1)         'Toerental [rpm]
-                T_Toerental_sec = T_Toerental_rpm / 60.0                         'Toerental [/sec]
-
-
+                T_Ptot_Pa = Tschets(nrq).werkp_opT(1)               'Pressure totaal [Pa]
+                T_PStat_Pa = Tschets(nrq).werkp_opT(2)              'Pressure statisch [Pa]
+                T_Power_opt = Tschets(nrq).werkp_opT(3)             'AS vermogen [kW]
+                T_Toerental_rpm = Tschets(nrq).Tdata(1)             'Toerental [rpm]
+                T_Toerental_sec = T_Toerental_rpm / 60.0            'Toerental [/sec]
 
                 '----------- temperaturen----------------
                 T_air_temp = 20                                                 'T-schetsen proef temperatuur
@@ -1130,6 +1129,20 @@ Public Class Form1
         TextBox109.Text = Round(J_tot, 1).ToString          'Massa traagheid Totaal
         NumericUpDown45.Value = Round(J_tot, 1).ToString
 
+        '-------------- check airfoil stress safety-----------------------
+        If airf_skin_hh > sigma_allowed / 1000 ^ 2 Then
+            TextBox73.BackColor = Color.Red
+        Else
+            TextBox73.BackColor = Color.LightGreen
+        End If
+
+        '-------------- check box stress safety-----------------------
+        If airf_hh > sigma_allowed / 1000 ^ 2 Then
+            TextBox67.BackColor = Color.Red
+        Else
+            TextBox67.BackColor = Color.LightGreen
+        End If
+
         '-------------- check schoep stress safety-----------------------
         If sigma_schoep > sigma_allowed / 1000 ^ 2 Then
             TextBox43.BackColor = Color.Red
@@ -1224,7 +1237,7 @@ Public Class Form1
     Private Sub fill_array_T_schetsen()
 
         Tschets(0).Tname = "Willi Bohl"
-        Tschets(0).Tdata = {400, 4850, 1.2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+        Tschets(0).Tdata = {400, 4850, 1.2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
         Tschets(0).Teff = {0, 43, 75, 81, 79, 42, 0, 0, 0, 0, 0, 0}                 '[%]
         Tschets(0).Tverm = {4, 5.1, 5.5, 6.1, 6.6, 9.0, 0.0, 0, 0, 0, 0, 0}         '[kW]
         Tschets(0).TPstat = {10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10}        '[Pa]
@@ -1239,7 +1252,7 @@ Public Class Form1
         Tschets(0).Teff_scaled = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}               'Vermogen[kW]
 
         Tschets(1).Tname = "T1A"
-        Tschets(1).Tdata = {1000, 1480, 1.205, 605.4, 832.4, 373.0, 6075.7, 702.7, 881.1, 1063.8, 878.9, 1295.1, 364.3, 12, 133.0, 133.0, 524.3, 605.4, 30, 30}
+        Tschets(1).Tdata = {1000, 1480, 1.205, 605.4, 832.4, 373.0, 6075.7, 702.7, 881.1, 1063.8, 878.9, 1295.1, 364.3, 12, 133.0, 133.0, 524.3, 605.4, 30, 30, 3.101816}
         Tschets(1).Teff = {0.00, 76.5, 79.5, 80.9, 82.52, 83.26, 83.7, 83.42, 82.3, 79.92, 76.2, 71.0}
         Tschets(1).Tverm = {6.1, 18.9, 20.3, 20.9, 21.4, 21.8, 22.2, 22.5, 22.6, 22.6, 22.5, 22.3}
         Tschets(1).TPstat = {3240.3, 3745.1, 3516.2, 3380.0, 3221.5, 3063.0, 2844.7, 2625.1, 2368.0, 2121.5, 1837.3, 1701.9}
@@ -1249,7 +1262,7 @@ Public Class Form1
         Tschets(1).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
 
         Tschets(2).Tname = "T1B"
-        Tschets(2).Tdata = {1000, 1480, 1.205, 679.0, 814.8, 370.4, 5679.0, 685.2, 850.6, 1043.2, 861.7, 1269.1, 416.0, 12, 129.6, 129.6, 596.3, 30, 30, 0}
+        Tschets(2).Tdata = {1000, 1480, 1.205, 679.0, 814.8, 370.4, 5679.0, 685.2, 850.6, 1043.2, 861.7, 1269.1, 416.0, 12, 129.6, 129.6, 596.3, 30, 30, 0, 3.101816}
         Tschets(2).Teff = {0.00, 15, 30.6, 47.0, 59.5, 69.0, 77.0, 81.0, 80.5, 77.0, 69.0, 55.0}
         Tschets(2).Tverm = {7.0, 9, 10.3, 13.6, 16.8, 19.5, 21.6, 23.1, 23.8, 23.5, 22.3, 20.5}
         Tschets(2).TPstat = {3179.6, 3240, 3296.0, 3392.6, 3455.4, 3460.0, 3334.4, 3041.7, 2580.4, 1999.7, 1156.9, 567.0}
@@ -1259,7 +1272,7 @@ Public Class Form1
         Tschets(2).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
 
         Tschets(3).Tname = "T1E"
-        Tschets(3).Tdata = {1000, 1480, 1.205, 617.3, 814.8, 370.4, 5679.0, 685.2, 866.7, 1045.7, 859.3, 1044.4, 385.2, 12, 129.6, 129.6, 512.3, 592.6, 30, 30}
+        Tschets(3).Tdata = {1000, 1480, 1.205, 617.3, 814.8, 370.4, 5679.0, 685.2, 866.7, 1045.7, 859.3, 1044.4, 385.2, 12, 129.6, 129.6, 512.3, 592.6, 30, 30, 3.101816}
         Tschets(3).Teff = {0.00, 59.5, 69.0, 72.5, 75.5, 77.2, 78.0, 78.5, 77.5, 74.0, 66.0, 50.0}
         Tschets(3).Tverm = {7.0, 16.8, 19.4, 20.7, 21.5, 22.3, 22.9, 23.2, 23.1, 22.3, 21.2, 19.4}
         Tschets(3).TPstat = {3179.6, 3455.4, 3452.3, 3389.0, 3279.2, 3121.7, 2934.4, 2654.5, 2413.4, 1792.8, 1156.9, 475.0}
@@ -1269,7 +1282,7 @@ Public Class Form1
         Tschets(3).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
 
         Tschets(4).Tname = "T12A."
-        Tschets(4).Tdata = {1000, 1480, 1.205, 897.2, 978.8, 489.4, 6107.7, 685.2, 913.5, 1151.7, 901.3, 1390.7, 243.1, 12, 187.6, 187.6, 758.6, 783.0, 21, 30}
+        Tschets(4).Tdata = {1000, 1480, 1.205, 897.2, 978.8, 489.4, 6107.7, 685.2, 913.5, 1151.7, 901.3, 1390.7, 243.1, 12, 187.6, 187.6, 758.6, 783.0, 21, 30, 3.475345}
         Tschets(4).Teff = {0.00, 69.0, 77.5, 79.64, 81.22, 82.08, 83.0, 82.0, 79.9, 76.0, 70.5, 40.0}
         Tschets(4).Tverm = {10.3, 26.4, 28.7, 29.1, 29.4, 29.3, 29.2, 28.8, 28.1, 27.4, 26.6, 22.9}
         Tschets(4).TPstat = {2325.7, 2766.8, 2491.5, 2387.2, 2261.6, 2111.9, 1938.1, 1729.1, 1497.0, 1237.7, 962.4, 614.8}
@@ -1280,7 +1293,7 @@ Public Class Form1
 
 
         Tschets(5).Tname = "T16B."
-        Tschets(5).Tdata = {1000, 1480, 1.205, 291.3, 359.2, 184.5, 4708.7, 689.3, 666.0, 728.2, 631.6, 811.2, 469.4, 10, 32.5, 14.6, 240.8, 289.3, 45, 40}
+        Tschets(5).Tdata = {1000, 1480, 1.205, 291.3, 359.2, 184.5, 4708.7, 689.3, 666.0, 728.2, 631.6, 811.2, 469.4, 10, 32.5, 14.6, 240.8, 289.3, 45, 40, 1.603017}
         Tschets(5).Teff = {0.00, 48.0, 64.2, 66.04, 67.82, 69.06, 69.9, 69.24, 67.86, 65.26, 60.4, 20.0}
         Tschets(5).Tverm = {1.1, 2.0, 2.9, 3.1, 3.3, 3.5, 3.7, 3.9, 4.0, 4.1, 4.1, 4.0}
         Tschets(5).TPstat = {3976.8, 4249.0, 4042.1, 3934.2, 3816.3, 3686.6, 3531.1, 3286.1, 2998.5, 2656.9, 2272.5, 591.8}
@@ -1290,7 +1303,7 @@ Public Class Form1
         Tschets(5).Geljon = {0.141944, 6.35969, -2229.46, 0.0001695, 0.201068, -13.27, 0.00148, 0.00671}
 
         Tschets(6).Tname = "T17B."
-        Tschets(6).Tdata = {1000, 1480, 1.205, 738.3, 872.5, 402.7, 5704.7, 617.4, 735.6, 974.5, 837.6, 1273.8, 351.7, 12, 134.2, 134.2, 624.2, 644.3, 27, 30}
+        Tschets(6).Tdata = {1000, 1480, 1.205, 738.3, 872.5, 402.7, 5704.7, 617.4, 735.6, 974.5, 837.6, 1273.8, 351.7, 12, 134.2, 134.2, 624.2, 644.3, 27, 30, 2.637289}
         Tschets(6).Teff = {0.00, 72.0, 79.45, 81.16, 82.3, 82.91, 83.0, 82.82, 81.98, 80.34, 77.32, 63.0}
         Tschets(6).Tverm = {5.8, 20.9, 23.1, 23.5, 23.9, 24.2, 24.4, 24.3, 24.1, 23.7, 23.1, 21.1}
         Tschets(6).TPstat = {2850.5, 3094.9, 2960.9, 2888.6, 2787.2, 2662.3, 2506.7, 2352.8, 2115.7, 1853.3, 1581.8, 868.7}
@@ -1300,7 +1313,7 @@ Public Class Form1
         Tschets(6).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
 
         Tschets(7).Tname = "T20B"
-        Tschets(7).Tdata = {1000, 1480, 1.205, 472.4, 570.1, 275.6, 5275.6, 708.7, 749.6, 859.1, 733.9, 1018.9, 433.1, 10, 126.8, 71.7, 389.0, 442.5, 29, 40}
+        Tschets(7).Tdata = {1000, 1480, 1.205, 472.4, 570.1, 275.6, 5275.6, 708.7, 749.6, 859.1, 733.9, 1018.9, 433.1, 10, 126.8, 71.7, 389.0, 442.5, 29, 40, 2.173719}
         Tschets(7).Teff = {0.00, 73.5, 76.02, 78.07, 79.49, 79.95, 80.0, 78.77, 76.71, 74.07, 70.24, 66.0}
         Tschets(7).Tverm = {2.3, 10.2, 11.4, 12.5, 13.5, 14.6, 15.6, 16.4, 17.1, 17.7, 18.1, 18.3}
         Tschets(7).TPstat = {3799.1, 4453.1, 4308.6, 4200.2, 4059.4, 3888.2, 3668.3, 3397.3, 3091.9, 2764.6, 2397.8, 2053.5}
@@ -1310,7 +1323,7 @@ Public Class Form1
         Tschets(7).Geljon = {0.15345, 1.44388, -116.84, 0.00019665, 0.22452, -3.1435, 0.01084, 0.028648}
 
         Tschets(8).Tname = "T21E"
-        Tschets(8).Tdata = {1000, 1480, 1.205, 755.6, 673.3, 500.0, 5044.4, 622.2, 706.7, 844.4, 736.9, 1073.6, 242.2, 8, 160.0, 124.4, 626.7, 640.0, 35, 59}
+        Tschets(8).Tdata = {1000, 1480, 1.205, 755.6, 673.3, 500.0, 5044.4, 622.2, 706.7, 844.4, 736.9, 1073.6, 242.2, 8, 160.0, 124.4, 626.7, 640.0, 35, 59, 2.082895}
         Tschets(8).Teff = {0.00, 58.0, 67.3, 70.26, 72.46, 73.28, 73.5, 72.82, 71.56, 70.16, 68.2, 66.0}
         Tschets(8).Tverm = {6.2, 17.0, 22.7, 24.7, 26.8, 28.6, 30.4, 31.7, 32.8, 33.4, 34.0, 34.6}
         Tschets(8).TPstat = {3199.6, 3596.4, 3329.8, 3186.0, 3002.4, 2797.8, 2554.7, 2311.6, 2048.7, 1831.7, 1624.6, 1413.8}
@@ -1320,7 +1333,7 @@ Public Class Form1
         Tschets(8).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
 
         Tschets(9).Tname = "T21F"
-        Tschets(9).Tdata = {1000, 1480, 1.205, 755.6, 673.3, 500.0, 5044.4, 622.2, 706.7, 844.4, 736.9, 1073.6, 242.2, 16, 160.0, 124.4, 626.7, 640.0, 35, 59}
+        Tschets(9).Tdata = {1000, 1480, 1.205, 755.6, 673.3, 500.0, 5044.4, 622.2, 706.7, 844.4, 736.9, 1073.6, 242.2, 16, 160.0, 124.4, 626.7, 640.0, 35, 59, 2.082826}
         Tschets(9).Teff = {0.00, 69.0, 70.2, 71.2, 72.8, 73.86, 75.3, 75.02, 73.7, 70.66, 66.7, 64.0}
         Tschets(9).Tverm = {5.2, 27.8, 30.2, 32.2, 34.1, 35.9, 37.2, 38.8, 40.0, 41.4, 42.3, 41.3}
         Tschets(9).TPstat = {3125.2, 3844.5, 3658.5, 3571.6, 3472.4, 3343.5, 3150.0, 2884.6, 2587.0, 2244.7, 1885.0, 1432.1}
@@ -1330,7 +1343,7 @@ Public Class Form1
         Tschets(9).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
 
         Tschets(10).Tname = "T22B"
-        Tschets(10).Tdata = {1000, 1480, 1.205, 964.9, 905.3, 659.6, 4666.7, 666.7, 731.6, 912.3, 649.1, 1101.8, 243.9, 24, 321.1, 271.9, 800.0, 800.0, 20, 25}
+        Tschets(10).Tdata = {1000, 1480, 1.205, 964.9, 905.3, 659.6, 4666.7, 666.7, 731.6, 912.3, 649.1, 1101.8, 243.9, 24, 321.1, 271.9, 800.0, 800.0, 20, 25, 2.326601}
         Tschets(10).Teff = {0.00, 48.6, 59.8, 63.6, 64.9, 69.5, 70.1, 75.2, 72.2, 71.5, 69.3, 64.8}
         Tschets(10).Tverm = {11.8, 20.6, 28.6, 32.8, 35.5, 37.6, 39.9, 41.4, 42.3, 42.5, 42.0, 40.7}
         Tschets(10).TPstat = {2213.0, 2616.0, 2645.0, 2660.0, 2623.0, 2550.0, 2477.0, 2323.0, 2154.0, 1883.0, 1634.0, 1224.0}
@@ -1340,7 +1353,7 @@ Public Class Form1
         Tschets(10).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
 
         Tschets(11).Tname = "T22C"
-        Tschets(11).Tdata = {1000, 1480, 1.205, 964.9, 905.3, 659.6, 4666.7, 666.7, 731.6, 912.3, 649.1, 1101.8, 243.9, 12, 321.1, 271.9, 800.0, 800.0, 20, 25}
+        Tschets(11).Tdata = {1000, 1480, 1.205, 964.9, 905.3, 659.6, 4666.7, 666.7, 731.6, 912.3, 649.1, 1101.8, 243.9, 12, 321.1, 271.9, 800.0, 800.0, 20, 25, 2.326601}
         Tschets(11).Teff = {0.00, 41.7, 50.9, 59.0, 63.4, 67.1, 70.3, 72.9, 73.9, 75.2, 74.8, 67.7}
         Tschets(11).Tverm = {17.6, 27.5, 33.7, 38.3, 39.5, 40.4, 41.0, 41.1, 41.1, 40.2, 38.7, 35.6}
         Tschets(11).TPstat = {2345.0, 2682.0, 2638.0, 2536.0, 2470.0, 2382.0, 2250.0, 2089.0, 1891.0, 1744.0, 1363.0, 865.0}
@@ -1350,7 +1363,7 @@ Public Class Form1
         Tschets(11).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
 
         Tschets(12).Tname = "T25B"
-        Tschets(12).Tdata = {758, 1465, 1.205, 584.0, 650.0, 345.0, 4766.0, 600.0, 665.6, 804.2, 665.0, 990.0, 220.0, 12, 194.0, 122.0, 430.0, 460.0, 30, 31}
+        Tschets(12).Tdata = {758, 1465, 1.205, 584.0, 650.0, 345.0, 4766.0, 600.0, 665.6, 804.2, 665.0, 990.0, 220.0, 12, 194.0, 122.0, 430.0, 460.0, 30, 31, 2.326601}
         Tschets(12).Teff = {0, 32.6, 49.5, 61.8, 71.5, 78.2, 82.2, 84.8, 85.1, 83.8, 79.4, 73.2}
         Tschets(12).Tverm = {1.8, 2.9, 3.9, 4.8, 5.7, 6.5, 7.2, 7.6, 7.9, 8.0, 7.9, 7.6}
         Tschets(12).TPstat = {1767, 1864, 1884, 1933, 1962, 1946, 1836, 1670, 1474, 1234, 932, 662}
@@ -1360,7 +1373,7 @@ Public Class Form1
         Tschets(12).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
 
         Tschets(13).Tname = "T26"
-        Tschets(13).Tdata = {1000, 1480, 1.205, 349.9, 438.1, 213.4, 5689.9, 625.9, 694.2, 768.1, 666.4, 885.5, 470.8, 10, 60.7, 28.9, 290.2, 331.4, 40, 40}
+        Tschets(13).Tdata = {1000, 1480, 1.205, 349.9, 438.1, 213.4, 5689.9, 625.9, 694.2, 768.1, 666.4, 885.5, 470.8, 10, 60.7, 28.9, 290.2, 331.4, 40, 40, 1.703013}
         Tschets(13).Teff = {0.00, 50.0, 68.4, 72.74, 75.38, 76.82, 77.5, 76.82, 74.8, 70.98, 65.5, 44.5}
         Tschets(13).Tverm = {1.7, 3.3, 4.6, 5.2, 5.7, 6.3, 6.8, 7.3, 7.7, 8.0, 8.2, 7.9}
         Tschets(13).TPstat = {4166.8, 4268.4, 4146.5, 4032.7, 3892.4, 3711.5, 3481.8, 3191.2, 2855.8, 2449.3, 2022.4, 1341.5}
@@ -1370,7 +1383,7 @@ Public Class Form1
         Tschets(13).Geljon = {0.14663, 1.5415, -408.8, 0.00032837, 0.1665, -4.3091, 0.002516, 0.016904}
 
         Tschets(14).Tname = "T27"
-        Tschets(14).Tdata = {1000, 1480, 1.205, 285.7, 347.8, 183.9, 4596.3, 677.0, 648.9, 701.9, 618.6, 792.5, 414.3, 16, 54.7, 23.6, 288.2, 511.8, 44, 60}
+        Tschets(14).Tdata = {1000, 1480, 1.205, 285.7, 347.8, 183.9, 4596.3, 677.0, 648.9, 701.9, 618.6, 792.5, 414.3, 16, 54.7, 23.6, 288.2, 511.8, 44, 60, 1.521398}
         Tschets(14).Teff = {0.00, 71.0, 73.18, 73.97, 74.37, 74.93, 75.01, 74.8, 74.04, 73.32, 72.43, 65.0}
         Tschets(14).Tverm = {1.3, 4.5, 4.9, 5.2, 5.4, 5.7, 6.0, 6.3, 6.5, 6.7, 6.9, 7.6}
         Tschets(14).TPstat = {3884.0, 4507.1, 4382.5, 4341.0, 4287.0, 4206.0, 4112.5, 4008.6, 3892.3, 3755.3, 3638.9, 3055.3}
@@ -1380,7 +1393,7 @@ Public Class Form1
         Tschets(14).Geljon = {0.16763, 0.12793, -479.67, -0.000030339, 0.27083, -9.9922, 0.0045166, 0.010324}
 
         Tschets(15).Tname = "T28"
-        Tschets(15).Tdata = {1000, 1480, 1.205, 477.3, 477.3, 378.8, 4742.4, 643.9, 706.1, 792.4, 643.9, 882.6, 421.2, 8, 234.8, 151.5, 643.9, 369.7, 0, 0}
+        Tschets(15).Tdata = {1000, 1480, 1.205, 477.3, 477.3, 378.8, 4742.4, 643.9, 706.1, 792.4, 643.9, 882.6, 421.2, 8, 234.8, 151.5, 643.9, 369.7, 0, 0, 1.862612}
         Tschets(15).Teff = {0.00, 49.0, 60.0, 62.36, 64.0, 64.86, 65.0, 64.68, 64.0, 62.88, 60.91, 58.0}
         Tschets(15).Tverm = {11.6, 18.2, 24.5, 26.2, 28.2, 30.3, 32.2, 33.9, 36.0, 37.9, 40.1, 43.2}
         Tschets(15).TPstat = {4450.7, 4762.0, 4473.8, 4337.7, 4185.5, 4017.2, 3828.1, 3629.8, 3389.9, 3159.3, 2882.6, 2413.0}
@@ -1390,7 +1403,7 @@ Public Class Form1
         Tschets(15).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
 
         Tschets(16).Tname = "T31A"
-        Tschets(16).Tdata = {1000, 1480, 1.205, 770.4, 857.5, 422.2, 6229.6, 791.6, 878.6, 1060.7, 877.3, 1306.1, 403.0, 8, 197.9, 102.9, 567.3, 606.9, 20, 30}
+        Tschets(16).Tdata = {1000, 1480, 1.205, 770.4, 857.5, 422.2, 6229.6, 791.6, 878.6, 1060.7, 877.3, 1306.1, 403.0, 8, 197.9, 102.9, 567.3, 606.9, 20, 30, 3.155667}
         Tschets(16).Teff = {0.00, 53.02, 62.41, 77.14, 76.39, 80.74, 83.23, 84.42, 83.2, 79.59, 72.52, 61.87}
         Tschets(16).Tverm = {6.3, 13.0, 15.0, 16.9, 18.3, 19.3, 19.9, 20.1, 20.0, 19.6, 18.8, 17.6}
         Tschets(16).TPstat = {3139.1, 3319.7, 3373.8, 3397.4, 3320.6, 3129.5, 2865.9, 2561.2, 2201.5, 1797.2, 1336.2, 844.5}
@@ -1400,7 +1413,7 @@ Public Class Form1
         Tschets(16).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
 
         Tschets(17).Tname = "T31B"
-        Tschets(17).Tdata = {1000, 1480, 1.205, 770.4, 857.5, 422.2, 6229.6, 791.6, 878.6, 1060.7, 877.3, 1306.1, 403.0, 8, 213.7, 118.7, 567.3, 606.9, 20, 30}
+        Tschets(17).Tdata = {1000, 1480, 1.205, 770.4, 857.5, 422.2, 6229.6, 791.6, 878.6, 1060.7, 877.3, 1306.1, 403.0, 8, 213.7, 118.7, 567.3, 606.9, 20, 30, 3.155667}
         Tschets(17).Teff = {0.00, 56.51, 65.14, 72.1, 78.58, 82.71, 84.89, 85.58, 85.38, 83.38, 80.38, 73.98}
         Tschets(17).Tverm = {6.8, 15.4, 17.2, 18.9, 20.4, 21.6, 22.4, 22.9, 23.0, 23.0, 22.6, 22.2}
         Tschets(17).TPstat = {3156.6, 3426.6, 3439.5, 3439.1, 3408.2, 3269.9, 3024.2, 2742.8, 2432.4, 2094.9, 1735.6, 1333.4}
@@ -1410,7 +1423,7 @@ Public Class Form1
         Tschets(17).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
 
         Tschets(18).Tname = "T31C."
-        Tschets(18).Tdata = {1000, 1480, 1.205, 770.4, 857.5, 455.1, 6229.6, 791.6, 878.6, 1060.7, 877.3, 1306.1, 403.0, 8, 246.7, 151.7, 567.3, 606.9, 20, 30}
+        Tschets(18).Tdata = {1000, 1480, 1.205, 770.4, 857.5, 455.1, 6229.6, 791.6, 878.6, 1060.7, 877.3, 1306.1, 403.0, 8, 246.7, 151.7, 567.3, 606.9, 20, 30, 3.155667}
         Tschets(18).Teff = {0.00, 62.34, 69.36, 75.3, 80.45, 84.07, 85.99, 86.61, 85.9, 83.74, 81.3, 77.49}
         Tschets(18).Tverm = {7.9, 18.7, 20.6, 22.4, 23.8, 24.9, 25.9, 26.7, 27.4, 27.9, 27.9, 27.5}
         Tschets(18).TPstat = {3231.6, 3591.0, 3607.8, 3594.7, 3528.8, 3380.7, 3174.7, 2943.9, 2674.4, 2374.9, 2055.9, 1703.4}
@@ -1420,7 +1433,7 @@ Public Class Form1
         Tschets(18).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
 
         Tschets(19).Tname = "T31D"
-        Tschets(19).Tdata = {1000, 1480, 1.205, 770.4, 857.5, 521.1, 6229.6, 791.6, 878.6, 1060.7, 877.3, 1306.1, 403.0, 8, 278.4, 183.4, 567.3, 606.9, 20, 30}
+        Tschets(19).Tdata = {1000, 1480, 1.205, 770.4, 857.5, 521.1, 6229.6, 791.6, 878.6, 1060.7, 877.3, 1306.1, 403.0, 8, 278.4, 183.4, 567.3, 606.9, 20, 30, 3.155667}
         Tschets(19).Teff = {0.00, 48.55, 59.16, 67.74, 74.91, 80.69, 84.59, 86.61, 86.83, 84.66, 80.56, 74.37}
         Tschets(19).Tverm = {8.5, 17.0, 20.2, 23.0, 25.5, 27.5, 29.2, 30.6, 31.6, 32.4, 32.6, 32.3}
         Tschets(19).TPstat = {3351.9, 3597.3, 3689.8, 3735.3, 3709.3, 3622.4, 3446.5, 3213.1, 2922.2, 2570.2, 2152.1, 1692.1}
@@ -1430,7 +1443,7 @@ Public Class Form1
         Tschets(19).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
 
         Tschets(20).Tname = "T31E"
-        Tschets(20).Tdata = {1000, 1480, 1.205, 770.4, 857.5, 521.1, 6229.6, 791.6, 878.6, 1060.7, 877.3, 1306.1, 403.0, 8, 310.0, 215.0, 567.3, 606.9, 20, 30}
+        Tschets(20).Tdata = {1000, 1480, 1.205, 770.4, 857.5, 521.1, 6229.6, 791.6, 878.6, 1060.7, 877.3, 1306.1, 403.0, 8, 310.0, 215.0, 567.3, 606.9, 20, 30, 3.155667}
         Tschets(20).Teff = {0.00, 55.18, 64.4, 71.52, 77.81, 82.51, 84.57, 85.39, 84.76, 82.84, 79.16, 73.67}
         Tschets(20).Tverm = {10.0, 20.2, 23.1, 25.9, 28.3, 30.6, 32.7, 34.6, 35.9, 36.9, 37.3, 37.0}
         Tschets(20).TPstat = {3435.6, 3722.1, 3781.1, 3789.6, 3752.7, 3661.8, 3485.5, 3262.2, 2974.4, 2636.0, 2241.9, 1793.7}
@@ -1440,7 +1453,7 @@ Public Class Form1
         Tschets(20).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
 
         Tschets(21).Tname = "T33."
-        Tschets(21).Tdata = {1000, 1480, 1.205, 1013.2, 857.5, 637.2, 6229.6, 791.6, 877.3, 1060.7, 877.3, 1306.1, 411.6, 8, 314.0, 233.5, 659.6, 688.7, 10, 30}
+        Tschets(21).Tdata = {1000, 1480, 1.205, 1013.2, 857.5, 637.2, 6229.6, 791.6, 877.3, 1060.7, 877.3, 1306.1, 411.6, 8, 314.0, 233.5, 659.6, 688.7, 10, 30, 3.155667}
         Tschets(21).Teff = {0.00, 64.0, 85.1, 86.98, 88.16, 89.0, 89.28, 88.52, 87.1, 84.2, 80.5, 74.0}
         Tschets(21).Tverm = {10.6, 24.3, 29.9, 30.4, 30.9, 31.2, 31.4, 31.0, 30.4, 29.5, 28.2, 26.2}
         Tschets(21).TPstat = {2902.2, 3304.3, 3007.1, 2888.2, 2725.6, 2578.8, 2355.0, 2073.5, 1835.7, 1521.0, 1223.8, 786.7}
@@ -1450,7 +1463,7 @@ Public Class Form1
         Tschets(21).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
 
         Tschets(22).Tname = "T34"
-        Tschets(22).Tdata = {1000, 1480, 1.205, 1013.2, 857.5, 693.9, 6229.6, 791.6, 877.3, 1060.7, 877.3, 1306.1, 411.6, 8, 370.7, 290.2, 659.6, 688.7, 10, 30}
+        Tschets(22).Tdata = {1000, 1480, 1.205, 1013.2, 857.5, 693.9, 6229.6, 791.6, 877.3, 1060.7, 877.3, 1306.1, 411.6, 8, 370.7, 290.2, 659.6, 688.7, 10, 30, 3.155667}
         Tschets(22).Teff = {0.00, 69.0, 83.2, 85.2, 87.0, 88.22, 88.9, 88.3, 87.12, 85.1, 82.6, 52.0}
         Tschets(22).Tverm = {12.2, 28.6, 33.8, 34.7, 35.2, 35.7, 35.9, 35.9, 35.4, 34.7, 33.9, 26.6}
         Tschets(22).TPstat = {2954.7, 3339.3, 2874.2, 2788.6, 2694.8, 2535.7, 2372.5, 2173.2, 1963.4, 1739.6, 1503.6, 760.5}
@@ -1460,7 +1473,7 @@ Public Class Form1
         Tschets(22).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
 
         Tschets(23).Tname = "T35A"
-        Tschets(23).Tdata = {1000, 1480, 1.205, 233.3, 333.3, 175.0, 5016.7, 792.0, 736.7, 760.0, 650.0, 816.7, 433.3, 8, 108.3, 33.3, 375.0, 133.3, 0, 0}
+        Tschets(23).Tdata = {1000, 1480, 1.205, 233.3, 333.3, 175.0, 5016.7, 792.0, 736.7, 760.0, 650.0, 816.7, 433.3, 8, 108.3, 33.3, 375.0, 133.3, 0, 0, 1.87903}
         Tschets(23).Teff = {0.00, 41.0, 53.0, 54.89, 56.02, 56.56, 56.9, 56.44, 55.9, 54.8, 52.56, 36.5}
         Tschets(23).Tverm = {3.4, 5.0, 6.7, 7.2, 7.9, 8.4, 9.1, 9.7, 10.4, 11.0, 11.8, 14.6}
         Tschets(23).TPstat = {4325.0, 4499.4, 4206.4, 4080.9, 3913.5, 3744.6, 3536.8, 3313.5, 3048.5, 2787.6, 2419.2, 2232.3}
@@ -1470,7 +1483,7 @@ Public Class Form1
         Tschets(23).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
 
         Tschets(24).Tname = "T35B"
-        Tschets(24).Tdata = {1000, 1480, 1.205, 233.3, 333.3, 175.0, 5016.7, 792.0, 736.7, 760.0, 650.0, 816.7, 433.3, 8, 108.3, 50.0, 375.0, 133.3, 0, 0}
+        Tschets(24).Tdata = {1000, 1480, 1.205, 233.3, 333.3, 175.0, 5016.7, 792.0, 736.7, 760.0, 650.0, 816.7, 433.3, 8, 108.3, 50.0, 375.0, 133.3, 0, 0, 1.87903}
         Tschets(24).Teff = {0.00, 40.0, 50.0, 55.06, 57.72, 59.1, 59.6, 56.6, 52.0, 45.0, 35.0, 31.0}
         Tschets(24).Tverm = {3.4, 5.6, 6.6, 7.5, 8.5, 9.5, 10.5, 12.5, 14.0, 15.7, 17.5, 18.2}
         Tschets(24).TPstat = {4429.7, 4729.6, 4604.1, 4459.0, 4234.3, 3981.8, 3683.3, 2949.4, 2346.7, 1576.5, 558.1, 0.0}
@@ -1480,7 +1493,7 @@ Public Class Form1
         Tschets(24).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
 
         Tschets(25).Tname = "T35D"  'CHECH TORERENTAL
-        Tschets(25).Tdata = {1000, 1480, 1.205, 303.3, 333.3, 175.0, 5016.7, 1208.3, 736.7, 760.0, 650.0, 816.7, 433.3, 8, 108.3, 50.0, 375.0, 133.3, 0, 0}
+        Tschets(25).Tdata = {1000, 1480, 1.205, 303.3, 333.3, 175.0, 5016.7, 1208.3, 736.7, 760.0, 650.0, 816.7, 433.3, 8, 108.3, 50.0, 375.0, 133.3, 0, 0, 2.102013}
         Tschets(25).Teff = {0.00, 30.0, 45.5, 47.98, 50.7, 51.92, 52.1, 51.68, 50.14, 47.48, 44.0, 30.0}
         Tschets(25).Tverm = {5.0, 7.1, 9.3, 9.9, 10.9, 11.7, 12.8, 14.2, 15.6, 17.2, 18.7, 22.4}
         Tschets(25).TPstat = {4813.3, 4743.6, 4429.7, 4302.7, 4107.4, 3919.0, 3655.4, 3278.7, 2846.2, 2323.2, 1744.0, 154.8}
@@ -1490,7 +1503,7 @@ Public Class Form1
         Tschets(25).Geljon = {0, 0, 0, 0, 0, 0, 0, 0}
 
         Tschets(26).Tname = "T36"
-        Tschets(26).Tdata = {1000, 1480, 1.205, 523.7, 572.4, 328.9, 5657.9, 710.5, 750.0, 859.2, 733.6, 1019.7, 425.0, 10, 156.6, 62.5, 442.1, 464.5, 29, 40}
+        Tschets(26).Tdata = {1000, 1480, 1.205, 523.7, 572.4, 328.9, 5657.9, 710.5, 750.0, 859.2, 733.6, 1019.7, 425.0, 10, 156.6, 62.5, 442.1, 464.5, 29, 40, 2.175123}
         Tschets(26).Teff = {0.00, 71.5, 80.5, 83.5, 86.52, 87.58, 88.0, 87.68, 86.2, 83.4, 79.0, 57.0}
         Tschets(26).Tverm = {3.0, 9.6, 12.0, 13.1, 14.1, 15.0, 15.9, 16.8, 17.4, 17.8, 18.6, 17.6}
         Tschets(26).TPstat = {3930.4, 4269.4, 4121.7, 4034.8, 3883.5, 3688.7, 3471.3, 3177.4, 2805.4, 2469.6, 2052.2, 1443.5}
@@ -1500,7 +1513,7 @@ Public Class Form1
         Tschets(26).Geljon = {0.14499, 1.2327, -79.528, 0.00060039, 0.16925, -1.9817, 0.01039, 0.03562}
 
         Tschets(27).Tname = "T36A."
-        Tschets(27).Tdata = {1000, 1480, 1.205, 523.7, 572.4, 328.9, 5657.9, 710.5, 750.0, 859.2, 733.6, 1019.7, 425.0, 10, 133.6, 62.5, 442.1, 464.5, 29, 40}
+        Tschets(27).Tdata = {1000, 1480, 1.205, 523.7, 572.4, 328.9, 5657.9, 710.5, 750.0, 859.2, 733.6, 1019.7, 425.0, 10, 133.6, 62.5, 442.1, 464.5, 29, 40, 2.175123}
         Tschets(27).Teff = {0.00, 71.0, 80.5, 82.1, 83.3, 84.24, 84.6, 84.04, 81.46, 77.16, 72.0, 60.0}
         Tschets(27).Tverm = {3.0, 9.0, 11.9, 12.7, 13.5, 14.1, 14.8, 15.6, 16.4, 16.9, 17.1, 17.1}
         Tschets(27).TPstat = {3826.1, 4252.2, 4060.9, 3963.5, 3833.9, 3695.7, 3533.9, 3220.0, 2868.7, 2440.9, 2036.5, 1756.5}
@@ -1510,7 +1523,7 @@ Public Class Form1
         Tschets(27).Geljon = {0.14412, 1.3974, -98.38, 0.00040028, 0.19121, -2.6461, 0.009678, 0.032648}
 
         Tschets(28).Tname = "GALAK"
-        Tschets(28).Tdata = {1200, 1465, 1.2, 500, 665, 300, 5500, 820, 886, 1018, 875, 1208, 408, 16, 120.0, 60.0, 455, 500, 38.4, 71.0}
+        Tschets(28).Tdata = {1200, 1465, 1.2, 500, 665, 300, 5500, 820, 886, 1018, 875, 1208, 408, 16, 120.0, 60.0, 455, 500, 38.4, 71.0, 2.100496}
         Tschets(28).Teff = {0.00, 33.1, 52.7, 66.2, 72.2, 74.1, 75.0, 75.1, 74.3, 72.9, 70.5, 63.4}
         Tschets(28).Tverm = {8.5, 15.3, 22.1, 29.1, 35.8, 38.8, 42.0, 45.1, 48.4, 51.5, 54.5, 56.9}
         Tschets(28).TPstat = {5258.2, 5655.1, 5982.7, 6182.0, 6174.5, 6022.2, 5832.8, 5586.9, 5284.4, 4925.3, 4529.3, 4057.0}
@@ -1519,7 +1532,7 @@ Public Class Form1
         Tschets(28).werkp_opT = {0, 0, 0, 0, 0}
 
         Tschets(29).Tname = "GW"
-        Tschets(29).Tdata = {1000, 1480, 1.205, 127.8, 156.7, 82.5, 4117.5, 618.6, 573.2, 573.2, 536.1, 614.4, 416.5, 12, 20.6, 8.2, 127.8, 167.0, 65, 90}
+        Tschets(29).Tdata = {1000, 1480, 1.205, 127.8, 156.7, 82.5, 4117.5, 618.6, 573.2, 573.2, 536.1, 614.4, 416.5, 12, 20.6, 8.2, 127.8, 167.0, 65, 90, 1.016747}
         Tschets(29).Teff = {0.00, 27.8, 40.2, 43.9, 46.4, 47.5, 47.5, 46.6, 43.8, 39.9, 34.8, 28.3}
         Tschets(29).Tverm = {0.4, 0.7, 1.0, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0}
         Tschets(29).TPstat = {3953.0, 4082.0, 4030.0, 3936.0, 3804.0, 3630.0, 3405.0, 3141.0, 2793.0, 2414.0, 1956.0, 1452.0}
@@ -1529,7 +1542,7 @@ Public Class Form1
         Tschets(29).Geljon = {0.1327, 32.1, -31159.0, 0.0001441, 0.26841, -23.368, 0.0004895, 0.001958}
 
         Tschets(30).Tname = "GWA"
-        Tschets(30).Tdata = {1000, 1480, 1.205, 127.8, 156.7, 82.5, 4117.5, 618.6, 1191.8, 573.2, 536.1, 577.3, 492.1, 12, 20.6, 8.2, 127.8, 167.0, 90, 50}
+        Tschets(30).Tdata = {1000, 1480, 1.205, 127.8, 156.7, 82.5, 4117.5, 618.6, 1191.8, 573.2, 536.1, 577.3, 492.1, 12, 20.6, 8.2, 127.8, 167.0, 90, 50, 1.016747}
         Tschets(30).Teff = {0.00, 30.27, 38.83, 44.99, 49.14, 51.21, 52.45, 52.1, 50.65, 47.89, 43.59, 38.33}
         Tschets(30).Tverm = {0.4, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.2, 1.3, 1.4, 1.5, 1.6}
         Tschets(30).TPstat = {3880.8, 3918.9, 3880.8, 3794.0, 3672.5, 3519.8, 3335.8, 3096.3, 2804.7, 2454.1, 2020.2, 1600.2}
@@ -2556,7 +2569,7 @@ Public Class Form1
         Dim Kw, bpf, dia_fan_inlet, diameter_imp As Double
         Dim Suction_raw(9), Suction_damper(9), Suction_clean(9), Suction_dba(9) As Double           'Suction fan
         Dim Discharge_raw(9), Discharge_damper(9), Discharge_clean(9), discharge_dba(9) As Double   'Discharge fan
-        ' Dim duct_in(9) As Double                                                                    'Ducting
+        Dim keel_diameter As Double
         Dim casing_raw(9), casing_insulation(9), casing_clean(9), casing_dba(9) As Double           'Casing
         Dim hh As Integer
         Dim words() As String
@@ -2584,10 +2597,13 @@ Public Class Form1
             dia_fan_inlet /= 1000                                           '[m]
             diameter_imp = NumericUpDown33.Value / 1000                     'Diam impeller    
             DzDw = dia_fan_inlet / diameter_imp                             'Dia zuig / dia waaier
-            Area_casing = (diameter_imp * 2) ^ 2                            '[m2] Estimeted area casing, one side
+            ' Area_casing = (diameter_imp * 2) ^ 2                          '[m2] Estimeted area casing, one side
+            ' Area_casing = 21.18
+            Area_casing = Tschets(ComboBox1.SelectedIndex).Tdata(20)
+
             area_measure = (Sqrt(Area_casing) + 2) ^ 2                      'Meet oppervlak Hoogte+2m, Breed+2m
             casing_dikte = NumericUpDown7.Value                             'Casing plaat dikte
-
+            keel_diameter = Tschets(ComboBox1.SelectedIndex).Tdata(16) / Tschets(ComboBox1.SelectedIndex).Tdata(0) * diameter_imp
             '------------------------ casing insulation--------------------       
             If (ComboBox9.SelectedIndex > -1) Then      'Prevent exceptions
                 words = insulation_casing(ComboBox9.SelectedIndex).Split(";")
@@ -2647,7 +2663,7 @@ Public Class Form1
 
             '------------------------------------------------------
             '------------------------------------------------------
-            Dim pppz, kappa, zet, kp, rend, fBA, Lws, Lwi, Lv, deltaLA, Rv, n_ref, Zoek_freq, inlet_red As Double
+            Dim pppz, kappa, zet, kp, rend, fBA, Lws, Lwi, Lv_area, deltaLA, Rv, n_ref, Zoek_freq, inlet_red As Double
 
             '-------------- VTK calculatie---------------
             nq = n_imp * Sqrt(Act_flow_sec) / (p_stat / roww) ^ 0.75
@@ -2663,8 +2679,8 @@ Public Class Form1
             fBA = 1 + (0.5 * (0.82 / rend - 1))
             If fBA > 1.2 Then fBA = 1.2
             Lws = (55 + 0.1885 * nq) * fBA                                          '[dB]
-            Lwi = Lws - 19.83 + 8.686 * Log(P_tot) + 4.343 * Log(Act_flow_sec)     '[dB]
-            Lv = 4.343 * Log(Area_casing)                                           '[m2] eenzijdig oppervlak
+            Lwi = Lws - 19.83 + 8.686 * Log(P_tot) + 4.343 * Log(Act_flow_sec)      '[dB]
+            Lv_area = 4.343 * Log(Area_casing)                                      '[m2] eenzijdig oppervlak
             deltaLA = 4.343 * Log(area_measure)                                     '[m2] meet oppervlak
             Rv = 17.71 + 5.86 * Log(casing_dikte)                                   '[mm] casing plaat dikte
 
@@ -2680,7 +2696,7 @@ Public Class Form1
             End Select
 
             Zoek_freq = n_ref ^ 2 * no_schoepen
-            inlet_red = -1 * 20 * Log10(diameter_imp / dia_fan_inlet) / Sqrt(2) + 1
+            inlet_red = -1 * (20 * Log10(diameter_imp / dia_fan_inlet) / Sqrt(2) + 1)
             TextBox324.Text = Round(Zoek_freq, 0).ToString
 
 
@@ -2691,26 +2707,38 @@ Public Class Form1
                 Else
                     words = zuig_bigger40(i).Split(";")
                 End If
-                If Zoek_freq > Convert.ToDouble(words(0)) Then
-                    Suction_raw(0) = Lwi + inlet_red + words(4)    'Lp63
-                    Suction_raw(1) = Lwi + inlet_red + words(5)    'Lp125
-                    Suction_raw(2) = Lwi + inlet_red + words(6)    'Lp250
-                    Suction_raw(3) = Lwi + inlet_red + words(7)    'LP500  
-                    Suction_raw(4) = Lwi + inlet_red + words(8)    'Lp1000
-                    Suction_raw(5) = Lwi + inlet_red + words(9)    'Lp2000  
-                    Suction_raw(6) = Lwi + inlet_red + words(10)   'Lp4000
-                    Suction_raw(7) = Lwi + inlet_red + words(11)   'Lp8000
+                If Zoek_freq >= Convert.ToDouble(words(0)) Then
+                    Suction_raw(0) = Lwi + inlet_red + words(4) - 26  'Lp63
+                    Suction_raw(1) = Lwi + inlet_red + words(5) - 16  'Lp125
+                    Suction_raw(2) = Lwi + inlet_red + words(6) - 8   'Lp250
+                    Suction_raw(3) = Lwi + inlet_red + words(7) - 3   'LP500  
+                    Suction_raw(4) = Lwi + inlet_red + words(8) + 0   'Lp1000
+                    Suction_raw(5) = Lwi + inlet_red + words(9) + 1   'Lp2000  
+                    Suction_raw(6) = Lwi + inlet_red + words(10) + 1  'Lp4000
+                    Suction_raw(7) = Lwi + inlet_red + words(11) - 1  'Lp8000
                     '------------------------------------
-                    Discharge_raw(0) = Lwi + words(4)               'Lp63
-                    Discharge_raw(1) = Lwi + words(5)               'Lp125
-                    Discharge_raw(2) = Lwi + words(6)               'Lp250
-                    Discharge_raw(3) = Lwi + words(7)               'LP500  
-                    Discharge_raw(4) = Lwi + words(8)               'Lp1000
-                    Discharge_raw(5) = Lwi + words(9)               'Lp2000  
-                    Discharge_raw(6) = Lwi + words(10)              'Lp4000
-                    Discharge_raw(7) = Lwi + words(11)              'Lp8000
+                    Discharge_raw(0) = Lwi + words(4) - 26            'Lp63
+                    Discharge_raw(1) = Lwi + words(5) - 16            'Lp125
+                    Discharge_raw(2) = Lwi + words(6) - 8             'Lp250
+                    Discharge_raw(3) = Lwi + words(7) - 3             'LP500  
+                    Discharge_raw(4) = Lwi + words(8) + 0             'Lp1000
+                    Discharge_raw(5) = Lwi + words(9) + 1             'Lp2000  
+                    Discharge_raw(6) = Lwi + words(10) + 1            'Lp4000
+                    Discharge_raw(7) = Lwi + words(11) - 1            'Lp8000
+
+                    '----------Suction Reductuion--------------
+                    TextBox360.Text = words(4)       '
+                    TextBox359.Text = words(5)
+                    TextBox358.Text = words(6)
+                    TextBox357.Text = words(7)
+                    TextBox356.Text = words(8)
+                    TextBox355.Text = words(9)
+                    TextBox354.Text = words(10)
+                    TextBox353.Text = words(11)
+
                 End If
             Next
+
 
             '----------- calc discharge clean-----------
             For i = 0 To (Discharge_clean.Length - 1)
@@ -2725,7 +2753,7 @@ Public Class Form1
 
             '----------- Casing RAW-----------
             For i = 0 To (casing_raw.Length - 1)
-                casing_raw(i) = Discharge_raw(i) - Rv + Lv
+                casing_raw(i) = Discharge_raw(i) - Rv + Lv_area
             Next
 
             '----------- Casing Clean [dB]-----------
@@ -2733,52 +2761,26 @@ Public Class Form1
                 casing_clean(i) = casing_raw(i) - casing_insulation(i)
             Next
 
-            '----------- Casing Clean [dBA]-----------
-            casing_dba(0) = casing_clean(0) - 26
-            casing_dba(1) = casing_clean(1) - 16
-            casing_dba(2) = casing_clean(2) - 9
-            casing_dba(3) = casing_clean(3) - 3
-            casing_dba(4) = casing_clean(4) + 0
-            casing_dba(5) = casing_clean(5) + 1
-            casing_dba(6) = casing_clean(6) + 1
-            casing_dba(7) = casing_clean(7) - 1
 
-            '----------- Suction Clean [dBA]-----------
-            Suction_dba(0) = Suction_clean(0) - 26
-            Suction_dba(1) = Suction_clean(1) - 16
-            Suction_dba(2) = Suction_clean(2) - 9
-            Suction_dba(3) = Suction_clean(3) - 3
-            Suction_dba(4) = Suction_clean(4) + 0
-            Suction_dba(5) = Suction_clean(5) + 1
-            Suction_dba(6) = Suction_clean(6) + 1
-            Suction_dba(7) = Suction_clean(7) - 1
-
-            '----------- Discharge [dBA]-----------
-            discharge_dba(0) = Discharge_clean(0) - 26
-            discharge_dba(1) = Discharge_clean(1) - 16
-            discharge_dba(2) = Discharge_clean(2) - 9
-            discharge_dba(3) = Discharge_clean(3) - 3
-            discharge_dba(4) = Discharge_clean(4) + 0
-            discharge_dba(5) = Discharge_clean(5) + 1
-            discharge_dba(6) = Discharge_clean(6) + 1
-            discharge_dba(7) = Discharge_clean(7) - 1
-
+            TextBox238.Text = Round(pppz, 3).ToString               'rendement
+            TextBox379.Text = Round(zet, 3).ToString                'rendement
+            TextBox380.Text = Round(kp, 3).ToString                 'rendement
             TextBox114.Text = Round(n_imp, 0).ToString              'Toerental [rpm]
             TextBox234.Text = Round(Kw, 0).ToString                 'As vermogen[kW]
             TextBox235.Text = Round(eff, 2).ToString                'Efficiency [-]
             TextBox236.Text = Round(no_schoepen, 1).ToString        'Aantal Schoepen
-            TextBox237.Text = Round(bpf, 0).ToString                'Blade passing Frequency
-            TextBox321.Text = Round(DzDw, 2).ToString               'Dzuig/Dia waaier
+
+            TextBox321.Text = Round(dia_fan_inlet, 2).ToString      'Dia zuig
+            TextBox237.Text = Round(diameter_imp, 2).ToString       'Dia waaier
+            TextBox381.Text = Round(keel_diameter, 2).ToString      'Dia Keel
             TextBox322.Text = Round(Area_casing, 1).ToString        'Estimated area fan casing one side [m2]
             TextBox317.Text = Round(nq, 3).ToString                 'Sound calcu variable
             TextBox318.Text = Round(rend, 2).ToString               'Sound calcu rendement
             TextBox320.Text = Round(fBA, 2).ToString                'Sound calcu rendement
             TextBox319.Text = Round(Lws, 1).ToString                'Sound power [dB]
             TextBox312.Text = Round(Lwi, 1).ToString                'Sound power discharge [dB]
-            TextBox303.Text = TextBox312.Text                       'Sound power discharge [dB]
 
-            TextBox125.Text = Round(Lwi + inlet_red, 1).ToString    'Sound power inlet [dB]
-            TextBox316.Text = Round(Lv, 3).ToString                 'Casing area [m2] 
+            TextBox316.Text = Round(Lv_area, 3).ToString            'Casing area [m2] 
             TextBox315.Text = Round(deltaLA, 3).ToString            'Meet area [m2] 
             TextBox314.Text = Round(Rv, 3).ToString                 'Plaat dikte isolatie 
             TextBox313.Text = Round(n_ref, 0).ToString              'Referentie toerental 
@@ -2800,6 +2802,7 @@ Public Class Form1
             TextBox120.Text = Round(Suction_raw(5), 1).ToString
             TextBox121.Text = Round(Suction_raw(6), 1).ToString
             TextBox122.Text = Round(Suction_raw(7), 1).ToString
+            TextBox125.Text = Round(add_decibels(Suction_raw), 1).ToString
 
             '----------Suction Clean induct opgesplits in banden--------------
             TextBox341.Text = Round(Suction_clean(0), 1).ToString       '
@@ -2812,17 +2815,6 @@ Public Class Form1
             TextBox334.Text = Round(Suction_clean(7), 1).ToString
             TextBox333.Text = Round(add_decibels(Suction_clean), 1).ToString
 
-            '----------Suction Clean dba--------------
-            TextBox360.Text = Round(Suction_dba(0), 1).ToString       '
-            TextBox359.Text = Round(Suction_dba(1), 1).ToString
-            TextBox358.Text = Round(Suction_dba(2), 1).ToString
-            TextBox357.Text = Round(Suction_dba(3), 1).ToString
-            TextBox356.Text = Round(Suction_dba(4), 1).ToString
-            TextBox355.Text = Round(Suction_dba(5), 1).ToString
-            TextBox354.Text = Round(Suction_dba(6), 1).ToString
-            TextBox353.Text = Round(Suction_dba(7), 1).ToString
-            TextBox352.Text = Round(add_decibels(Suction_dba), 1).ToString
-
             '----------Discharge RAW induct opgesplits in banden--------------
             TextBox311.Text = Round(Discharge_raw(0), 1).ToString       '
             TextBox310.Text = Round(Discharge_raw(1), 1).ToString
@@ -2832,6 +2824,7 @@ Public Class Form1
             TextBox306.Text = Round(Discharge_raw(5), 1).ToString
             TextBox305.Text = Round(Discharge_raw(6), 1).ToString
             TextBox304.Text = Round(Discharge_raw(7), 1).ToString
+            TextBox303.Text = Round(add_decibels(Discharge_raw), 1).ToString
 
             '----------Discharge Clean induct opgesplits in banden--------------
             TextBox369.Text = Round(Discharge_clean(0), 1).ToString       '
@@ -2844,19 +2837,7 @@ Public Class Form1
             TextBox362.Text = Round(Discharge_clean(7), 1).ToString
             TextBox361.Text = Round(add_decibels(Discharge_clean), 1).ToString     'Sound Pressure [dB]
 
-            '----------Discharge Clean induct opgesplits in banden--------------
-            TextBox378.Text = Round(discharge_dba(0), 1).ToString       '
-            TextBox377.Text = Round(discharge_dba(1), 1).ToString
-            TextBox376.Text = Round(discharge_dba(2), 1).ToString
-            TextBox375.Text = Round(discharge_dba(3), 1).ToString
-            TextBox374.Text = Round(discharge_dba(4), 1).ToString
-            TextBox373.Text = Round(discharge_dba(5), 1).ToString
-            TextBox372.Text = Round(discharge_dba(6), 1).ToString
-            TextBox371.Text = Round(discharge_dba(7), 1).ToString
-            TextBox370.Text = Round(add_decibels(discharge_dba), 1).ToString     'Sound Pressure [dB]
-
             '---------------- Casing raw -----------------------
-            TextBox225.Text = Round(add_decibels(casing_raw), 1).ToString   'Sound Pressure [dB]
             TextBox233.Text = Round(casing_raw(0), 1).ToString              'Sound Pressure [dB]
             TextBox232.Text = Round(casing_raw(1), 1).ToString              'Sound Pressure [dB]
             TextBox231.Text = Round(casing_raw(2), 1).ToString              'Sound Pressure [dB]
@@ -2865,6 +2846,7 @@ Public Class Form1
             TextBox228.Text = Round(casing_raw(5), 1).ToString               'Sound Pressure [dB]
             TextBox227.Text = Round(casing_raw(6), 1).ToString              'Sound Pressure [dB]
             TextBox226.Text = Round(casing_raw(7), 1).ToString              'Sound Pressure [dB]
+            TextBox225.Text = Round(add_decibels(casing_raw), 1).ToString   'Sound Pressure [dB]
 
             '---------------- Casing clean [dB]-----------------------
             TextBox296.Text = Round(add_decibels(casing_clean), 1).ToString     'Sound Pressure [dB]
@@ -2876,17 +2858,6 @@ Public Class Form1
             TextBox297.Text = Round(casing_clean(5), 1).ToString                'Sound Pressure [dB]
             TextBox295.Text = Round(casing_clean(6), 1).ToString                'Sound Pressure [dB]
             TextBox294.Text = Round(casing_clean(7), 1).ToString                'Sound Pressure [dB]
-
-            '---------------- Casing clean [dBA] -----------------------
-            TextBox344.Text = Round(add_decibels(casing_dba), 1).ToString     'Sound Pressure [dB]
-            TextBox350.Text = Round(casing_dba(0), 1).ToString                'Sound Pressure [dB]
-            TextBox347.Text = Round(casing_dba(1), 1).ToString                'Sound Pressure [dB]
-            TextBox349.Text = Round(casing_dba(2), 1).ToString                'Sound Pressure [dB]
-            TextBox348.Text = Round(casing_dba(3), 1).ToString                'Sound Pressure [dB]
-            TextBox346.Text = Round(casing_dba(4), 1).ToString                'Sound Pressure [dB]
-            TextBox345.Text = Round(casing_dba(5), 1).ToString                'Sound Pressure [dB]
-            TextBox343.Text = Round(casing_dba(6), 1).ToString                'Sound Pressure [dB]
-            TextBox342.Text = Round(casing_dba(7), 1).ToString                'Sound Pressure [dB]
 
 
         End If
