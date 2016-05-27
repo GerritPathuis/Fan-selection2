@@ -2562,24 +2562,26 @@ Public Class Form1
         Scale_rules_applied(ComboBox1.SelectedIndex, NumericUpDown9.Value, NumericUpDown10.Value, NumericUpDown12.Value)
         Selectie_1()
     End Sub
+
     'Calculate the noise tab
     Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click, TabPage4.Enter, NumericUpDown7.ValueChanged, ComboBox9.SelectedIndexChanged, ComboBox10.SelectedIndexChanged, ComboBox5.SelectedIndexChanged
         Dim spez_drehz, p_stat, P_tot, Act_flow_sec, roww As Double
         Dim eff, n_imp, no_schoepen As Double
-        Dim Kw, bpf, dia_fan_inlet, diameter_imp As Double
+        Dim Kw, dia_fan_inlet, diameter_imp As Double
         Dim Suction_raw(9), Suction_damper(9), Suction_clean(9), Suction_dba(9) As Double           'Suction fan
         Dim Discharge_raw(9), Discharge_damper(9), Discharge_clean(9), discharge_dba(9) As Double   'Discharge fan
         Dim keel_diameter As Double
         Dim casing_raw(9), casing_insulation(9), casing_clean(9), casing_dba(9) As Double           'Casing
         Dim hh As Integer
         Dim words() As String
-        Dim DzDw As Double                                                  'Diameter zuig/diameter waaier
+        Dim DzDw, fan_size_factor As Double                                 'Diameter zuig/diameter waaier
         Dim Area_casing, casing_dikte, area_measure As Double               'Estimated Area casing one side!!
         Dim nq As Double     '
 
         If (ComboBox1.SelectedIndex > -1) Then      'Prevent exceptions
 
             Label152.Text = "Waaier type " & Label1.Text
+            Double.TryParse(TextBox159.Text, dia_fan_inlet)                 'Diameter suction
             Double.TryParse(TextBox123.Text, spez_drehz)
             p_stat = NumericUpDown37.Value * 100                            '[mBar]->[Pa] static 
             Double.TryParse(TextBox273.Text, P_tot)                         '[mBar]
@@ -2592,18 +2594,18 @@ Public Class Form1
             roww = NumericUpDown12.Value                                    'Density [kg/Am3]
             n_imp = NumericUpDown13.Value                                   'toerental
             no_schoepen = Tschets(ComboBox1.SelectedIndex).Tdata(13)        'aantal schoepen.    
-
-            Double.TryParse(TextBox159.Text, dia_fan_inlet)                 'Diameter suction
             dia_fan_inlet /= 1000                                           '[m]
-            diameter_imp = NumericUpDown33.Value / 1000                     'Diam impeller    
+            diameter_imp = NumericUpDown33.Value / 1000                     '[m] Diam impeller    
             DzDw = dia_fan_inlet / diameter_imp                             'Dia zuig / dia waaier
-            ' Area_casing = (diameter_imp * 2) ^ 2                          '[m2] Estimeted area casing, one side
-            ' Area_casing = 21.18
-            Area_casing = Tschets(ComboBox1.SelectedIndex).Tdata(20)
 
+            fan_size_factor = diameter_imp * 1000 / Tschets(ComboBox1.SelectedIndex).Tdata(0)
+            Area_casing = Tschets(ComboBox1.SelectedIndex).Tdata(20) * fan_size_factor * 7.43    'Fan oppervlak [m2]
             area_measure = (Sqrt(Area_casing) + 2) ^ 2                      'Meet oppervlak Hoogte+2m, Breed+2m
+            TextBox343.Text = Round(area_measure, 2).ToString               'Meet oppervlak
+
             casing_dikte = NumericUpDown7.Value                             'Casing plaat dikte
-            keel_diameter = Tschets(ComboBox1.SelectedIndex).Tdata(16) / Tschets(ComboBox1.SelectedIndex).Tdata(0) * diameter_imp
+            keel_diameter = Tschets(ComboBox1.SelectedIndex).Tdata(16) / 1000 * fan_size_factor  '[m]
+
             '------------------------ casing insulation--------------------       
             If (ComboBox9.SelectedIndex > -1) Then      'Prevent exceptions
                 words = insulation_casing(ComboBox9.SelectedIndex).Split(";")
@@ -2653,8 +2655,6 @@ Public Class Form1
             End If
 
 
-
-
             'Sound power level-------------------------------------
             'Lws = 2.9513409 * Log(spez_drehz) + 26.0752394                  'Willi Bohl pagina 45 and 51 for check
             'Ltot = Lws + 10 * Log10(Act_flow / 3600) + 20 * Log10(p_stat)    ' +/- 5 db
@@ -2680,7 +2680,7 @@ Public Class Form1
             If fBA > 1.2 Then fBA = 1.2
             Lws = (55 + 0.1885 * nq) * fBA                                          '[dB]
             Lwi = Lws - 19.83 + 8.686 * Log(P_tot) + 4.343 * Log(Act_flow_sec)      '[dB]
-            Lv_area = 4.343 * Log(Area_casing)                                      '[m2] eenzijdig oppervlak
+            Lv_area = 4.343 * Log(Area_casing)                                      '[m2] fan oppervlak
             deltaLA = 4.343 * Log(area_measure)                                     '[m2] meet oppervlak
             Rv = 17.71 + 5.86 * Log(casing_dikte)                                   '[mm] casing plaat dikte
 
@@ -2758,7 +2758,7 @@ Public Class Form1
 
             '----------- Casing Clean [dB]-----------
             For i = 0 To (casing_clean.Length - 1)
-                casing_clean(i) = casing_raw(i) - casing_insulation(i)
+                casing_clean(i) = casing_raw(i) - casing_insulation(i) - deltaLA
             Next
 
 
@@ -2780,8 +2780,8 @@ Public Class Form1
             TextBox319.Text = Round(Lws, 1).ToString                'Sound power [dB]
             TextBox312.Text = Round(Lwi, 1).ToString                'Sound power discharge [dB]
 
-            TextBox316.Text = Round(Lv_area, 3).ToString            'Casing area [m2] 
-            TextBox315.Text = Round(deltaLA, 3).ToString            'Meet area [m2] 
+            TextBox316.Text = Round(Lv_area, 1).ToString            'Casing area [m2] 
+            TextBox315.Text = Round(deltaLA, 1).ToString            'Meet area [m2] 
             TextBox314.Text = Round(Rv, 3).ToString                 'Plaat dikte isolatie 
             TextBox313.Text = Round(n_ref, 0).ToString              'Referentie toerental 
             TextBox323.Text = Round(inlet_red, 3).ToString          'Suction noise reduction [dB] 
@@ -2858,10 +2858,12 @@ Public Class Form1
             TextBox297.Text = Round(casing_clean(5), 1).ToString                'Sound Pressure [dB]
             TextBox295.Text = Round(casing_clean(6), 1).ToString                'Sound Pressure [dB]
             TextBox294.Text = Round(casing_clean(7), 1).ToString                'Sound Pressure [dB]
-
-
         End If
     End Sub
+
+
+
+
     'Convert Sound power to pressure
     Private Function add_decibels(snd As Double())
         Dim Ltot As Double = 0
@@ -2934,7 +2936,17 @@ Public Class Form1
 
     Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click, CheckBox6.CheckedChanged, CheckBox3.CheckedChanged, CheckBox2.CheckedChanged, CheckBox1.CheckedChanged, TabPage3.Enter, NumericUpDown9.ValueChanged, NumericUpDown10.ValueChanged, RadioButton9.CheckedChanged, RadioButton11.CheckedChanged, RadioButton10.CheckedChanged, CheckBox7.CheckedChanged, CheckBox8.CheckedChanged, CheckBox10.CheckedChanged
         NumericUpDown33.Value = NumericUpDown9.Value
+        If NumericUpDown33.Value > 2300 Then
+            NumericUpDown33.BackColor = Color.Red
+        Else
+            NumericUpDown33.BackColor = Color.Yellow
+        End If
         NumericUpDown21.Value = NumericUpDown9.Value    'Diameter waaier
+        If NumericUpDown9.Value > 2300 Then
+            NumericUpDown9.BackColor = Color.Red
+        Else
+            NumericUpDown9.BackColor = Color.Yellow
+        End If
         NumericUpDown13.Value = NumericUpDown10.Value
         Scale_rules_applied(ComboBox1.SelectedIndex, NumericUpDown9.Value, NumericUpDown10.Value, NumericUpDown12.Value)
         draw_chart1(ComboBox1.SelectedIndex)
