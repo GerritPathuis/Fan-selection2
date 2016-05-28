@@ -201,6 +201,7 @@ Public Class Form1
     "560;400L;1828;85"}
 
 
+
     'Hz; rpm; Koppel_%,
     Public Shared EXD_VSD_torque() As String = {
      "0 ; 0; 56",
@@ -224,6 +225,15 @@ Public Class Form1
      "90; 2677; 46",
      "95; 2825; 43.5",
      "100; 2974; 42"}
+
+    'Db loss voor ducting per meter
+    Public Shared Duct_attenuation() As String = {
+     "6x6 ;   0.30; 0.2; 0.1;  0.1;  0.1; 0.1; 0.1; 0.1",
+     "12x12;  0.35; 0.2; 0.1;  0.06; 0.06; 0.06; 0.06; 0.06",
+     "12x24;  0.04; 0.2; 0.1;  0.05; 0.05; 0.05; 0.05; 0.05",
+     "24x24;  0.25; 0.2; 0.1;  0.03; 0.03; 0.03; 0.03; 0.03",
+     "48x48;  0.15; 0.1; 0.07; 0.2;  0.2; 0.2; 0.2; 0.2",
+     "72x72;  0.10; 0.1; 0.05; 0.2;  0.21; 0.2; 0.2; 0.2"}
 
     'ASHREA 1999, chapter 46.19, Table 21
     Public Shared TLout() As String = {
@@ -1253,8 +1263,8 @@ Public Class Form1
         '--------- Kinematic viscosity air[m2/s]
         '-----Kinematic viscosity = dynamic/density------------------
         ' Formula valid from -200 to +400 celcius------------------
-        If temp > 400 Then MessageBox.Show("kin_visco_air(temp) too high")
-        If temp < -200 Then MessageBox.Show("kin_visco_air(temp) too low")
+        If temp > 400 Then MessageBox.Show("kin_visco_air(temp) too high (T > 400)")
+        If temp < -200 Then MessageBox.Show("kin_visco_air(temp) too low (T < -200)")
 
         temp = temp + 273.15
         visco = 0.00009 * temp ^ 2 + 0.0351 * temp - 2.9294
@@ -1622,9 +1632,9 @@ Public Class Form1
                 Chart1.Series(4).Name = "Marker"
                 Chart1.Series(5).Name = "P static [mBar]"
 
-                Chart1.Series(0).Color = Color.Green        'Total pressure
+                Chart1.Series(0).Color = Color.LightGreen        'Total pressure
                 Chart1.Series(1).Color = Color.Red          'Efficiency
-                Chart1.Series(2).Color = Color.Green        'Power
+                Chart1.Series(2).Color = Color.LightGreen        'Power
                 Chart1.Series(3).Color = Color.Blue         'marker
                 Chart1.Series(4).Color = Color.LightBlue    'Line resistance
                 Chart1.Series(5).Color = Color.Blue         'Static pressure
@@ -1846,7 +1856,7 @@ Public Class Form1
 
         '----------------------------------------------
         'Insert a table, fill it with data and change the column widths.
-        oTable = oDoc.Tables.Add(oDoc.Bookmarks.Item("\endofdoc").Range, 4, 3)
+        oTable = oDoc.Tables.Add(oDoc.Bookmarks.Item("\endofdoc").Range, 5, 3)
         oTable.Range.ParagraphFormat.SpaceAfter = 1
         oTable.Range.Font.Size = 11
         oTable.Range.Font.Bold = False
@@ -1856,10 +1866,12 @@ Public Class Form1
         oTable.Cell(1, 2).Range.Text = TextBox283.Text
         oTable.Cell(2, 1).Range.Text = "Item number"
         oTable.Cell(2, 2).Range.Text = TextBox284.Text
-        oTable.Cell(3, 1).Range.Text = "Author "
-        oTable.Cell(3, 2).Range.Text = Environment.UserName
-        oTable.Cell(4, 1).Range.Text = "Date "
-        oTable.Cell(4, 2).Range.Text = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+        oTable.Cell(3, 1).Range.Text = "Fan type "
+        oTable.Cell(3, 2).Range.Text = Label1.Text
+        oTable.Cell(4, 1).Range.Text = "Author "
+        oTable.Cell(4, 2).Range.Text = Environment.UserName
+        oTable.Cell(5, 1).Range.Text = "Date "
+        oTable.Cell(6, 2).Range.Text = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
 
         oTable.Columns.Item(1).Width = oWord.InchesToPoints(2.5)   'Change width of columns 
         oTable.Columns.Item(2).Width = oWord.InchesToPoints(2)
@@ -1894,9 +1906,9 @@ Public Class Form1
         oTable.Columns.Item(3).Width = oWord.InchesToPoints(0.75)
         oTable.Columns.Item(4).Width = oWord.InchesToPoints(0.75)
         oTable.Columns.Item(5).Width = oWord.InchesToPoints(0.75)
-        oTable.Columns.Item(6).Width = oWord.InchesToPoints(0.65)
-        oTable.Columns.Item(7).Width = oWord.InchesToPoints(0.65)
-        oTable.Columns.Item(8).Width = oWord.InchesToPoints(0.65)
+        oTable.Columns.Item(6).Width = oWord.InchesToPoints(0.45)
+        oTable.Columns.Item(7).Width = oWord.InchesToPoints(0.45)
+        oTable.Columns.Item(8).Width = oWord.InchesToPoints(0.45)
 
 
         '------------------save Chart1 ---------------- 
@@ -2420,7 +2432,7 @@ Public Class Form1
             Chart4.Titles(0).Font = New Font("Arial", 16, System.Drawing.FontStyle.Bold)
 
             Chart4.Series(0).Name = "Torque"
-            Chart4.Series(0).Color = Color.Green
+            Chart4.Series(0).Color = Color.LightGreen
             Chart4.Series(0).BorderWidth = 1
 
             Chart4.ChartAreas("ChartArea0").AxisX.Title = "[rpm]"
@@ -2591,11 +2603,26 @@ Public Class Form1
         Scale_rules_applied(ComboBox1.SelectedIndex, NumericUpDown9.Value, NumericUpDown10.Value, NumericUpDown12.Value)
         Selectie_1()
     End Sub
+    'VDI 3731 
+    Function dL_oktaaf(laufz As Double, dia As Double, v_buiten As Double, okt As Double)
+        Dim dl As Double
+        Select Case True
+            Case laufz > 0.06 And laufz <= 0.2
+                dl = -1 * (6 + 12 * (Log10(okt * dia / v_buiten) - 0.13) ^ 2)
+                TextBox376.BackColor = Color.LightGreen
+            Case laufz > 0.2 And laufz < 0.56
+                dl = -1 * (5 + 5 * (Log10(okt * dia / v_buiten) - 0.39) ^ 2)
+                TextBox376.BackColor = Color.LightGreen
+            Case Else
+                TextBox376.BackColor = Color.Red
+        End Select
+        Return (dl)
+    End Function
 
     'Calculate the noise tab
     Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click, TabPage4.Enter, NumericUpDown7.ValueChanged, ComboBox9.SelectedIndexChanged, ComboBox10.SelectedIndexChanged, ComboBox5.SelectedIndexChanged
         Dim spez_drehz, p_stat, P_tot, Act_flow_sec_noise, roww As Double
-        Dim eff, n_imp, no_schoepen As Double
+        Dim L_eff, n_imp, no_schoepen As Double
         Dim Kw, dia_fan_inlet, diameter_imp As Double
         Dim Suction_raw(9), Suction_damper(9), Suction_clean(9), Suction_dba(9) As Double           'Suction fan
         Dim Discharge_raw(9), Discharge_damper(9), Discharge_clean(9), discharge_dba(9) As Double   'Discharge fan
@@ -2605,7 +2632,7 @@ Public Class Form1
         Dim words() As String
         Dim DzDw, fan_size_factor As Double                                 'Diameter zuig/diameter waaier
         Dim Area_casing, casing_dikte, area_measure As Double               'Estimated Area casing one side!!
-        Dim nq As Double     '
+        Dim nq, sound_speed As Double     '
 
         If (ComboBox1.SelectedIndex > -1) Then      'Prevent exceptions
 
@@ -2621,16 +2648,18 @@ Public Class Form1
                 Act_flow_sec_noise *= 2.0                                   'Double inlet
             End If
 
+            sound_speed = Sqrt(1.41 * NumericUpDown76.Value * 100 / NumericUpDown12.Value)   'K_lucht= 1.41
             Act_flow_sec_noise /= 3600                                      '[m3/sec]
             Double.TryParse(TextBox58.Text, Kw)                             'as vermogen
-            Double.TryParse(TextBox74.Text, eff)                            'Efficiency [%]
-            eff /= 100                                                      'Efficiency [-]
+            Double.TryParse(TextBox74.Text, L_eff)                          'Efficiency [%]
+            L_eff /= 100                                                    'Efficiency [-]
             roww = NumericUpDown12.Value                                    'Density [kg/Am3]
             n_imp = NumericUpDown13.Value                                   'toerental
             no_schoepen = Tschets(ComboBox1.SelectedIndex).Tdata(13)        'aantal schoepen.    
             dia_fan_inlet /= 1000                                           '[m]
             diameter_imp = NumericUpDown33.Value / 1000                     '[m] Diam impeller    
             DzDw = dia_fan_inlet / diameter_imp                             'Dia zuig / dia waaier
+
 
             fan_size_factor = diameter_imp * 1000 / Tschets(ComboBox1.SelectedIndex).Tdata(0)
             Area_casing = Tschets(ComboBox1.SelectedIndex).Tdata(20) * fan_size_factor * 7.43    'Fan oppervlak [m2]
@@ -2694,6 +2723,54 @@ Public Class Form1
             'Ltot = Lws + 10 * Log10(Act_flow / 3600) + 20 * Log10(p_stat)    ' +/- 5 db
             'Ltot = 27 + 10 * Log10(Act_flow / 3600) + 20 * Log10(p_stat)     ' http://www.schweizer-fn.de/lueftung/ventilator/ventilator.php
             'Ltot = 40 + 10 * Log10(Act_flow / 3600) + 20 * Log10(p_stat)     ' http://www.engineeringtoolbox.com/fan-noise-d_61.html
+
+            '--------------- VDI 3731 Blatt 2, gleigung 7 + 9 --------------
+            '-------------------- Lw4A--- Ausblaskaneel --------------------
+            Dim lw4a, v_omtrek, L_spec_labour, L_laufzahl As Double
+            Dim dL_okt(8) As Double
+
+            L_spec_labour = P_tot / roww                            'Spec arbeid [J/kg]
+            L_laufzahl = n_imp / 60 * Sqrt(Act_flow_sec_noise / Pow(T_spec_labour / 9.81, 0.75)) / 157.8
+            TextBox376.Text = Round(L_laufzahl, 3).ToString         'Laufzahl
+
+
+
+            v_omtrek = diameter_imp * PI * n_imp / 60                           '[m/s]
+            lw4a = 85.5 + 10 * Log10(p_stat * Act_flow_sec_noise * (1 / L_eff - 1)) + 27.7 * Log10(v_omtrek / sound_speed)
+
+            'dL_okt(0) = lw4a - (5 + 5 * (Log10(63 * diameter_imp / v_omtrek) - 0.39) ^ 2)
+            'dL_okt(1) = lw4a - (5 + 5 * (Log10(125 * diameter_imp / v_omtrek) - 0.39) ^ 2)
+            'dL_okt(2) = lw4a - (5 + 5 * (Log10(250 * diameter_imp / v_omtrek) - 0.39) ^ 2)
+            'dL_okt(3) = lw4a - (5 + 5 * (Log10(500 * diameter_imp / v_omtrek) - 0.39) ^ 2)
+            'dL_okt(4) = lw4a - (5 + 5 * (Log10(1000 * diameter_imp / v_omtrek) - 0.39) ^ 2)
+            'dL_okt(5) = lw4a - (5 + 5 * (Log10(2000 * diameter_imp / v_omtrek) - 0.39) ^ 2)
+            'dL_okt(6) = lw4a - (5 + 5 * (Log10(4000 * diameter_imp / v_omtrek) - 0.39) ^ 2)
+            'dL_okt(7) = lw4a - (5 + 5 * (Log10(8000 * diameter_imp / v_omtrek) - 0.39) ^ 2)
+
+            dL_okt(0) = lw4a + dL_oktaaf(L_laufzahl, diameter_imp, v_omtrek, 63)
+            dL_okt(1) = lw4a + dL_oktaaf(L_laufzahl, diameter_imp, v_omtrek, 125)
+            dL_okt(2) = lw4a + dL_oktaaf(L_laufzahl, diameter_imp, v_omtrek, 250)
+            dL_okt(3) = lw4a + dL_oktaaf(L_laufzahl, diameter_imp, v_omtrek, 500)
+            dL_okt(4) = lw4a + dL_oktaaf(L_laufzahl, diameter_imp, v_omtrek, 1000)
+            dL_okt(5) = lw4a + dL_oktaaf(L_laufzahl, diameter_imp, v_omtrek, 2000)
+            dL_okt(6) = lw4a + dL_oktaaf(L_laufzahl, diameter_imp, v_omtrek, 4000)
+            dL_okt(7) = lw4a + dL_oktaaf(L_laufzahl, diameter_imp, v_omtrek, 8000)
+
+
+
+
+
+
+            TextBox350.Text = Round(lw4a, 1).ToString                   'VDI Discharge power
+            TextBox374.Text = Round(dL_okt(0), 1).ToString              'VDI Discharge
+            TextBox371.Text = Round(dL_okt(1), 1).ToString              'VDI Discharge
+            TextBox373.Text = Round(dL_okt(2), 1).ToString              'VDI Discharge
+            TextBox372.Text = Round(dL_okt(3), 1).ToString              'VDI Discharge
+            TextBox370.Text = Round(dL_okt(4), 1).ToString              'VDI Discharge
+            TextBox352.Text = Round(dL_okt(5), 1).ToString              'VDI Discharge
+            TextBox349.Text = Round(dL_okt(6), 1).ToString              'VDI Discharge
+            TextBox348.Text = Round(dL_okt(7), 1).ToString              'VDI Discharge
+            TextBox375.Text = Round(add_decibels(dL_okt), 1).ToString
 
             '------------------------------------------------------
             '------------------------------------------------------
@@ -2780,124 +2857,120 @@ Public Class Form1
                 Next
 
 
-                '----------- calc suction clean-----------
-                For i = 0 To (Suction_clean.Length - 1)
+            '----------- calc suction clean-----------
+            For i = 0 To (Suction_clean.Length - 1)
                     Suction_clean(i) = Suction_raw(i) + Suction_damper(i)
                 Next
 
-                '----------- Casing RAW-----------
-                For i = 0 To (casing_raw.Length - 1)
-                    casing_raw(i) = Discharge_raw(i) - Rv + Lv_area
-                Next
+            '----------- Casing RAW-----------
+            For i = 0 To (casing_raw.Length - 1)
+                casing_raw(i) = Discharge_raw(i) - Rv + Lv_area
+            Next
 
-                '----------- Casing Clean [dB]-----------
-                For i = 0 To (casing_clean.Length - 1)
-                    casing_clean(i) = casing_raw(i) - casing_insulation(i) - deltaLA
-                Next
+            '----------- Casing Clean [dB]-----------
+            For i = 0 To (casing_clean.Length - 1)
+                casing_clean(i) = casing_raw(i) - casing_insulation(i) - deltaLA
+            Next
+
+            TextBox347.Text = Round(sound_speed, 1).ToString        '[m/s] geluidsnelhied
+            TextBox238.Text = Round(pppz, 3).ToString               'rendement
+            TextBox379.Text = Round(zet, 3).ToString                'rendement
+            TextBox380.Text = Round(kp, 3).ToString                 'rendement
+            TextBox114.Text = Round(n_imp, 0).ToString              'Toerental [rpm]
+            TextBox234.Text = Round(Kw, 0).ToString                 'As vermogen[kW]
+            TextBox235.Text = Round(L_eff, 2).ToString              'Efficiency [-]
+            TextBox236.Text = Round(no_schoepen, 1).ToString        'Aantal Schoepen
+
+            TextBox321.Text = Round(dia_fan_inlet, 2).ToString      'Dia zuig
+            TextBox237.Text = Round(diameter_imp, 2).ToString       'Dia waaier
+            TextBox381.Text = Round(keel_diameter, 2).ToString      'Dia Keel
+            TextBox322.Text = Round(Area_casing, 1).ToString        'Estimated area fan casing one side [m2]
+            TextBox317.Text = Round(nq, 3).ToString                 'Sound calcu variable
+            TextBox318.Text = Round(rend, 2).ToString               'Sound calcu rendement
+            TextBox320.Text = Round(fBA, 2).ToString                'Sound calcu rendement
+            TextBox319.Text = Round(Lws, 1).ToString                'Sound power [dB]
+            TextBox312.Text = Round(Lwi, 1).ToString                'Sound power discharge [dB]
+
+            TextBox316.Text = Round(Lv_area, 1).ToString            'Casing area [m2] 
+            TextBox315.Text = Round(deltaLA, 1).ToString            'Meet area [m2] 
+            TextBox314.Text = Round(Rv, 3).ToString                 'Plaat dikte isolatie 
+            TextBox313.Text = Round(n_ref, 0).ToString              'Referentie toerental 
+            TextBox323.Text = Round(inlet_red, 3).ToString          'Suction noise reduction [dB] 
+
+            '---------------- input data--------------------------
+            TextBox112.Text = Round(Act_flow_sec_noise * 3600, 0).ToString  'Debiet [m3/hr]
+            TextBox127.Text = Round(Act_flow_sec_noise, 2).ToString         'Debiet [m3/s]
+            TextBox113.Text = Round(p_stat / 100, 0).ToString               'Dp static [mbar]
+            TextBox126.Text = Round(p_stat, 0).ToString                     'Dp static [Pa]
 
 
-                TextBox238.Text = Round(pppz, 3).ToString               'rendement
-                TextBox379.Text = Round(zet, 3).ToString                'rendement
-                TextBox380.Text = Round(kp, 3).ToString                 'rendement
-                TextBox114.Text = Round(n_imp, 0).ToString              'Toerental [rpm]
-                TextBox234.Text = Round(Kw, 0).ToString                 'As vermogen[kW]
-                TextBox235.Text = Round(eff, 2).ToString                'Efficiency [-]
-                TextBox236.Text = Round(no_schoepen, 1).ToString        'Aantal Schoepen
+            '----------Suction RAW induct opgesplits in banden--------------
+            TextBox115.Text = Round(Suction_raw(0), 1).ToString       '
+            TextBox116.Text = Round(Suction_raw(1), 1).ToString
+            TextBox117.Text = Round(Suction_raw(2), 1).ToString
+            TextBox118.Text = Round(Suction_raw(3), 1).ToString
+            TextBox119.Text = Round(Suction_raw(4), 1).ToString
+            TextBox120.Text = Round(Suction_raw(5), 1).ToString
+            TextBox121.Text = Round(Suction_raw(6), 1).ToString
+            TextBox122.Text = Round(Suction_raw(7), 1).ToString
+            TextBox125.Text = Round(add_decibels(Suction_raw), 1).ToString
 
-                TextBox321.Text = Round(dia_fan_inlet, 2).ToString      'Dia zuig
-                TextBox237.Text = Round(diameter_imp, 2).ToString       'Dia waaier
-                TextBox381.Text = Round(keel_diameter, 2).ToString      'Dia Keel
-                TextBox322.Text = Round(Area_casing, 1).ToString        'Estimated area fan casing one side [m2]
-                TextBox317.Text = Round(nq, 3).ToString                 'Sound calcu variable
-                TextBox318.Text = Round(rend, 2).ToString               'Sound calcu rendement
-                TextBox320.Text = Round(fBA, 2).ToString                'Sound calcu rendement
-                TextBox319.Text = Round(Lws, 1).ToString                'Sound power [dB]
-                TextBox312.Text = Round(Lwi, 1).ToString                'Sound power discharge [dB]
+            '----------Suction Clean induct opgesplits in banden--------------
+            TextBox341.Text = Round(Suction_clean(0), 1).ToString       '
+            TextBox340.Text = Round(Suction_clean(1), 1).ToString
+            TextBox339.Text = Round(Suction_clean(2), 1).ToString
+            TextBox338.Text = Round(Suction_clean(3), 1).ToString
+            TextBox337.Text = Round(Suction_clean(4), 1).ToString
+            TextBox336.Text = Round(Suction_clean(5), 1).ToString
+            TextBox335.Text = Round(Suction_clean(6), 1).ToString
+            TextBox334.Text = Round(Suction_clean(7), 1).ToString
+            TextBox333.Text = Round(add_decibels(Suction_clean), 1).ToString
 
-                TextBox316.Text = Round(Lv_area, 1).ToString            'Casing area [m2] 
-                TextBox315.Text = Round(deltaLA, 1).ToString            'Meet area [m2] 
-                TextBox314.Text = Round(Rv, 3).ToString                 'Plaat dikte isolatie 
-                TextBox313.Text = Round(n_ref, 0).ToString              'Referentie toerental 
-                TextBox323.Text = Round(inlet_red, 3).ToString          'Suction noise reduction [dB] 
+            '----------Discharge RAW induct opgesplits in banden--------------
+            TextBox311.Text = Round(Discharge_raw(0), 1).ToString       '
+            TextBox310.Text = Round(Discharge_raw(1), 1).ToString
+            TextBox309.Text = Round(Discharge_raw(2), 1).ToString
+            TextBox308.Text = Round(Discharge_raw(3), 1).ToString
+            TextBox307.Text = Round(Discharge_raw(4), 1).ToString
+            TextBox306.Text = Round(Discharge_raw(5), 1).ToString
+            TextBox305.Text = Round(Discharge_raw(6), 1).ToString
+            TextBox304.Text = Round(Discharge_raw(7), 1).ToString
+            TextBox303.Text = Round(add_decibels(Discharge_raw), 1).ToString
 
-                '---------------- input data--------------------------
-                TextBox112.Text = Round(Act_flow_sec_noise * 3600, 0).ToString  'Debiet [m3/hr]
-                TextBox127.Text = Round(Act_flow_sec_noise, 2).ToString         'Debiet [m3/s]
-                TextBox113.Text = Round(p_stat / 100, 0).ToString               'Dp static [mbar]
-                TextBox126.Text = Round(p_stat, 0).ToString                     'Dp static [Pa]
+            '----------Discharge Clean induct opgesplits in banden--------------
+            TextBox369.Text = Round(Discharge_clean(0), 1).ToString       '
+            TextBox368.Text = Round(Discharge_clean(1), 1).ToString
+            TextBox367.Text = Round(Discharge_clean(2), 1).ToString
+            TextBox366.Text = Round(Discharge_clean(3), 1).ToString
+            TextBox365.Text = Round(Discharge_clean(4), 1).ToString
+            TextBox364.Text = Round(Discharge_clean(5), 1).ToString
+            TextBox363.Text = Round(Discharge_clean(6), 1).ToString
+            TextBox362.Text = Round(Discharge_clean(7), 1).ToString
+            TextBox361.Text = Round(add_decibels(Discharge_clean), 1).ToString     'Sound Pressure [dB]
 
+            '---------------- Casing raw -----------------------
+            TextBox233.Text = Round(casing_raw(0), 1).ToString              'Sound Pressure [dB]
+            TextBox232.Text = Round(casing_raw(1), 1).ToString              'Sound Pressure [dB]
+            TextBox231.Text = Round(casing_raw(2), 1).ToString              'Sound Pressure [dB]
+            TextBox230.Text = Round(casing_raw(3), 1).ToString              'Sound Pressure [dB]
+            TextBox229.Text = Round(casing_raw(4), 1).ToString               'Sound Pressure [dB]
+            TextBox228.Text = Round(casing_raw(5), 1).ToString               'Sound Pressure [dB]
+            TextBox227.Text = Round(casing_raw(6), 1).ToString              'Sound Pressure [dB]
+            TextBox226.Text = Round(casing_raw(7), 1).ToString              'Sound Pressure [dB]
+            TextBox225.Text = Round(add_decibels(casing_raw), 1).ToString   'Sound Pressure [dB]
 
-                '----------Suction RAW induct opgesplits in banden--------------
-                TextBox115.Text = Round(Suction_raw(0), 1).ToString       '
-                TextBox116.Text = Round(Suction_raw(1), 1).ToString
-                TextBox117.Text = Round(Suction_raw(2), 1).ToString
-                TextBox118.Text = Round(Suction_raw(3), 1).ToString
-                TextBox119.Text = Round(Suction_raw(4), 1).ToString
-                TextBox120.Text = Round(Suction_raw(5), 1).ToString
-                TextBox121.Text = Round(Suction_raw(6), 1).ToString
-                TextBox122.Text = Round(Suction_raw(7), 1).ToString
-                TextBox125.Text = Round(add_decibels(Suction_raw), 1).ToString
-
-                '----------Suction Clean induct opgesplits in banden--------------
-                TextBox341.Text = Round(Suction_clean(0), 1).ToString       '
-                TextBox340.Text = Round(Suction_clean(1), 1).ToString
-                TextBox339.Text = Round(Suction_clean(2), 1).ToString
-                TextBox338.Text = Round(Suction_clean(3), 1).ToString
-                TextBox337.Text = Round(Suction_clean(4), 1).ToString
-                TextBox336.Text = Round(Suction_clean(5), 1).ToString
-                TextBox335.Text = Round(Suction_clean(6), 1).ToString
-                TextBox334.Text = Round(Suction_clean(7), 1).ToString
-                TextBox333.Text = Round(add_decibels(Suction_clean), 1).ToString
-
-                '----------Discharge RAW induct opgesplits in banden--------------
-                TextBox311.Text = Round(Discharge_raw(0), 1).ToString       '
-                TextBox310.Text = Round(Discharge_raw(1), 1).ToString
-                TextBox309.Text = Round(Discharge_raw(2), 1).ToString
-                TextBox308.Text = Round(Discharge_raw(3), 1).ToString
-                TextBox307.Text = Round(Discharge_raw(4), 1).ToString
-                TextBox306.Text = Round(Discharge_raw(5), 1).ToString
-                TextBox305.Text = Round(Discharge_raw(6), 1).ToString
-                TextBox304.Text = Round(Discharge_raw(7), 1).ToString
-                TextBox303.Text = Round(add_decibels(Discharge_raw), 1).ToString
-
-                '----------Discharge Clean induct opgesplits in banden--------------
-                TextBox369.Text = Round(Discharge_clean(0), 1).ToString       '
-                TextBox368.Text = Round(Discharge_clean(1), 1).ToString
-                TextBox367.Text = Round(Discharge_clean(2), 1).ToString
-                TextBox366.Text = Round(Discharge_clean(3), 1).ToString
-                TextBox365.Text = Round(Discharge_clean(4), 1).ToString
-                TextBox364.Text = Round(Discharge_clean(5), 1).ToString
-                TextBox363.Text = Round(Discharge_clean(6), 1).ToString
-                TextBox362.Text = Round(Discharge_clean(7), 1).ToString
-                TextBox361.Text = Round(add_decibels(Discharge_clean), 1).ToString     'Sound Pressure [dB]
-
-                '---------------- Casing raw -----------------------
-                TextBox233.Text = Round(casing_raw(0), 1).ToString              'Sound Pressure [dB]
-                TextBox232.Text = Round(casing_raw(1), 1).ToString              'Sound Pressure [dB]
-                TextBox231.Text = Round(casing_raw(2), 1).ToString              'Sound Pressure [dB]
-                TextBox230.Text = Round(casing_raw(3), 1).ToString              'Sound Pressure [dB]
-                TextBox229.Text = Round(casing_raw(4), 1).ToString               'Sound Pressure [dB]
-                TextBox228.Text = Round(casing_raw(5), 1).ToString               'Sound Pressure [dB]
-                TextBox227.Text = Round(casing_raw(6), 1).ToString              'Sound Pressure [dB]
-                TextBox226.Text = Round(casing_raw(7), 1).ToString              'Sound Pressure [dB]
-                TextBox225.Text = Round(add_decibels(casing_raw), 1).ToString   'Sound Pressure [dB]
-
-                '---------------- Casing clean [dB]-----------------------
-                TextBox296.Text = Round(add_decibels(casing_clean), 1).ToString     'Sound Pressure [dB]
-                TextBox302.Text = Round(casing_clean(0), 1).ToString                'Sound Pressure [dB]
-                TextBox299.Text = Round(casing_clean(1), 1).ToString                'Sound Pressure [dB]
-                TextBox301.Text = Round(casing_clean(2), 1).ToString                'Sound Pressure [dB]
-                TextBox300.Text = Round(casing_clean(3), 1).ToString                'Sound Pressure [dB]
-                TextBox298.Text = Round(casing_clean(4), 1).ToString                'Sound Pressure [dB]
-                TextBox297.Text = Round(casing_clean(5), 1).ToString                'Sound Pressure [dB]
-                TextBox295.Text = Round(casing_clean(6), 1).ToString                'Sound Pressure [dB]
-                TextBox294.Text = Round(casing_clean(7), 1).ToString                'Sound Pressure [dB]
-            End If
+            '---------------- Casing clean [dB]-----------------------
+            TextBox296.Text = Round(add_decibels(casing_clean), 1).ToString     'Sound Pressure [dB]
+            TextBox302.Text = Round(casing_clean(0), 1).ToString                'Sound Pressure [dB]
+            TextBox299.Text = Round(casing_clean(1), 1).ToString                'Sound Pressure [dB]
+            TextBox301.Text = Round(casing_clean(2), 1).ToString                'Sound Pressure [dB]
+            TextBox300.Text = Round(casing_clean(3), 1).ToString                'Sound Pressure [dB]
+            TextBox298.Text = Round(casing_clean(4), 1).ToString                'Sound Pressure [dB]
+            TextBox297.Text = Round(casing_clean(5), 1).ToString                'Sound Pressure [dB]
+            TextBox295.Text = Round(casing_clean(6), 1).ToString                'Sound Pressure [dB]
+            TextBox294.Text = Round(casing_clean(7), 1).ToString                'Sound Pressure [dB]
+        End If
     End Sub
-
-
-
-
     'Convert Sound power to pressure
     Private Function add_decibels(snd As Double())
         Dim Ltot As Double = 0
@@ -2911,8 +2984,6 @@ Public Class Form1
 
         Return (Ltot)
     End Function
-
-
     'Convert Sound power to pressure
     Private Function power_to_pressure(sound_power As Double)
         Dim distance As Double
@@ -3652,11 +3723,17 @@ Public Class Form1
 
         TextBox78.Text = Round(ambient_mbar, 2).ToString
     End Sub
-
+    'Adding sound
     Private Sub Button21_Click(sender As Object, e As EventArgs) 
         Dim Total As Double
         Total = 10 * Log10(10 ^ (NumericUpDown78.Value / 10) + 10 ^ (NumericUpDown79.Value / 10))
         TextBox287.Text = Round(Total, 2).ToString
+    End Sub
+
+    Private Sub Button22_Click(sender As Object, e As EventArgs) Handles Button22.Click, NumericUpDown80.ValueChanged, NumericUpDown42.ValueChanged
+        Dim Pressure As Double
+        Pressure = NumericUpDown80.Value - 20 * Log10(NumericUpDown42.Value) - 8
+        TextBox346.Text = Round(Pressure, 2).ToString
     End Sub
 
     Private Sub calc_emotor_4P()
