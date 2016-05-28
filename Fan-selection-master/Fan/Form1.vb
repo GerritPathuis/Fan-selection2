@@ -510,11 +510,38 @@ Public Class Form1
 
         TextBox12.Text = NumericUpDown58.Value.ToString
 
+        '--------------------- model name-----------
+        Label1.Text = ""
+        If RadioButton6.Checked Then Label1.Text = "2"      'Double suction
+
+        If NumericUpDown37.Value <= 10 Then
+            Label1.Text += "LD "                             'Low pressure
+        Else
+            If NumericUpDown37.Value > 10 And NumericUpDown37.Value <= 40 Then
+                Label1.Text += "MD "                         'Medium pressure
+            Else
+                If NumericUpDown37.Value > 40 Then
+                    Label1.Text += "HD "                     'High pressure
+                End If
+            End If
+        End If
+
 
         nrq = ComboBox7.SelectedIndex   'Prevent out of bounds error
         If nrq >= 0 And nrq <= 30 Then
             Try
-                Label1.Text = TextBox159.Text & "/" & NumericUpDown33.Value.ToString & "/" & Tschets(ComboBox1.SelectedIndex).Tname
+                Label1.Text += TextBox159.Text & "/" & NumericUpDown33.Value.ToString & "/" & Tschets(ComboBox1.SelectedIndex).Tname
+
+                '---------------- Debiet in [kgs/hr]------------------
+                If RadioButton6.Checked Then
+                    G_Debiet_kg_hr = NumericUpDown3.Value / 2
+                Else
+                    G_Debiet_kg_hr = NumericUpDown3.Value
+                End If
+                TextBox344.Text = Round(G_Debiet_kg_hr, 0).ToString
+                TextBox345.Text = Round(G_Debiet_kg_hr, 0).ToString
+                G_Debiet_kg_s = G_Debiet_kg_hr / 3600       'Gewenst Debiet [kg/sec]
+
 
                 '------- get data from database--------------------------
                 TextBox1.Text = Tschets(nrq).Tdata(0)               'Diameter waaier. 
@@ -623,9 +650,6 @@ Public Class Form1
                 '------------ Relatieve vochtigheid ---------------
                 Rel_humidity = Convert.ToDouble(NumericUpDown5.Value)
 
-                '---------------- Debiet in kgs------------------
-                G_Debiet_kg_hr = NumericUpDown3.Value
-                G_Debiet_kg_s = G_Debiet_kg_hr / 3600       'Gewenst Debiet [kg/sec]
 
                 '----------- Zuigdruk ----------------
                 P_zuig_Pa_static = NumericUpDown76.Value * 100                      '[Pa abs]
@@ -655,12 +679,10 @@ Public Class Form1
                     GroupBox16.Visible = False                      'Molair weight
                 End If
 
-
                 '---------------- Debiet in m3------------------
                 G_Debiet_z_act_sec = G_Debiet_kg_s / G_density_act_zuig     'Gewenst Debiet [Am3/hr]
                 G_Debiet_z_act_hr = G_Debiet_z_act_sec * 3600.0             'Gewenst Debiet [Am3/hr]
                 G_Debiet_z_N_hr = G_Debiet_kg_s / G_density_N_zuig * 3600   'Gewenst Debiet [Nm3/hr]
-
 
                 '----------- calc diameter and rpm gewenste waaier---------------
                 G_omtrek_s = Pow(2 * G_Pstat_Pa / (G_density_act_zuig * T_Staticdruckzahl), 0.5)
@@ -670,13 +692,11 @@ Public Class Form1
                 '---------- as vermogen gewenste waaier-----------
                 G_as_kw = 0.001 * G_Debiet_z_act_sec * G_Ptot_Pa / T_eff    'Go to Kw
 
-                'MessageBox.Show("T uit " & G_temp_uit_c.ToString & " G_as_kw  " & G_as_kw.ToString & " G_Debiet_kg_s " & G_Debiet_kg_s.ToString & " cp_air " & cp_air.ToString)
-
                 '---------- temperaturen, lost power is tranferred to heat -----------
                 G_temp_uit_c = G_air_temp + (G_as_kw / (cp_air * G_Debiet_kg_s))
 
                 '----------------- Actual conditions at discharge ----------------------------
-                ' MessageBox.Show("P_pers_Pa_static= " & P_pers_Pa_static.ToString)  ?
+                'MessageBox.Show("G_density_act_zuig= " & G_density_act_zuig.ToString & " P1= " & P_zuig_Pa_static.ToString & " P2= " & P_pers_Pa_static.ToString & " T1= " & G_air_temp.ToString & " T2= " & G_temp_uit_c.ToString)
 
 
                 G_density_act_pers = calc_density(G_density_act_zuig, P_zuig_Pa_static, P_pers_Pa_static, G_air_temp, G_temp_uit_c)
@@ -715,8 +735,6 @@ Public Class Form1
                 P_pers_Pa_total = P_zuig_Pa_static + G_Ptot_Pa
 
 
-
-
                 '---------- presenteren-----------------------  
                 TextBox16.Text = Round(G_temp_uit_c, 0).ToString                        'Temp uit
                 TextBox23.Text = Round(P_pers_Pa_static / 100, 2).ToString              'Static Pers druk in mbar abs
@@ -727,13 +745,19 @@ Public Class Form1
                 TextBox28.Text = Round(G_Debiet_p * 3600, 0).ToString                   'Pers debiet is kleiner dan zuig debiet door drukverhoging
                 TextBox27.Text = Round(G_diaw_m * 1000, 0).ToString                     'Diameter waaier [mm]
                 TextBox29.Text = Round(G_Toerental_rpm, 0).ToString
-                TextBox58.Text = Round(G_as_kw, 1).ToString
+
+                If RadioButton6.Checked Then
+                    TextBox58.Text = Round(G_as_kw * 2, 1).ToString                     'Two impellers on the shaft
+                Else
+                    TextBox58.Text = Round(G_as_kw, 1).ToString                         'One impeller on the shaft
+                End If
+
                 TextBox20.Text = Round(G_Debiet_z_N_hr, 0).ToString                     'Debiet [Nm3/hr]  
                 TextBox22.Text = Round(G_Debiet_z_act_hr, 0).ToString                   'Debiet [Am3/hr]  
                 TextBox203.Text = Round(G_Ptot_Pa / 100, 1).ToString                    'Ptotal [mBar] 
                 TextBox72.Text = Round((G_reynolds * 10 ^ -6), 2).ToString
                 TextBox70.Text = visco_temp.ToString                                    'Visco T_schets
-                TextBox74.Text = Round(G_eff * 100, 1).ToString                               'Efficiency
+                TextBox74.Text = Round(G_eff * 100, 1).ToString                         'Efficiency
 
 
 
@@ -751,11 +775,18 @@ Public Class Form1
                 star_eff = (ABCDE_Eff(0) + ABCDE_Eff(1) * flow ^ 1 + ABCDE_Eff(2) * flow ^ 2 + ABCDE_Eff(3) * flow ^ 3 + ABCDE_Eff(4) * flow ^ 4 + ABCDE_Eff(5) * flow ^ 5).ToString
                 start_dyn = star_Ptot - star_Psta
 
-                flow = G_Debiet_z_act_sec
-                TextBox272.Text = star_flow
-                TextBox271.Text = Round(star_Psta, 1)                             'Pstatic [mBar abs]
-                TextBox273.Text = Round(star_Ptot, 1)                             'Ptotal [mBar abs]
-                TextBox274.Text = Round(star_pow, 0)
+                TextBox157.Text = Round(NumericUpDown3.Value, 0).ToString       'Debiet [kg/hr] 
+                TextBox272.Text = star_flow                                     '[Am3/hr]
+                TextBox271.Text = Round(star_Psta, 1)                           'Pstatic [mBar abs]
+                TextBox273.Text = Round(star_Ptot, 1)                           'Ptotal [mBar abs]
+
+                If RadioButton6.Checked Then
+                    TextBox274.Text = Round(star_pow * 2, 0)                    'Two impellers on the shaft
+                Else
+                    TextBox274.Text = Round(star_pow, 0)                        'One impellers on the shaft
+                End If
+
+
                 TextBox275.Text = Round(star_eff, 0)
                 TextBox75.Text = Round(start_dyn, 1)
                 TextBox151.Text = Round(star_Psta + NumericUpDown76.Value, 2)     'Pstatic [mBar g]
@@ -782,11 +813,11 @@ Public Class Form1
                 cond(1).Rpm0 = Tschets(cond(1).Typ).Tdata(1)        '[rpm]      T_SCHETS
                 cond(1).Ro0 = Tschets(cond(1).Typ).Tdata(2)         '[kg/m3]    T_SCHETS density inlet flange 
 
-                cond(1).T1 = G_air_temp                             '[c]
-                cond(1).Dia1 = NumericUpDown33.Value                '[mm]
-                cond(1).Rpm1 = NumericUpDown13.Value                '[rpm]
-                cond(1).Ro1 = NumericUpDown12.Value                 'density [kg/m3] inlet flange
-                cond(1).Qkg = NumericUpDown3.Value                  '[kg/hr]
+                If RadioButton6.Checked Then
+                    cond(1).Qkg = Round(NumericUpDown3.Value / 2, 0) '[kg/hr]   Double suction
+                Else
+                    cond(1).Qkg = NumericUpDown3.Value              '[kg/hr]
+                End If
                 cond(1).Pt1 = P_zuig_Pa_static                      '[Pa abs] inlet flange waaier #1           
                 cond(1).Ps1 = P_zuig_Pa_static                      '[Pa abs] inlet flange waaier #1
                 cond(1).Power0 = Tschets(cond(1).Typ).werkp_opT(3)  '[Am3/s] Tschets
@@ -813,7 +844,6 @@ Public Class Form1
 
                 Calc_stage(cond(3))                                 'Bereken de waaier #3   
 
-
                 '------------ Rendement Waaier (Ackeret) --------------
                 If CheckBox4.Checked Then
                     Direct_eff = cond(1).Ackeret
@@ -822,7 +852,6 @@ Public Class Form1
                 End If
 
                 TextBox54.Text = Round(cond(1).T2, 0).ToString                                  'Temp uit [c]
-                TextBox157.Text = Round(cond(1).Qkg, 0).ToString                                'Debiet [kg/hr]
                 TextBox76.Text = Round(cond(1).Om_velos, 0).ToString                            'Omtrek snelheid [m/s]
                 TextBox218.Text = Round(cond(1).Om_velos / Vel_Mach(cond(1).T1), 2).ToString    'Omtrek snelheid [M]
                 TextBox77.Text = Round((cond(1).Reynolds * 10 ^ -6), 2).ToString
@@ -835,7 +864,7 @@ Public Class Form1
                 cond(1).Q2 = cond(1).Qkg / cond(1).Ro2                                          'Debiet pers [Am3/hr]
 
                 TextBox267.Text = Round(cond(1).Q2, 0).ToString                                 'Debiet outlet [Am3/hr]
-                TextBox268.Text = Round(cond(1).Ro2, 3).ToString                                'Density outlet [kg/Am3]
+                TextBox268.Text = Round(cond(1).Ro2, 4).ToString                                'Density outlet [kg/Am3]
                 TextBox269.Text = Round(cond(1).Qkg / Convert.ToDouble(TextBox261.Text), 0).ToString    'Debiet zuig [Nm3/hr]
 
                 '----------------------- present waaier #1 ------------------------
@@ -2552,7 +2581,7 @@ Public Class Form1
         TextBox111.Text = Round(N_max_doorbuiging * 1000, 3).ToString   'Max doorbuiging in [mm]
     End Sub
 
-    Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click, NumericUpDown8.ValueChanged, NumericUpDown5.ValueChanged, NumericUpDown4.ValueChanged, NumericUpDown3.ValueChanged, NumericUpDown13.ValueChanged, NumericUpDown12.ValueChanged, ComboBox1.SelectedIndexChanged, RadioButton4.CheckedChanged, RadioButton3.CheckedChanged, CheckBox4.CheckedChanged, NumericUpDown33.ValueChanged, ComboBox7.SelectedIndexChanged, RadioButton14.CheckedChanged, RadioButton13.CheckedChanged, RadioButton12.CheckedChanged, NumericUpDown58.ValueChanged, NumericUpDown37.ValueChanged, NumericUpDown76.ValueChanged
+    Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click, NumericUpDown8.ValueChanged, NumericUpDown5.ValueChanged, NumericUpDown4.ValueChanged, NumericUpDown3.ValueChanged, NumericUpDown13.ValueChanged, NumericUpDown12.ValueChanged, ComboBox1.SelectedIndexChanged, RadioButton4.CheckedChanged, RadioButton3.CheckedChanged, CheckBox4.CheckedChanged, NumericUpDown33.ValueChanged, ComboBox7.SelectedIndexChanged, RadioButton14.CheckedChanged, RadioButton13.CheckedChanged, RadioButton12.CheckedChanged, NumericUpDown58.ValueChanged, NumericUpDown37.ValueChanged, NumericUpDown76.ValueChanged, RadioButton6.CheckedChanged
         NumericUpDown9.Value = NumericUpDown33.Value
         NumericUpDown21.Value = NumericUpDown33.Value       'Diameter waaier spanning berekening
         NumericUpDown10.Value = NumericUpDown13.Value
@@ -2565,7 +2594,7 @@ Public Class Form1
 
     'Calculate the noise tab
     Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click, TabPage4.Enter, NumericUpDown7.ValueChanged, ComboBox9.SelectedIndexChanged, ComboBox10.SelectedIndexChanged, ComboBox5.SelectedIndexChanged
-        Dim spez_drehz, p_stat, P_tot, Act_flow_sec, roww As Double
+        Dim spez_drehz, p_stat, P_tot, Act_flow_sec_noise, roww As Double
         Dim eff, n_imp, no_schoepen As Double
         Dim Kw, dia_fan_inlet, diameter_imp As Double
         Dim Suction_raw(9), Suction_damper(9), Suction_clean(9), Suction_dba(9) As Double           'Suction fan
@@ -2586,8 +2615,13 @@ Public Class Form1
             p_stat = NumericUpDown37.Value * 100                            '[mBar]->[Pa] static 
             Double.TryParse(TextBox273.Text, P_tot)                         '[mBar]
             P_tot *= 100                                                    '[mBar]->[Pa]
-            Double.TryParse(TextBox22.Text, Act_flow_sec)                   '[m3/hr]
-            Act_flow_sec /= 3600                                            '[m3/sec]
+            Double.TryParse(TextBox22.Text, Act_flow_sec_noise)             '[m3/hr]
+
+            If RadioButton6.Checked Then
+                Act_flow_sec_noise *= 2.0                                   'Double inlet
+            End If
+
+            Act_flow_sec_noise /= 3600                                      '[m3/sec]
             Double.TryParse(TextBox58.Text, Kw)                             'as vermogen
             Double.TryParse(TextBox74.Text, eff)                            'Efficiency [%]
             eff /= 100                                                      'Efficiency [-]
@@ -2665,39 +2699,39 @@ Public Class Form1
             '------------------------------------------------------
             Dim pppz, kappa, zet, kp, rend, fBA, Lws, Lwi, Lv_area, deltaLA, Rv, n_ref, Zoek_freq, inlet_red As Double
 
-            '-------------- VTK calculatie---------------
-            nq = n_imp * Sqrt(Act_flow_sec) / (p_stat / roww) ^ 0.75
+                '-------------- VTK calculatie---------------
+                nq = n_imp * Sqrt(Act_flow_sec_noise) / (p_stat / roww) ^ 0.75
 
-            '-------------- redendement---------------
-            pppz = (P_tot + 101325) / 101325
-            kappa = 1.4              'Compressiboliteit ?
-            zet = (kappa - 1) * roww * Kw * 1000 / kappa / (Act_flow_sec * roww) / P_tot
-            kp = zet * Log(pppz) / Log(1 + zet * (pppz - 1))
-            rend = Act_flow_sec * P_tot / Kw / 1000 * kp
+                '-------------- redendement---------------
+                pppz = (P_tot + 101325) / 101325
+                kappa = 1.4              'Compressiboliteit ?
+                zet = (kappa - 1) * roww * Kw * 1000 / kappa / (Act_flow_sec_noise * roww) / P_tot
+                kp = zet * Log(pppz) / Log(1 + zet * (pppz - 1))
+                rend = Act_flow_sec_noise * P_tot / Kw / 1000 * kp
 
-            '-------------- fBA---------------
-            fBA = 1 + (0.5 * (0.82 / rend - 1))
-            If fBA > 1.2 Then fBA = 1.2
-            Lws = (55 + 0.1885 * nq) * fBA                                          '[dB]
-            Lwi = Lws - 19.83 + 8.686 * Log(P_tot) + 4.343 * Log(Act_flow_sec)      '[dB]
-            Lv_area = 4.343 * Log(Area_casing)                                      '[m2] fan oppervlak
-            deltaLA = 4.343 * Log(area_measure)                                     '[m2] meet oppervlak
-            Rv = 17.71 + 5.86 * Log(casing_dikte)                                   '[mm] casing plaat dikte
+                '-------------- fBA---------------
+                fBA = 1 + (0.5 * (0.82 / rend - 1))
+                If fBA > 1.2 Then fBA = 1.2
+                Lws = (55 + 0.1885 * nq) * fBA                                              '[dB]
+                Lwi = Lws - 19.83 + 8.686 * Log(P_tot) + 4.343 * Log(Act_flow_sec_noise)    '[dB]
+                Lv_area = 4.343 * Log(Area_casing)                                          '[m2] fan oppervlak
+                deltaLA = 4.343 * Log(area_measure)                                         'Loss trough Casing Wall
+                Rv = 17.71 + 5.86 * Log(casing_dikte)                                       '[mm] casing plaat dikte
 
-            Select Case n_imp
-                Case 2249 To 50000
-                    n_ref = 4500
-                Case 1124 To 2249
-                    n_ref = 2249
-                Case 559 To 1124
-                    n_ref = 1124
-                Case 0 To 559
-                    n_ref = 559
-            End Select
+                Select Case n_imp
+                    Case 2249 To 50000
+                        n_ref = 4500
+                    Case 1124 To 2249
+                        n_ref = 2249
+                    Case 559 To 1124
+                        n_ref = 1124
+                    Case 0 To 559
+                        n_ref = 559
+                End Select
 
-            Zoek_freq = n_ref ^ 2 * no_schoepen
-            inlet_red = -1 * (20 * Log10(diameter_imp / dia_fan_inlet) / Sqrt(2) + 1)
-            TextBox324.Text = Round(Zoek_freq, 0).ToString
+                Zoek_freq = n_ref ^ 2 * no_schoepen
+                inlet_red = -1 * (20 * Log10(diameter_imp / dia_fan_inlet) / Sqrt(2) + 1)
+                TextBox324.Text = Round(Zoek_freq, 0).ToString
 
 
             '----------- find the reduction on fan inlet-----------
@@ -2710,7 +2744,7 @@ Public Class Form1
                 If Zoek_freq >= Convert.ToDouble(words(0)) Then
                     Suction_raw(0) = Lwi + inlet_red + words(4) - 26  'Lp63
                     Suction_raw(1) = Lwi + inlet_red + words(5) - 16  'Lp125
-                    Suction_raw(2) = Lwi + inlet_red + words(6) - 8   'Lp250
+                    Suction_raw(2) = Lwi + inlet_red + words(6) - 9   'Lp250
                     Suction_raw(3) = Lwi + inlet_red + words(7) - 3   'LP500  
                     Suction_raw(4) = Lwi + inlet_red + words(8) + 0   'Lp1000
                     Suction_raw(5) = Lwi + inlet_red + words(9) + 1   'Lp2000  
@@ -2719,7 +2753,7 @@ Public Class Form1
                     '------------------------------------
                     Discharge_raw(0) = Lwi + words(4) - 26            'Lp63
                     Discharge_raw(1) = Lwi + words(5) - 16            'Lp125
-                    Discharge_raw(2) = Lwi + words(6) - 8             'Lp250
+                    Discharge_raw(2) = Lwi + words(6) - 9             'Lp250
                     Discharge_raw(3) = Lwi + words(7) - 3             'LP500  
                     Discharge_raw(4) = Lwi + words(8) + 0             'Lp1000
                     Discharge_raw(5) = Lwi + words(9) + 1             'Lp2000  
@@ -2742,123 +2776,123 @@ Public Class Form1
 
             '----------- calc discharge clean-----------
             For i = 0 To (Discharge_clean.Length - 1)
-                Discharge_clean(i) = Discharge_raw(i) + Discharge_damper(i)
-            Next
+                    Discharge_clean(i) = Discharge_raw(i) + Discharge_damper(i)
+                Next
 
 
-            '----------- calc suction clean-----------
-            For i = 0 To (Suction_clean.Length - 1)
-                Suction_clean(i) = Suction_raw(i) + Suction_damper(i)
-            Next
+                '----------- calc suction clean-----------
+                For i = 0 To (Suction_clean.Length - 1)
+                    Suction_clean(i) = Suction_raw(i) + Suction_damper(i)
+                Next
 
-            '----------- Casing RAW-----------
-            For i = 0 To (casing_raw.Length - 1)
-                casing_raw(i) = Discharge_raw(i) - Rv + Lv_area
-            Next
+                '----------- Casing RAW-----------
+                For i = 0 To (casing_raw.Length - 1)
+                    casing_raw(i) = Discharge_raw(i) - Rv + Lv_area
+                Next
 
-            '----------- Casing Clean [dB]-----------
-            For i = 0 To (casing_clean.Length - 1)
-                casing_clean(i) = casing_raw(i) - casing_insulation(i) - deltaLA
-            Next
-
-
-            TextBox238.Text = Round(pppz, 3).ToString               'rendement
-            TextBox379.Text = Round(zet, 3).ToString                'rendement
-            TextBox380.Text = Round(kp, 3).ToString                 'rendement
-            TextBox114.Text = Round(n_imp, 0).ToString              'Toerental [rpm]
-            TextBox234.Text = Round(Kw, 0).ToString                 'As vermogen[kW]
-            TextBox235.Text = Round(eff, 2).ToString                'Efficiency [-]
-            TextBox236.Text = Round(no_schoepen, 1).ToString        'Aantal Schoepen
-
-            TextBox321.Text = Round(dia_fan_inlet, 2).ToString      'Dia zuig
-            TextBox237.Text = Round(diameter_imp, 2).ToString       'Dia waaier
-            TextBox381.Text = Round(keel_diameter, 2).ToString      'Dia Keel
-            TextBox322.Text = Round(Area_casing, 1).ToString        'Estimated area fan casing one side [m2]
-            TextBox317.Text = Round(nq, 3).ToString                 'Sound calcu variable
-            TextBox318.Text = Round(rend, 2).ToString               'Sound calcu rendement
-            TextBox320.Text = Round(fBA, 2).ToString                'Sound calcu rendement
-            TextBox319.Text = Round(Lws, 1).ToString                'Sound power [dB]
-            TextBox312.Text = Round(Lwi, 1).ToString                'Sound power discharge [dB]
-
-            TextBox316.Text = Round(Lv_area, 1).ToString            'Casing area [m2] 
-            TextBox315.Text = Round(deltaLA, 1).ToString            'Meet area [m2] 
-            TextBox314.Text = Round(Rv, 3).ToString                 'Plaat dikte isolatie 
-            TextBox313.Text = Round(n_ref, 0).ToString              'Referentie toerental 
-            TextBox323.Text = Round(inlet_red, 3).ToString          'Suction noise reduction [dB] 
-
-            '---------------- input data--------------------------
-            TextBox112.Text = Round(Act_flow_sec * 3600, 0).ToString        'Debiet [m3/hr]
-            TextBox127.Text = Round(Act_flow_sec, 2).ToString               'Debiet [m3/s]
-            TextBox113.Text = Round(p_stat / 100, 0).ToString               'Dp static [mbar]
-            TextBox126.Text = Round(p_stat, 0).ToString                     'Dp static [Pa]
+                '----------- Casing Clean [dB]-----------
+                For i = 0 To (casing_clean.Length - 1)
+                    casing_clean(i) = casing_raw(i) - casing_insulation(i) - deltaLA
+                Next
 
 
-            '----------Suction RAW induct opgesplits in banden--------------
-            TextBox115.Text = Round(Suction_raw(0), 1).ToString       '
-            TextBox116.Text = Round(Suction_raw(1), 1).ToString
-            TextBox117.Text = Round(Suction_raw(2), 1).ToString
-            TextBox118.Text = Round(Suction_raw(3), 1).ToString
-            TextBox119.Text = Round(Suction_raw(4), 1).ToString
-            TextBox120.Text = Round(Suction_raw(5), 1).ToString
-            TextBox121.Text = Round(Suction_raw(6), 1).ToString
-            TextBox122.Text = Round(Suction_raw(7), 1).ToString
-            TextBox125.Text = Round(add_decibels(Suction_raw), 1).ToString
+                TextBox238.Text = Round(pppz, 3).ToString               'rendement
+                TextBox379.Text = Round(zet, 3).ToString                'rendement
+                TextBox380.Text = Round(kp, 3).ToString                 'rendement
+                TextBox114.Text = Round(n_imp, 0).ToString              'Toerental [rpm]
+                TextBox234.Text = Round(Kw, 0).ToString                 'As vermogen[kW]
+                TextBox235.Text = Round(eff, 2).ToString                'Efficiency [-]
+                TextBox236.Text = Round(no_schoepen, 1).ToString        'Aantal Schoepen
 
-            '----------Suction Clean induct opgesplits in banden--------------
-            TextBox341.Text = Round(Suction_clean(0), 1).ToString       '
-            TextBox340.Text = Round(Suction_clean(1), 1).ToString
-            TextBox339.Text = Round(Suction_clean(2), 1).ToString
-            TextBox338.Text = Round(Suction_clean(3), 1).ToString
-            TextBox337.Text = Round(Suction_clean(4), 1).ToString
-            TextBox336.Text = Round(Suction_clean(5), 1).ToString
-            TextBox335.Text = Round(Suction_clean(6), 1).ToString
-            TextBox334.Text = Round(Suction_clean(7), 1).ToString
-            TextBox333.Text = Round(add_decibels(Suction_clean), 1).ToString
+                TextBox321.Text = Round(dia_fan_inlet, 2).ToString      'Dia zuig
+                TextBox237.Text = Round(diameter_imp, 2).ToString       'Dia waaier
+                TextBox381.Text = Round(keel_diameter, 2).ToString      'Dia Keel
+                TextBox322.Text = Round(Area_casing, 1).ToString        'Estimated area fan casing one side [m2]
+                TextBox317.Text = Round(nq, 3).ToString                 'Sound calcu variable
+                TextBox318.Text = Round(rend, 2).ToString               'Sound calcu rendement
+                TextBox320.Text = Round(fBA, 2).ToString                'Sound calcu rendement
+                TextBox319.Text = Round(Lws, 1).ToString                'Sound power [dB]
+                TextBox312.Text = Round(Lwi, 1).ToString                'Sound power discharge [dB]
 
-            '----------Discharge RAW induct opgesplits in banden--------------
-            TextBox311.Text = Round(Discharge_raw(0), 1).ToString       '
-            TextBox310.Text = Round(Discharge_raw(1), 1).ToString
-            TextBox309.Text = Round(Discharge_raw(2), 1).ToString
-            TextBox308.Text = Round(Discharge_raw(3), 1).ToString
-            TextBox307.Text = Round(Discharge_raw(4), 1).ToString
-            TextBox306.Text = Round(Discharge_raw(5), 1).ToString
-            TextBox305.Text = Round(Discharge_raw(6), 1).ToString
-            TextBox304.Text = Round(Discharge_raw(7), 1).ToString
-            TextBox303.Text = Round(add_decibels(Discharge_raw), 1).ToString
+                TextBox316.Text = Round(Lv_area, 1).ToString            'Casing area [m2] 
+                TextBox315.Text = Round(deltaLA, 1).ToString            'Meet area [m2] 
+                TextBox314.Text = Round(Rv, 3).ToString                 'Plaat dikte isolatie 
+                TextBox313.Text = Round(n_ref, 0).ToString              'Referentie toerental 
+                TextBox323.Text = Round(inlet_red, 3).ToString          'Suction noise reduction [dB] 
 
-            '----------Discharge Clean induct opgesplits in banden--------------
-            TextBox369.Text = Round(Discharge_clean(0), 1).ToString       '
-            TextBox368.Text = Round(Discharge_clean(1), 1).ToString
-            TextBox367.Text = Round(Discharge_clean(2), 1).ToString
-            TextBox366.Text = Round(Discharge_clean(3), 1).ToString
-            TextBox365.Text = Round(Discharge_clean(4), 1).ToString
-            TextBox364.Text = Round(Discharge_clean(5), 1).ToString
-            TextBox363.Text = Round(Discharge_clean(6), 1).ToString
-            TextBox362.Text = Round(Discharge_clean(7), 1).ToString
-            TextBox361.Text = Round(add_decibels(Discharge_clean), 1).ToString     'Sound Pressure [dB]
+                '---------------- input data--------------------------
+                TextBox112.Text = Round(Act_flow_sec_noise * 3600, 0).ToString  'Debiet [m3/hr]
+                TextBox127.Text = Round(Act_flow_sec_noise, 2).ToString         'Debiet [m3/s]
+                TextBox113.Text = Round(p_stat / 100, 0).ToString               'Dp static [mbar]
+                TextBox126.Text = Round(p_stat, 0).ToString                     'Dp static [Pa]
 
-            '---------------- Casing raw -----------------------
-            TextBox233.Text = Round(casing_raw(0), 1).ToString              'Sound Pressure [dB]
-            TextBox232.Text = Round(casing_raw(1), 1).ToString              'Sound Pressure [dB]
-            TextBox231.Text = Round(casing_raw(2), 1).ToString              'Sound Pressure [dB]
-            TextBox230.Text = Round(casing_raw(3), 1).ToString              'Sound Pressure [dB]
-            TextBox229.Text = Round(casing_raw(4), 1).ToString               'Sound Pressure [dB]
-            TextBox228.Text = Round(casing_raw(5), 1).ToString               'Sound Pressure [dB]
-            TextBox227.Text = Round(casing_raw(6), 1).ToString              'Sound Pressure [dB]
-            TextBox226.Text = Round(casing_raw(7), 1).ToString              'Sound Pressure [dB]
-            TextBox225.Text = Round(add_decibels(casing_raw), 1).ToString   'Sound Pressure [dB]
 
-            '---------------- Casing clean [dB]-----------------------
-            TextBox296.Text = Round(add_decibels(casing_clean), 1).ToString     'Sound Pressure [dB]
-            TextBox302.Text = Round(casing_clean(0), 1).ToString                'Sound Pressure [dB]
-            TextBox299.Text = Round(casing_clean(1), 1).ToString                'Sound Pressure [dB]
-            TextBox301.Text = Round(casing_clean(2), 1).ToString                'Sound Pressure [dB]
-            TextBox300.Text = Round(casing_clean(3), 1).ToString                'Sound Pressure [dB]
-            TextBox298.Text = Round(casing_clean(4), 1).ToString                'Sound Pressure [dB]
-            TextBox297.Text = Round(casing_clean(5), 1).ToString                'Sound Pressure [dB]
-            TextBox295.Text = Round(casing_clean(6), 1).ToString                'Sound Pressure [dB]
-            TextBox294.Text = Round(casing_clean(7), 1).ToString                'Sound Pressure [dB]
-        End If
+                '----------Suction RAW induct opgesplits in banden--------------
+                TextBox115.Text = Round(Suction_raw(0), 1).ToString       '
+                TextBox116.Text = Round(Suction_raw(1), 1).ToString
+                TextBox117.Text = Round(Suction_raw(2), 1).ToString
+                TextBox118.Text = Round(Suction_raw(3), 1).ToString
+                TextBox119.Text = Round(Suction_raw(4), 1).ToString
+                TextBox120.Text = Round(Suction_raw(5), 1).ToString
+                TextBox121.Text = Round(Suction_raw(6), 1).ToString
+                TextBox122.Text = Round(Suction_raw(7), 1).ToString
+                TextBox125.Text = Round(add_decibels(Suction_raw), 1).ToString
+
+                '----------Suction Clean induct opgesplits in banden--------------
+                TextBox341.Text = Round(Suction_clean(0), 1).ToString       '
+                TextBox340.Text = Round(Suction_clean(1), 1).ToString
+                TextBox339.Text = Round(Suction_clean(2), 1).ToString
+                TextBox338.Text = Round(Suction_clean(3), 1).ToString
+                TextBox337.Text = Round(Suction_clean(4), 1).ToString
+                TextBox336.Text = Round(Suction_clean(5), 1).ToString
+                TextBox335.Text = Round(Suction_clean(6), 1).ToString
+                TextBox334.Text = Round(Suction_clean(7), 1).ToString
+                TextBox333.Text = Round(add_decibels(Suction_clean), 1).ToString
+
+                '----------Discharge RAW induct opgesplits in banden--------------
+                TextBox311.Text = Round(Discharge_raw(0), 1).ToString       '
+                TextBox310.Text = Round(Discharge_raw(1), 1).ToString
+                TextBox309.Text = Round(Discharge_raw(2), 1).ToString
+                TextBox308.Text = Round(Discharge_raw(3), 1).ToString
+                TextBox307.Text = Round(Discharge_raw(4), 1).ToString
+                TextBox306.Text = Round(Discharge_raw(5), 1).ToString
+                TextBox305.Text = Round(Discharge_raw(6), 1).ToString
+                TextBox304.Text = Round(Discharge_raw(7), 1).ToString
+                TextBox303.Text = Round(add_decibels(Discharge_raw), 1).ToString
+
+                '----------Discharge Clean induct opgesplits in banden--------------
+                TextBox369.Text = Round(Discharge_clean(0), 1).ToString       '
+                TextBox368.Text = Round(Discharge_clean(1), 1).ToString
+                TextBox367.Text = Round(Discharge_clean(2), 1).ToString
+                TextBox366.Text = Round(Discharge_clean(3), 1).ToString
+                TextBox365.Text = Round(Discharge_clean(4), 1).ToString
+                TextBox364.Text = Round(Discharge_clean(5), 1).ToString
+                TextBox363.Text = Round(Discharge_clean(6), 1).ToString
+                TextBox362.Text = Round(Discharge_clean(7), 1).ToString
+                TextBox361.Text = Round(add_decibels(Discharge_clean), 1).ToString     'Sound Pressure [dB]
+
+                '---------------- Casing raw -----------------------
+                TextBox233.Text = Round(casing_raw(0), 1).ToString              'Sound Pressure [dB]
+                TextBox232.Text = Round(casing_raw(1), 1).ToString              'Sound Pressure [dB]
+                TextBox231.Text = Round(casing_raw(2), 1).ToString              'Sound Pressure [dB]
+                TextBox230.Text = Round(casing_raw(3), 1).ToString              'Sound Pressure [dB]
+                TextBox229.Text = Round(casing_raw(4), 1).ToString               'Sound Pressure [dB]
+                TextBox228.Text = Round(casing_raw(5), 1).ToString               'Sound Pressure [dB]
+                TextBox227.Text = Round(casing_raw(6), 1).ToString              'Sound Pressure [dB]
+                TextBox226.Text = Round(casing_raw(7), 1).ToString              'Sound Pressure [dB]
+                TextBox225.Text = Round(add_decibels(casing_raw), 1).ToString   'Sound Pressure [dB]
+
+                '---------------- Casing clean [dB]-----------------------
+                TextBox296.Text = Round(add_decibels(casing_clean), 1).ToString     'Sound Pressure [dB]
+                TextBox302.Text = Round(casing_clean(0), 1).ToString                'Sound Pressure [dB]
+                TextBox299.Text = Round(casing_clean(1), 1).ToString                'Sound Pressure [dB]
+                TextBox301.Text = Round(casing_clean(2), 1).ToString                'Sound Pressure [dB]
+                TextBox300.Text = Round(casing_clean(3), 1).ToString                'Sound Pressure [dB]
+                TextBox298.Text = Round(casing_clean(4), 1).ToString                'Sound Pressure [dB]
+                TextBox297.Text = Round(casing_clean(5), 1).ToString                'Sound Pressure [dB]
+                TextBox295.Text = Round(casing_clean(6), 1).ToString                'Sound Pressure [dB]
+                TextBox294.Text = Round(casing_clean(7), 1).ToString                'Sound Pressure [dB]
+            End If
     End Sub
 
 
@@ -2889,13 +2923,15 @@ Public Class Form1
     'Calculate density
     '1= inlet, 2= outlet
     'Temperatures in celsius
-    'Pressure in Pascal absolute
+    'Pressure is Barometric (static) absolute pressure in Pascal
 
     Private Function calc_density(density1 As Double, pressure1 As Double, pressure2 As Double, temperature1 As Double, temperature2 As Double)
         ' MessageBox.Show(density1.ToString & " " & pressure1.ToString & "  " & temperature1.ToString)
         'If (pressure1 < 80000) Or (pressure1 < 80000) Then
         '    MessageBox.Show("Density calculation warning Pressure must be in Pa absolute")
         'End If
+
+        ' MessageBox.Show(" Ro1= " & density1.ToString & " P1= " & Round(pressure1, 0).ToString & " P2= " & Round(pressure2, 0).ToString & " T1= " & Round(temperature1, 1).ToString & " T2= " & Round(temperature2, 1).ToString)
 
         Return (density1 * (pressure2 / pressure1) * ((temperature1 + 273.15) / (temperature2 + 273.15)))
     End Function
@@ -2989,7 +3025,7 @@ Public Class Form1
 
         y.Ackeret = 1 - 0.5 * (1.0 - Tschets(y.Typ).werkp_opT(0) / 100) * Pow((1 + (T_reynolds / y.Reynolds)), 0.2)
 
-        y.Ro2 = calc_density(y.Ro1, (y.Ps1 + 101325), (y.Ps2 + 101325), y.T1, y.T2) 'Ro outlet flange fan
+        y.Ro2 = calc_density(y.Ro1, (y.Ps1), (y.Ps2), y.T1, y.T2) 'Ro outlet flange fan
     End Sub
 
     Private Sub calc_loop_loss(ByRef x As Stage)
@@ -3019,7 +3055,7 @@ Public Class Form1
         x.Pt3 = x.Pt2 - x.loop_loss                                             '[Pa]
         x.Ps3 = x.Ps2 - x.loop_loss
 
-        x.Ro3 = calc_density(x.Ro1, (x.Pt1 + 101325), (x.Pt3 + 101325), x.T1, x.T2)
+        x.Ro3 = calc_density(x.Ro1, x.Ps1, x.Ps3, x.T1, x.T2) 'Static pressure
     End Sub
 
     Public Function Trend(Data() As PPOINT, ByVal Degree As Integer) As PPOINT()
