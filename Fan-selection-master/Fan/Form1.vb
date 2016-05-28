@@ -1265,7 +1265,7 @@ Public Class Form1
 
     Private Sub fill_array_T_schetsen()
 
-        Tschets(0).Tname = "Willi Bohl"
+        Tschets(0).Tname = "W.Bohl"
         Tschets(0).Tdata = {400, 4850, 1.2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
         Tschets(0).Teff = {0, 43, 75, 81, 79, 42, 0, 0, 0, 0, 0, 0}                 '[%]
         Tschets(0).Tverm = {4, 5.1, 5.5, 6.1, 6.6, 9.0, 0.0, 0, 0, 0, 0, 0}         '[kW]
@@ -3653,7 +3653,7 @@ Public Class Form1
         TextBox78.Text = Round(ambient_mbar, 2).ToString
     End Sub
 
-    Private Sub Button21_Click(sender As Object, e As EventArgs) Handles Button21.Click, NumericUpDown79.VisibleChanged, NumericUpDown78.ValueChanged
+    Private Sub Button21_Click(sender As Object, e As EventArgs) 
         Dim Total As Double
         Total = 10 * Log10(10 ^ (NumericUpDown78.Value / 10) + 10 ^ (NumericUpDown79.Value / 10))
         TextBox287.Text = Round(Total, 2).ToString
