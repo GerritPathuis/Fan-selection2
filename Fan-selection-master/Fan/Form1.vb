@@ -2621,7 +2621,7 @@ Public Class Form1
 
     'Calculate the noise tab
     Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click, TabPage4.Enter, NumericUpDown7.ValueChanged, ComboBox9.SelectedIndexChanged, ComboBox10.SelectedIndexChanged, ComboBox5.SelectedIndexChanged
-        Dim spez_drehz, p_stat, P_tot, Act_flow_sec_noise, roww As Double
+        Dim p_stat, P_tot, Act_flow_sec_noise, roww As Double
         Dim L_eff, n_imp, no_schoepen As Double
         Dim Kw, dia_fan_inlet, diameter_imp As Double
         Dim Suction_raw(9), Suction_damper(9), Suction_clean(9), Suction_dba(9) As Double           'Suction fan
@@ -2638,14 +2638,13 @@ Public Class Form1
 
             Label152.Text = "Waaier type " & Label1.Text
             Double.TryParse(TextBox159.Text, dia_fan_inlet)                 'Diameter suction
-            Double.TryParse(TextBox123.Text, spez_drehz)
             p_stat = NumericUpDown37.Value * 100                            '[mBar]->[Pa] static 
             Double.TryParse(TextBox273.Text, P_tot)                         '[mBar]
             P_tot *= 100                                                    '[mBar]->[Pa]
             Double.TryParse(TextBox22.Text, Act_flow_sec_noise)             '[m3/hr]
 
             If RadioButton6.Checked Then
-                Act_flow_sec_noise *= 2.0                                   'Double inlet
+                Act_flow_sec_noise *= 2.0                                   'Double inlet fan type
             End If
 
             sound_speed = Sqrt(1.41 * NumericUpDown76.Value * 100 / NumericUpDown12.Value)   'K_lucht= 1.41
@@ -2659,7 +2658,6 @@ Public Class Form1
             dia_fan_inlet /= 1000                                           '[m]
             diameter_imp = NumericUpDown33.Value / 1000                     '[m] Diam impeller    
             DzDw = dia_fan_inlet / diameter_imp                             'Dia zuig / dia waaier
-
 
             fan_size_factor = diameter_imp * 1000 / Tschets(ComboBox1.SelectedIndex).Tdata(0)
             Area_casing = Tschets(ComboBox1.SelectedIndex).Tdata(20) * fan_size_factor * 7.43    'Fan oppervlak [m2]
@@ -2719,14 +2717,13 @@ Public Class Form1
 
 
             'Sound power level-------------------------------------
-            'Lws = 2.9513409 * Log(spez_drehz) + 26.0752394                  'Willi Bohl pagina 45 and 51 for check
             'Ltot = Lws + 10 * Log10(Act_flow / 3600) + 20 * Log10(p_stat)    ' +/- 5 db
             'Ltot = 27 + 10 * Log10(Act_flow / 3600) + 20 * Log10(p_stat)     ' http://www.schweizer-fn.de/lueftung/ventilator/ventilator.php
             'Ltot = 40 + 10 * Log10(Act_flow / 3600) + 20 * Log10(p_stat)     ' http://www.engineeringtoolbox.com/fan-noise-d_61.html
 
             '--------------- VDI 3731 Blatt 2, gleigung 7 + 9 --------------
             '-------------------- Lw4A--- Ausblaskaneel --------------------
-            Dim lw4a, v_omtrek, L_spec_labour, L_laufzahl As Double
+            Dim lw4a, v_omtrek, L_spec_labour, L_laufzahl, Schaufel_hz As Double
             Dim dL_okt(8) As Double
 
             L_spec_labour = P_tot / roww                            'Spec arbeid [J/kg]
@@ -2734,18 +2731,8 @@ Public Class Form1
             TextBox376.Text = Round(L_laufzahl, 3).ToString         'Laufzahl
 
 
-
             v_omtrek = diameter_imp * PI * n_imp / 60                           '[m/s]
             lw4a = 85.5 + 10 * Log10(p_stat * Act_flow_sec_noise * (1 / L_eff - 1)) + 27.7 * Log10(v_omtrek / sound_speed)
-
-            'dL_okt(0) = lw4a - (5 + 5 * (Log10(63 * diameter_imp / v_omtrek) - 0.39) ^ 2)
-            'dL_okt(1) = lw4a - (5 + 5 * (Log10(125 * diameter_imp / v_omtrek) - 0.39) ^ 2)
-            'dL_okt(2) = lw4a - (5 + 5 * (Log10(250 * diameter_imp / v_omtrek) - 0.39) ^ 2)
-            'dL_okt(3) = lw4a - (5 + 5 * (Log10(500 * diameter_imp / v_omtrek) - 0.39) ^ 2)
-            'dL_okt(4) = lw4a - (5 + 5 * (Log10(1000 * diameter_imp / v_omtrek) - 0.39) ^ 2)
-            'dL_okt(5) = lw4a - (5 + 5 * (Log10(2000 * diameter_imp / v_omtrek) - 0.39) ^ 2)
-            'dL_okt(6) = lw4a - (5 + 5 * (Log10(4000 * diameter_imp / v_omtrek) - 0.39) ^ 2)
-            'dL_okt(7) = lw4a - (5 + 5 * (Log10(8000 * diameter_imp / v_omtrek) - 0.39) ^ 2)
 
             dL_okt(0) = lw4a + dL_oktaaf(L_laufzahl, diameter_imp, v_omtrek, 63)
             dL_okt(1) = lw4a + dL_oktaaf(L_laufzahl, diameter_imp, v_omtrek, 125)
@@ -2756,9 +2743,23 @@ Public Class Form1
             dL_okt(6) = lw4a + dL_oktaaf(L_laufzahl, diameter_imp, v_omtrek, 4000)
             dL_okt(7) = lw4a + dL_oktaaf(L_laufzahl, diameter_imp, v_omtrek, 8000)
 
+            '------------- Add Schaufelfrequenz-Pegelzuschlag---------------
+            Schaufel_hz = no_schoepen * n_imp / 60          'Schaufelfrequenz
 
-
-
+            Select Case Schaufel_hz
+                Case Is <= 63 * 1.41
+                    dL_okt(0) += 3
+                Case Is <= 125 * 1.41
+                    dL_okt(1) += 3
+                Case Is <= 500 * 1.41
+                    dL_okt(2) += 3
+                Case Is <= 1000 * 1.41
+                    dL_okt(3) += 3
+                Case Is <= 2000 * 1.41
+                    dL_okt(4) += 3
+                Case Is <= 4000 * 1.41
+                    dL_okt(5) += 3
+            End Select
 
 
             TextBox350.Text = Round(lw4a, 1).ToString                   'VDI Discharge power
@@ -2776,39 +2777,39 @@ Public Class Form1
             '------------------------------------------------------
             Dim pppz, kappa, zet, kp, rend, fBA, Lws, Lwi, Lv_area, deltaLA, Rv, n_ref, Zoek_freq, inlet_red As Double
 
-                '-------------- VTK calculatie---------------
-                nq = n_imp * Sqrt(Act_flow_sec_noise) / (p_stat / roww) ^ 0.75
+            '-------------- VTK calculatie---------------
+            nq = n_imp * Sqrt(Act_flow_sec_noise) / (p_stat / roww) ^ 0.75
 
-                '-------------- redendement---------------
-                pppz = (P_tot + 101325) / 101325
-                kappa = 1.4              'Compressiboliteit ?
-                zet = (kappa - 1) * roww * Kw * 1000 / kappa / (Act_flow_sec_noise * roww) / P_tot
-                kp = zet * Log(pppz) / Log(1 + zet * (pppz - 1))
-                rend = Act_flow_sec_noise * P_tot / Kw / 1000 * kp
+            '-------------- redendement---------------
+            pppz = (P_tot + 101325) / 101325
+            kappa = 1.4              'Compressiboliteit ?
+            zet = (kappa - 1) * roww * Kw * 1000 / kappa / (Act_flow_sec_noise * roww) / P_tot
+            kp = zet * Log(pppz) / Log(1 + zet * (pppz - 1))
+            rend = Act_flow_sec_noise * P_tot / Kw / 1000 * kp
 
-                '-------------- fBA---------------
-                fBA = 1 + (0.5 * (0.82 / rend - 1))
-                If fBA > 1.2 Then fBA = 1.2
-                Lws = (55 + 0.1885 * nq) * fBA                                              '[dB]
-                Lwi = Lws - 19.83 + 8.686 * Log(P_tot) + 4.343 * Log(Act_flow_sec_noise)    '[dB]
-                Lv_area = 4.343 * Log(Area_casing)                                          '[m2] fan oppervlak
-                deltaLA = 4.343 * Log(area_measure)                                         'Loss trough Casing Wall
-                Rv = 17.71 + 5.86 * Log(casing_dikte)                                       '[mm] casing plaat dikte
+            '-------------- fBA---------------
+            fBA = 1 + (0.5 * (0.82 / rend - 1))
+            If fBA > 1.2 Then fBA = 1.2
+            Lws = (55 + 0.1885 * nq) * fBA                                              '[dB]
+            Lwi = Lws - 19.83 + 8.686 * Log(P_tot) + 4.343 * Log(Act_flow_sec_noise)    '[dB]
+            Lv_area = 4.343 * Log(Area_casing)                                          '[m2] fan oppervlak
+            deltaLA = 4.343 * Log(area_measure)                                         'Loss trough Casing Wall
+            Rv = 17.71 + 5.86 * Log(casing_dikte)                                       '[mm] casing plaat dikte
 
-                Select Case n_imp
-                    Case 2249 To 50000
-                        n_ref = 4500
-                    Case 1124 To 2249
-                        n_ref = 2249
-                    Case 559 To 1124
-                        n_ref = 1124
-                    Case 0 To 559
-                        n_ref = 559
-                End Select
+            Select Case n_imp
+                Case 2249 To 50000
+                    n_ref = 4500
+                Case 1124 To 2249
+                    n_ref = 2249
+                Case 559 To 1124
+                    n_ref = 1124
+                Case 0 To 559
+                    n_ref = 559
+            End Select
 
-                Zoek_freq = n_ref ^ 2 * no_schoepen
-                inlet_red = -1 * (20 * Log10(diameter_imp / dia_fan_inlet) / Sqrt(2) + 1)
-                TextBox324.Text = Round(Zoek_freq, 0).ToString
+            Zoek_freq = n_ref ^ 2 * no_schoepen
+            inlet_red = -1 * (20 * Log10(diameter_imp / dia_fan_inlet) / Sqrt(2) + 1)
+            TextBox324.Text = Round(Zoek_freq, 0).ToString
 
 
             '----------- find the reduction on fan inlet-----------
@@ -2853,14 +2854,14 @@ Public Class Form1
 
             '----------- calc discharge clean-----------
             For i = 0 To (Discharge_clean.Length - 1)
-                    Discharge_clean(i) = Discharge_raw(i) + Discharge_damper(i)
-                Next
+                Discharge_clean(i) = Discharge_raw(i) + Discharge_damper(i)
+            Next
 
 
             '----------- calc suction clean-----------
             For i = 0 To (Suction_clean.Length - 1)
-                    Suction_clean(i) = Suction_raw(i) + Suction_damper(i)
-                Next
+                Suction_clean(i) = Suction_raw(i) + Suction_damper(i)
+            Next
 
             '----------- Casing RAW-----------
             For i = 0 To (casing_raw.Length - 1)
