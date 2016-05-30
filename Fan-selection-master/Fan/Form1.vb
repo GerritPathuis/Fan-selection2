@@ -1881,14 +1881,13 @@ Public Class Form1
 
         '----------------------------------------------
         'Insert a 20 x 10 table, fill it with data and change the column widths.
-        oTable = oDoc.Tables.Add(oDoc.Bookmarks.Item("\endofdoc").Range, 21, 10)
+        oTable = oDoc.Tables.Add(oDoc.Bookmarks.Item("\endofdoc").Range, 23, 10)
         oTable.Range.ParagraphFormat.SpaceAfter = 1
         oTable.Range.Font.Size = 9
         oTable.Range.Font.Bold = False
         oTable.Rows.Item(1).Range.Font.Bold = True
 
-
-        For j = 0 To 20 'Rows
+        For j = 0 To 24 'Rows
             oTable.Cell(j + 1, 1).Range.Text = case_x_conditions(j, 10)     'Write all variables
             oTable.Cell(j + 1, 2).Range.Text = case_x_conditions(j, 11)     'Write all units
             oTable.Cell(j + 1, 3).Range.Text = case_x_conditions(j, 1)      'Case 1
@@ -1909,6 +1908,65 @@ Public Class Form1
         oTable.Columns.Item(6).Width = oWord.InchesToPoints(0.45)
         oTable.Columns.Item(7).Width = oWord.InchesToPoints(0.45)
         oTable.Columns.Item(8).Width = oWord.InchesToPoints(0.45)
+        oDoc.Bookmarks.Item("\endofdoc").Range.InsertParagraphAfter()
+
+        '------------------ Noise Details----------------------
+        'Insert a table, fill it with data and change the column widths.
+        oTable = oDoc.Tables.Add(oDoc.Bookmarks.Item("\endofdoc").Range, 5, 3)
+        oTable.Range.ParagraphFormat.SpaceAfter = 1
+        oTable.Range.Font.Size = 9
+        oTable.Range.Font.Bold = False
+        oTable.Rows.Item(1).Range.Font.Bold = True
+        oTable.Cell(1, 1).Range.Text = "Noise"
+        oTable.Cell(2, 1).Range.Text = "Sound power Suction (induct) "
+        oTable.Cell(2, 2).Range.Text = TextBox350.Text
+        oTable.Cell(2, 3).Range.Text = "[dBA]"
+        oTable.Cell(3, 1).Range.Text = "Sound power Discharge (induct) "
+        oTable.Cell(3, 2).Range.Text = TextBox350.Text
+        oTable.Cell(3, 3).Range.Text = "[dBA]"
+        oTable.Cell(4, 1).Range.Text = "Sound pressure Casing"
+        oTable.Cell(4, 2).Range.Text = TextBox296.Text
+        oTable.Cell(4, 3).Range.Text = "[dBA] @ 1m"
+        oTable.Columns.Item(1).Width = oWord.InchesToPoints(2.0)   'Change width of columns
+        oTable.Columns.Item(2).Width = oWord.InchesToPoints(0.8)
+        oTable.Columns.Item(3).Width = oWord.InchesToPoints(0.8)
+        oTable.Rows.Item(1).Range.Font.Bold = True
+        oDoc.Bookmarks.Item("\endofdoc").Range.InsertParagraphAfter()
+
+
+        '------------------ motor----------------------
+        'Insert a table, fill it with data and change the column widths.
+        oTable = oDoc.Tables.Add(oDoc.Bookmarks.Item("\endofdoc").Range, 11, 3)
+        oTable.Range.ParagraphFormat.SpaceAfter = 1
+        oTable.Range.Font.Size = 9
+        oTable.Range.Font.Bold = False
+        oTable.Rows.Item(1).Range.Font.Bold = True
+        oTable.Cell(1, 1).Range.Text = "Electric Motor"
+        oTable.Cell(2, 1).Range.Text = "Manufacturer"
+        oTable.Cell(2, 2).Range.Text = "WEG"
+        oTable.Cell(3, 1).Range.Text = "Speed"
+        oTable.Cell(3, 2).Range.Text = " "
+        oTable.Cell(3, 3).Range.Text = "[rpm]"
+        oTable.Cell(4, 1).Range.Text = "Power"
+        oTable.Cell(4, 2).Range.Text = ""
+        oTable.Cell(4, 3).Range.Text = "[kW]"
+        oTable.Cell(5, 1).Range.Text = "Power Supply"
+        oTable.Cell(5, 2).Range.Text = "..V/3ph/..Hz"
+        oTable.Cell(6, 1).Range.Text = "ATEX "
+        oTable.Cell(6, 2).Range.Text = "Safe area/Zone 1,2,3"
+        oTable.Cell(7, 1).Range.Text = "Tropicalized"
+        oTable.Cell(7, 2).Range.Text = "YES/NO"
+        oTable.Cell(8, 1).Range.Text = "Winterized"
+        oTable.Cell(8, 2).Range.Text = "YES/NO"
+        oTable.Cell(9, 1).Range.Text = "Starting"
+        oTable.Cell(9, 2).Range.Text = "VSD/DOL"
+        oTable.Cell(10, 1).Range.Text = "Paint"
+        oTable.Cell(10, 2).Range.Text = "Manufacturer's standard"
+        oTable.Columns.Item(1).Width = oWord.InchesToPoints(1.3)   'Change width of columns
+        oTable.Columns.Item(2).Width = oWord.InchesToPoints(1.55)
+        oTable.Columns.Item(3).Width = oWord.InchesToPoints(0.8)
+        oTable.Rows.Item(1).Range.Font.Bold = True
+        oDoc.Bookmarks.Item("\endofdoc").Range.InsertParagraphAfter()
 
 
         '------------------save Chart1 ---------------- 
@@ -2649,7 +2707,7 @@ Public Class Form1
 
             sound_speed = Sqrt(1.41 * NumericUpDown76.Value * 100 / NumericUpDown12.Value)   'K_lucht= 1.41
             Act_flow_sec_noise /= 3600                                      '[m3/sec]
-            Double.TryParse(TextBox58.Text, Kw)                             'as vermogen
+            Double.TryParse(TextBox274.Text, Kw)                            'as vermogen
             Double.TryParse(TextBox74.Text, L_eff)                          'Efficiency [%]
             L_eff /= 100                                                    'Efficiency [-]
             roww = NumericUpDown12.Value                                    'Density [kg/Am3]
@@ -2744,23 +2802,35 @@ Public Class Form1
             dL_okt(7) = lw4a + dL_oktaaf(L_laufzahl, diameter_imp, v_omtrek, 8000)
 
             '------------- Add Schaufelfrequenz-Pegelzuschlag---------------
+            'Oktaaf aanvullen tot het gewenste overall-nivo is bereikt-----
             Schaufel_hz = no_schoepen * n_imp / 60          'Schaufelfrequenz
 
             Select Case Schaufel_hz
                 Case Is <= 63 * 1.41
-                    dL_okt(0) += 3
+                    Do While (lw4a > add_decibels(dL_okt))
+                        dL_okt(0) += 0.1
+                    Loop
                 Case Is <= 125 * 1.41
-                    dL_okt(1) += 3
+                    Do While (lw4a > add_decibels(dL_okt))
+                        dL_okt(1) += 0.1
+                    Loop
                 Case Is <= 500 * 1.41
-                    dL_okt(2) += 3
+                    Do While (lw4a > add_decibels(dL_okt))
+                        dL_okt(2) += 0.1
+                    Loop
                 Case Is <= 1000 * 1.41
-                    dL_okt(3) += 3
+                    Do While (lw4a > add_decibels(dL_okt))
+                        dL_okt(3) += 0.1
+                    Loop
                 Case Is <= 2000 * 1.41
-                    dL_okt(4) += 3
+                    Do While (lw4a > add_decibels(dL_okt))
+                        dL_okt(4) += 0.1
+                    Loop
                 Case Is <= 4000 * 1.41
-                    dL_okt(5) += 3
+                    Do While (lw4a > add_decibels(dL_okt))
+                        dL_okt(5) += 0.1
+                    Loop
             End Select
-
 
             TextBox350.Text = Round(lw4a, 1).ToString                   'VDI Discharge power
             TextBox374.Text = Round(dL_okt(0), 1).ToString              'VDI Discharge
@@ -2771,7 +2841,6 @@ Public Class Form1
             TextBox352.Text = Round(dL_okt(5), 1).ToString              'VDI Discharge
             TextBox349.Text = Round(dL_okt(6), 1).ToString              'VDI Discharge
             TextBox348.Text = Round(dL_okt(7), 1).ToString              'VDI Discharge
-            TextBox375.Text = Round(add_decibels(dL_okt), 1).ToString
 
             '------------------------------------------------------
             '------------------------------------------------------
@@ -2977,7 +3046,7 @@ Public Class Form1
         Dim Ltot As Double = 0
         Dim i As Integer
 
-        For i = 0 To 7
+        For i = 0 To 8
             Ltot += 10 ^ (snd(i) / 10)
         Next
         'Ltot = 10 * Log10(10 ^ (snd(0) / 10) + 10 ^ (snd(1) / 10) + 10 ^ (snd(2) / 10) + 10 ^ (snd(3) / 10) + 10 ^ (snd(4) / 10) + 10 ^ (snd(5) / 10) + 10 ^ (snd(6) / 10) + 10 ^ (snd(7) / 10))
@@ -3598,9 +3667,7 @@ Public Class Form1
     End Sub
     'Save Case button is hit
     Private Sub Button18_Click_1(sender As Object, e As EventArgs) Handles Button18.Click
-        'If String.IsNullOrEmpty(TextBox99.Text) Then
-        '    TextBox99.Text = "?"
-        'End If
+
         '----------- Variable------------------
         case_x_conditions(0, 10) = "Case name"
         case_x_conditions(1, 10) = "Model"
@@ -3628,10 +3695,12 @@ Public Class Form1
         case_x_conditions(17, 10) = "dP Dynamic"
         case_x_conditions(18, 10) = "dP Total"
         case_x_conditions(19, 10) = "Shaft power"
-        case_x_conditions(20, 10) = "Efficiency"
+        case_x_conditions(20, 10) = "Installed power"
+        case_x_conditions(21, 10) = "Efficiency"
+        case_x_conditions(22, 10) = " "
+        case_x_conditions(23, 10) = " "
 
         '----------- Units------------------
-        '------------------------------------------
         case_x_conditions(0, 11) = " "
         case_x_conditions(1, 11) = " "
         case_x_conditions(2, 11) = "[rpm]"
@@ -3658,7 +3727,10 @@ Public Class Form1
         case_x_conditions(17, 11) = "[mbar.g]"
         case_x_conditions(18, 11) = "[mbar.g]"
         case_x_conditions(19, 11) = "[kW]"
-        case_x_conditions(20, 11) = "[%]"
+        case_x_conditions(20, 11) = "[kW]"
+        case_x_conditions(21, 11) = "[%]"
+        case_x_conditions(22, 11) = "  "
+        case_x_conditions(23, 11) = "  "
 
         '----------- general data------------------
         case_x_conditions(0, NumericUpDown72.Value) = TextBox89.Text                                'Case name 
@@ -3687,7 +3759,13 @@ Public Class Form1
         case_x_conditions(17, NumericUpDown72.Value) = TextBox75.Text                   'Dynamic dP [mbar.g]
         case_x_conditions(18, NumericUpDown72.Value) = TextBox273.Text                  'Total dP [mbar.g]
         case_x_conditions(19, NumericUpDown72.Value) = TextBox274.Text                  'Shaft power [kW]
-        case_x_conditions(20, NumericUpDown72.Value) = TextBox275.Text                  'Efficiency [%]
+        case_x_conditions(20, NumericUpDown72.Value) = ""                               '
+        case_x_conditions(21, NumericUpDown72.Value) = TextBox275.Text                  'Efficiency [%]
+
+        '----------- Noise-------------------
+        case_x_conditions(22, NumericUpDown72.Value) = ""                    '
+        case_x_conditions(23, NumericUpDown72.Value) = ""
+
 
         Button11_Click(sender, New System.EventArgs())  'Draw chart1 (calculate the data points before storage)
 
@@ -3804,27 +3882,25 @@ Public Class Form1
         TextBox198.Text = Round(m_torque_max, 0).ToString           'Max torque [N.m]
         TextBox199.Text = Round(motor_inertia, 2).ToString          'Motor inertia [kg.m2]
         TextBox200.Text = Round(m_torque_rated, 0).ToString         'Rated torque [N.m]
-
         TextBox202.Text = Round(impellar_inertia, 1).ToString       'impellar inertia [kg.m2]
         TextBox207.Text = Round(motor_inertia, 1).ToString          'motor inertia [kg.m2]
         NumericUpDown46.Value = Round(motor_inertia, 1).ToString    'motor inertia [kg.m2]
         TextBox213.Text = Round(total_inertia, 1).ToString          'Total inertia[kg.m2]
-
         TextBox206.Text = Round(m_torque_average, 0).ToString       'Torque average [kg.m2]
         TextBox205.Text = Round(C_acc, 0).ToString                  'Effective acceleration torque [N.m]
         TextBox214.Text = Round(required_power / 1000, 0).ToString  'Fan power @ max speed [kw]
         TextBox215.Text = Round(fan_load_torque, 0).ToString        'Fan torque @ max speed [N.m]
-
         TextBox146.Text = Round(aanlooptijd, 1).ToString            'Aanlooptijd [s]
-
 
         '------- check geinstalleerd vermogen 15% safety --------------------
         Double.TryParse(TextBox274.Text, shaft_power)
 
         If (Ins_power < (shaft_power * 1000 * 1.15)) Then        '15% safety
             Label254.Visible = True
+            ComboBox6.BackColor = Color.Red
         Else
             Label254.Visible = False
+            ComboBox6.BackColor = Color.Yellow
         End If
 
         '------- check aanlooptijd --------------------
