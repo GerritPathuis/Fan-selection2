@@ -2623,8 +2623,35 @@ Public Class Form1
         End Select
         Return (dl)
     End Function
+    'VDI 3731 OPEN Suction-Discharge gleigung 20
+    Function dL_open_discharge(freq As Double)
+        Dim dl, RKH, uit_b, uit_h, uit_radius, v_geluid As Double
 
-    'Convert Sound power to pressure
+        Double.TryParse(TextBox160.Text, uit_b)     'Uitlaat breedte
+        Double.TryParse(TextBox161.Text, uit_h)     'Uitlaat hoogte
+        Double.TryParse(TextBox347.Text, v_geluid)  'geluidsnelheid
+
+        uit_radius = (uit_b / 1000 + uit_h / 1000) / PI 'Hydraulische diameter [m]
+
+        RKH = 2 * PI * freq * uit_radius / v_geluid
+        ' MessageBox.Show(RKH.ToString)
+        dl = 10 * Log10(2.3 * RKH ^ 2 / (1 + 2.3 * RKH ^ 2))
+        Return (dl)
+    End Function
+
+    'VDI 3731 OPEN Suction-Discharge gleigung 20
+    Function dL_open_suction(freq As Double)
+        Dim dl, RKH, in_radius, v_geluid As Double
+
+        Double.TryParse(TextBox347.Text, v_geluid)      'geluidsnelheid
+        Double.TryParse(TextBox159.Text, in_radius)     'Inlet diameter
+
+        RKH = 2 * PI * freq * (in_radius / 1000) / v_geluid
+        ' MessageBox.Show(RKH.ToString)
+        dl = 10 * Log10(2.3 * RKH ^ 2 / (1 + 2.3 * RKH ^ 2))
+        Return (dl)
+    End Function
+    'Add the octaves
     Private Function add_decibels(snd As Double())
         Dim Ltot As Double = 0
         Dim i As Integer
@@ -2660,8 +2687,8 @@ Public Class Form1
         Return (density1 * (pressure2 / pressure1) * ((temperature1 + 273.15) / (temperature2 + 273.15)))
     End Function
     'Calculate the noise tab
-    Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click, TabPage4.Enter, NumericUpDown7.ValueChanged, ComboBox9.SelectedIndexChanged, ComboBox10.SelectedIndexChanged, ComboBox5.SelectedIndexChanged
-        calc_noise()
+    Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click, TabPage4.Enter, NumericUpDown7.ValueChanged, ComboBox9.SelectedIndexChanged, ComboBox10.SelectedIndexChanged, ComboBox5.SelectedIndexChanged, CheckBox11.CheckedChanged, CheckBox12.CheckedChanged
+        Calc_noise()
     End Sub
 
     'Calculate the noise tab
@@ -2671,6 +2698,7 @@ Public Class Form1
         Dim Kw, dia_fan_inlet, diameter_imp As Double
         Dim Suction_raw(9), Suction_damper(9), Suction_clean(9), Suction_dba(9) As Double           'Suction fan
         Dim Discharge_raw(9), Discharge_damper(9), Discharge_clean(9), discharge_dba(9) As Double   'Discharge fan
+        Dim Discharge_pressure(9), Suction_pressure(9) As Double                                    'Sound pressure fan
         Dim keel_diameter As Double
         Dim casing_raw(9), casing_insulation(9), casing_clean(9), casing_dba(9) As Double           'Casing
         Dim hh As Integer
@@ -2838,9 +2866,9 @@ Public Class Form1
             '------------------------------------------------------
             Dim Rv_plate_thickness, Lv_area, deltaLA As Double
 
-            Lv_area = 4.343 * Log(Area_casing)                                          '[m2] fan oppervlak
-            deltaLA = 4.343 * Log(area_measure)                                         'Loss trough Casing Wall
-            Rv_plate_thickness = 17.71 + 5.86 * Log(casing_dikte)                                       '[mm] casing plaat dikte
+            Lv_area = 4.343 * Log(Area_casing)                              '[m2] fan oppervlak
+            deltaLA = 4.343 * Log(area_measure)                             'Loss trough Casing Wall
+            Rv_plate_thickness = 17.71 + 5.86 * Log(casing_dikte)           '[mm] casing plaat dikte
 
 
             '----------- calc discharge clean-----------
@@ -2862,6 +2890,59 @@ Public Class Form1
             For i = 0 To (casing_clean.Length - 1)
                 casing_clean(i) = casing_raw(i) - casing_insulation(i) - deltaLA
             Next
+
+            '--------------- Open discharge reduction-------------
+            Dim Open_disch_red(9) As Double
+            Dim Open_suction_red(9) As Double
+
+            Open_disch_red(0) = dL_open_discharge(63)
+            Open_disch_red(1) = dL_open_discharge(125)
+            Open_disch_red(2) = dL_open_discharge(250)
+            Open_disch_red(3) = dL_open_discharge(500)
+            Open_disch_red(4) = dL_open_discharge(1000)
+            Open_disch_red(5) = dL_open_discharge(2000)
+            Open_disch_red(6) = dL_open_discharge(4000)
+            Open_disch_red(7) = dL_open_discharge(8000)
+
+            If CheckBox11.Checked Then  'Open discharge 
+                Label361.Text = "Free Discharge Power (SWL)"
+                Panel3.Visible = True
+                For i = 0 To (Discharge_clean.Length - 1)
+                    Discharge_clean(i) += Open_disch_red(i)
+                Next
+            Else
+                Panel3.Visible = False
+                Label361.Text = "Remaining induct (SWL)"
+            End If
+
+            '--------------- Open Suction reduction-------------
+            Open_suction_red(0) = dL_open_discharge(63)
+            Open_suction_red(1) = dL_open_discharge(125)
+            Open_suction_red(2) = dL_open_discharge(250)
+            Open_suction_red(3) = dL_open_discharge(500)
+            Open_suction_red(4) = dL_open_discharge(1000)
+            Open_suction_red(5) = dL_open_discharge(2000)
+            Open_suction_red(6) = dL_open_discharge(4000)
+            Open_suction_red(7) = dL_open_discharge(8000)
+
+            If CheckBox12.Checked Then  'Open suction 
+                Label356.Text = "Free Suction Power (SWL)"
+                Panel4.Visible = True
+                For i = 0 To (Suction_clean.Length - 1)
+                    Suction_clean(i) += Open_suction_red(i)
+                Next
+            Else
+                Panel4.Visible = False
+                Label356.Text = "Remaining induct (SWL)"
+            End If
+
+
+            '------------- Power to pressure @ 1m --------------
+            For i = 0 To (Discharge_clean.Length - 1)
+                Discharge_pressure(i) = power_to_pressure(Discharge_clean(i))
+                Suction_pressure(i) = power_to_pressure(Suction_clean(i))
+            Next
+
 
             TextBox347.Text = Round(sound_speed, 1).ToString            '[m/s] geluidsnelhied
             TextBox114.Text = Round(n_imp, 0).ToString                  'Toerental [rpm]
@@ -2928,29 +3009,52 @@ Public Class Form1
             TextBox364.Text = Round(Discharge_clean(5), 1).ToString
             TextBox363.Text = Round(Discharge_clean(6), 1).ToString
             TextBox362.Text = Round(Discharge_clean(7), 1).ToString
-            TextBox361.Text = Round(add_decibels(Discharge_clean), 1).ToString     'Sound Pressure [dB]
+            TextBox361.Text = Round(add_decibels(Discharge_clean), 1).ToString
 
             '---------------- Casing raw -----------------------
-            TextBox233.Text = Round(casing_raw(0), 1).ToString              'Sound Pressure [dB]
-            TextBox232.Text = Round(casing_raw(1), 1).ToString              'Sound Pressure [dB]
-            TextBox231.Text = Round(casing_raw(2), 1).ToString              'Sound Pressure [dB]
-            TextBox230.Text = Round(casing_raw(3), 1).ToString              'Sound Pressure [dB]
-            TextBox229.Text = Round(casing_raw(4), 1).ToString               'Sound Pressure [dB]
-            TextBox228.Text = Round(casing_raw(5), 1).ToString               'Sound Pressure [dB]
-            TextBox227.Text = Round(casing_raw(6), 1).ToString              'Sound Pressure [dB]
-            TextBox226.Text = Round(casing_raw(7), 1).ToString              'Sound Pressure [dB]
-            TextBox225.Text = Round(add_decibels(casing_raw), 1).ToString   'Sound Pressure [dB]
+            TextBox233.Text = Round(casing_raw(0), 1).ToString
+            TextBox232.Text = Round(casing_raw(1), 1).ToString
+            TextBox231.Text = Round(casing_raw(2), 1).ToString
+            TextBox230.Text = Round(casing_raw(3), 1).ToString
+            TextBox229.Text = Round(casing_raw(4), 1).ToString
+            TextBox228.Text = Round(casing_raw(5), 1).ToString
+            TextBox227.Text = Round(casing_raw(6), 1).ToString
+            TextBox226.Text = Round(casing_raw(7), 1).ToString
+            TextBox225.Text = Round(add_decibels(casing_raw), 1).ToString
 
             '---------------- Casing clean [dB]-----------------------
-            TextBox296.Text = Round(add_decibels(casing_clean), 1).ToString     'Sound Pressure [dB]
-            TextBox302.Text = Round(casing_clean(0), 1).ToString                'Sound Pressure [dB]
-            TextBox299.Text = Round(casing_clean(1), 1).ToString                'Sound Pressure [dB]
-            TextBox301.Text = Round(casing_clean(2), 1).ToString                'Sound Pressure [dB]
-            TextBox300.Text = Round(casing_clean(3), 1).ToString                'Sound Pressure [dB]
-            TextBox298.Text = Round(casing_clean(4), 1).ToString                'Sound Pressure [dB]
-            TextBox297.Text = Round(casing_clean(5), 1).ToString                'Sound Pressure [dB]
-            TextBox295.Text = Round(casing_clean(6), 1).ToString                'Sound Pressure [dB]
-            TextBox294.Text = Round(casing_clean(7), 1).ToString                'Sound Pressure [dB]
+            TextBox302.Text = Round(casing_clean(0), 1).ToString
+            TextBox299.Text = Round(casing_clean(1), 1).ToString
+            TextBox301.Text = Round(casing_clean(2), 1).ToString
+            TextBox300.Text = Round(casing_clean(3), 1).ToString
+            TextBox298.Text = Round(casing_clean(4), 1).ToString
+            TextBox297.Text = Round(casing_clean(5), 1).ToString
+            TextBox295.Text = Round(casing_clean(6), 1).ToString
+            TextBox294.Text = Round(casing_clean(7), 1).ToString
+            TextBox296.Text = Round(add_decibels(casing_clean), 1).ToString
+
+            '----------Open Discharge PRESSURE opgesplits in banden--------------
+            TextBox356.Text = Round(Discharge_pressure(0), 1).ToString
+            TextBox353.Text = Round(Discharge_pressure(1), 1).ToString
+            TextBox355.Text = Round(Discharge_pressure(2), 1).ToString
+            TextBox354.Text = Round(Discharge_pressure(3), 1).ToString
+            TextBox352.Text = Round(Discharge_pressure(4), 1).ToString
+            TextBox350.Text = Round(Discharge_pressure(5), 1).ToString
+            TextBox349.Text = Round(Discharge_pressure(6), 1).ToString
+            TextBox348.Text = Round(Discharge_pressure(7), 1).ToString
+            TextBox238.Text = Round(add_decibels(Discharge_pressure), 1).ToString
+
+
+            '----------Open Suction PRESSURE opgesplits in banden--------------
+            TextBox317.Text = Round(Suction_pressure(0), 1).ToString
+            TextBox313.Text = Round(Suction_pressure(1), 1).ToString
+            TextBox318.Text = Round(Suction_pressure(2), 1).ToString
+            TextBox319.Text = Round(Suction_pressure(3), 1).ToString
+            TextBox320.Text = Round(Suction_pressure(4), 1).ToString
+            TextBox323.Text = Round(Suction_pressure(5), 1).ToString
+            TextBox324.Text = Round(Suction_pressure(6), 1).ToString
+            TextBox357.Text = Round(Suction_pressure(7), 1).ToString
+            TextBox312.Text = Round(add_decibels(Suction_pressure), 1).ToString
         End If
     End Sub
 
