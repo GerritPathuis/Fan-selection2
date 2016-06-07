@@ -1839,13 +1839,13 @@ Public Class Form1
 
         '----------------------------------------------
         'Insert a 20 x 10 table, fill it with data and change the column widths.
-        oTable = oDoc.Tables.Add(oDoc.Bookmarks.Item("\endofdoc").Range, 21, 10)
+        oTable = oDoc.Tables.Add(oDoc.Bookmarks.Item("\endofdoc").Range, 23, 10)
         oTable.Range.ParagraphFormat.SpaceAfter = 1
         oTable.Range.Font.Size = 9
         oTable.Range.Font.Bold = False
         oTable.Rows.Item(1).Range.Font.Bold = True
 
-        For j = 0 To 22 'Rows
+        For j = 0 To 23 'Rows
             oTable.Cell(j + 1, 1).Range.Text = case_x_conditions(j, 10)     'Write all variables
             oTable.Cell(j + 1, 2).Range.Text = case_x_conditions(j, 11)     'Write all units
             oTable.Cell(j + 1, 3).Range.Text = case_x_conditions(j, 1)      'Case 1
@@ -3677,7 +3677,7 @@ Public Class Form1
         case_x_conditions(18, 10) = "dP Total"
         case_x_conditions(19, 10) = "Shaft power"
         case_x_conditions(20, 10) = "Efficiency"
-        case_x_conditions(21, 10) = " "
+        case_x_conditions(21, 10) = "Mol weight "
 
         '----------- Units------------------
         case_x_conditions(0, 11) = " "
@@ -3707,7 +3707,7 @@ Public Class Form1
         case_x_conditions(18, 11) = "[mbar.g]"
         case_x_conditions(19, 11) = "[kW]"
         case_x_conditions(20, 11) = "[%]"
-        case_x_conditions(21, 11) = "  "
+        case_x_conditions(21, 11) = "[g/mol]"
 
         '----------- general data------------------
         case_x_conditions(0, NumericUpDown72.Value) = TextBox89.Text                                'Case name 
@@ -3716,14 +3716,14 @@ Public Class Form1
         case_x_conditions(3, NumericUpDown72.Value) = NumericUpDown33.Value.ToString                'Diameter [mm]
         case_x_conditions(4, NumericUpDown72.Value) = TextBox157.Text                               'Mass flow [kg/hr]
         case_x_conditions(5, NumericUpDown72.Value) = TextBox159.Text                               'Inlet Diameter [mm]
-        case_x_conditions(6, NumericUpDown72.Value) = TextBox160.Text & "x" & TextBox161.Text     'Outlet diemsions [mm]
+        case_x_conditions(6, NumericUpDown72.Value) = TextBox160.Text & "x" & TextBox161.Text       'Outlet diemsions [mm]
 
         '----------- inlet data--------------------
         case_x_conditions(7, NumericUpDown72.Value) = TextBox272.Text                   'Flow [Am3/hr]
         case_x_conditions(8, NumericUpDown72.Value) = TextBox269.Text                   'Flow [Nm3/hr]
         case_x_conditions(9, NumericUpDown72.Value) = NumericUpDown4.Value.ToString     'Temp [c]
         case_x_conditions(10, NumericUpDown72.Value) = NumericUpDown76.Value.ToString    'Pressure [mbar abs]
-        case_x_conditions(11, NumericUpDown72.Value) = NumericUpDown12.Value.ToString    'Density [kg/Am3]
+        case_x_conditions(11, NumericUpDown72.Value) = NumericUpDown12.Value.ToString 'Density [kg/Am3]
 
         '----------- outlet data--------------------
         case_x_conditions(12, NumericUpDown72.Value) = TextBox267.Text                  'Volume Flow [Am3/hr]
@@ -3737,7 +3737,11 @@ Public Class Form1
         case_x_conditions(18, NumericUpDown72.Value) = TextBox273.Text                  'Total dP [mbar.g]
         case_x_conditions(19, NumericUpDown72.Value) = TextBox274.Text                  'Shaft power [kW]
         case_x_conditions(20, NumericUpDown72.Value) = TextBox275.Text                  'Efficiency [%]
-        case_x_conditions(21, NumericUpDown72.Value) = ""
+        If RadioButton3.Checked Then    'Density given or calculated
+            case_x_conditions(21, NumericUpDown72.Value) = NumericUpDown8.Value.ToString
+        Else
+            case_x_conditions(21, NumericUpDown72.Value) = "n.a."
+        End If
 
 
         Button11_Click(sender, New System.EventArgs())  'Draw chart1 (calculate the data points before storage)
