@@ -276,24 +276,62 @@ Public Class Form1
     "200mm Rockw., Al-plate, 2.6mm Foil;2,6;6;14;18;22;24;25;25;25",
     "200mm Rockw., Fe-plate, 2.6mm Foil;2,6;10;17;24;25;26;27;27;27"}
 
-    'Inlet noise dempers
+    'Inlet noise dempers, Standaard absorptie coulis, dikte 200mm, TROX Nederland
     'Lengte;63;125;250;500;1000;2000;4000;8000,
     Public Shared inlet_damper() As String = {
     "NO damper;0;0;0;0;0;0;0;0",
-    "Damper L=500 mm;-3;-5;-10;-17;-24;-20;-14;-11",
-    "Damper L=750 mm;-3;-6;-13;-24;-32;-26;-16;-12",
-    "Damper L=1000 mm;-4;-8;-17;-30;-40;-32;-19;-13",
-    "Damper L=1250 mm;-5;-10;-20;-35;-49;-38;-22;-15",
-    "Damper L=1500 mm;-6;-14;-23;-41;-50;-44;-25;-17",
-    "Damper L=1750 mm;-7;-16;-27;-47;-50;-50;-27;-18",
-    "Damper L=2000 mm;-7;-17;-30;-50;-50;-50;-30;-20",
-    "Damper L=2250 mm;-8;-18;-33;-50;-50;-50;-32;-21",
-    "Damper L=2500 mm;-8;-19;-36;-50;-50;-50;-35;-22",
-    "Damper L=2750 mm;-8;-20;-38;-50;-50;-50;-37;-23",
-    "Damper L=3000 mm;-9;-21;-39;-50;-50;-50;-38;-23"}
+    "L=500, Slit=60;2;5;12;23;33;32;21;16",
+    "L=500, Slit=80;2;4;10;20;27;26;18;12",
+    "L=500, Slit=100;2;4;9;18;24;22;16;10",
+    "L=500, Slit=120;2;3;8;15;20;19;13;8",
+    "L=500, Slit=140;2;3;7;13;18;16;11;7",
+    "L=500, Slit=160;1;2;7;12;16;14;10;7",
+    "L=500, Slit=180;1;2;6;11;15;13;8;6",
+    "L=500, Slit=200;1;2;6;10;14;11;7;6",
+    "L=1000, Slit=60;3;10;22;34;48;48;31;22",
+    "L=1000, Slit=80;3;8;19;31;44;43;27;18",
+    "L=1000, Slit=100;3;7;17;29;41;39;24;15",
+    "L=1000, Slit=120;2;6;15;25;35;32;20;12",
+    "L=1000, Slit=140;2;5;14;23;31;27;17;10",
+    "L=1000, Slit=160;2;5;13;21;28;24;14;9",
+    "L=1000, Slit=180;2;5;12;20;26;21;12;8",
+    "L=1000, Slit=200;2;4;11;19;24;19;11;7",
+    "L=1500, Slit=60;5;14;32;47;50;50;42;28",
+    "L=1500, Slit=80;4;11;27;43;50;50;35;22",
+    "L=1500, Slit=100;3;10;25;40;50;50;32;19",
+    "L=1500, Slit=120;3;9;22;36;46;44;26;15",
+    "L=1500, Slit=140;3;8;20;33;37;37;21;13",
+    "L=1500, Slit=160;2;7;19;30;32;32;18;11",
+    "L=1500, Slit=180;2;6;17;28;28;28;16;10",
+    "L=1500, Slit=200;2;6;17;27;25;25;14;8",
+    "L=2000, Slit=60;6;17;41;50;50;50;50;33",
+    "L=2000, Slit=80;5;14;36;50;50;50;44;26",
+    "L=2000, Slit=100;4;13;33;50;50;50;39;22",
+    "L=2000, Slit=120;4;11;29;46;50;50;31;18",
+    "L=2000, Slit=140;3;10;26;42;50;47;26;15",
+    "L=2000, Slit=160;3;9;24;39;49;41;22;13",
+    "L=2000, Slit=180;3;8;23;37;46;36;19;11",
+    "L=2000, Slit=200;2;8;22;35;44;32;16;10",
+    "L=2500, Slit=60;8;20;48;50;50;50;50;37",
+    "L=2500, Slit=80;6;17;42;50;50;50;50;29",
+    "L=2500, Slit=100;5;15;39;50;50;50;45;25",
+    "L=2500, Slit=120;5;13;35;50;50;50;36;20",
+    "L=2500, Slit=140;4;11;32;50;50;50;30;17",
+    "L=2500, Slit=160;3;10;29;48;50;47;25;14",
+    "L=2500, Slit=180;3;10;27;45;50;42;22;12",
+    "L=2500, Slit=200;3;9;26;43;50;38;19;11",
+    "L=3000, Slit=60;10;23;50;50;50;50;50;40",
+    "L=3000, Slit=80;8;19;49;50;50;50;50;32",
+    "L=3000, Slit=100;7;17;46;50;50;50;50;27",
+    "L=3000, Slit=120;5;15;40;50;50;50;41;22",
+    "L=3000, Slit=140;5;13;37;50;50;50;34;18",
+    "L=3000, Slit=160;4;12;34;50;50;50;29;16",
+    "L=3000, Slit=180;3;11;32;50;50;48;25;13",
+    "L=3000, Slit=200;3;10;30;50;50;44;21;12"}
 
 
-    Dim flenzen() As Double = {71, 80, 90, 100, 112, 125, 140, 160, 180, 200, 224, 250, 280, 315, 355, 400, 450, 500, 560, 630, 710, 800, 900, 1000, 1120, 1250, 1400, 1600, 1800, 2000}
+    Dim Std_flens_dia() As Double = {71, 80, 90, 100, 112, 125, 140, 160, 180, 200, 224, 250, 280, 315,
+        355, 400, 450, 500, 560, 630, 710, 800, 900, 1000, 1120, 1250, 1400, 1600, 1800, 2000, 2100, 2200, 2400, 2500}
     Dim R20() As Double
 
     'T-model, Alle gegevens bij het hoogste rendement
@@ -419,7 +457,6 @@ Public Class Form1
             ComboBox10.Items.Add(words(0))
         Next hh
 
-
         '----------------- prevent out of bounds------------------
         If ComboBox1.Items.Count > 0 Then
             ComboBox1.SelectedIndex = 6                 'Select T17B
@@ -435,8 +472,6 @@ Public Class Form1
         If ComboBox4.Items.Count > 0 Then
             ComboBox4.SelectedIndex = 12                'Selecteer de motor 90kW
         End If
-
-
 
         If ComboBox6.Items.Count > 0 Then
             ComboBox6.SelectedIndex = 12                'Selecteer de motor 90kW
@@ -732,6 +767,11 @@ Public Class Form1
 
                 '------------ Calcu Pstatic @ Star-Flow in chart1----------------------------------------------- 
                 Dim star_flow, star_Ptot, star_Psta, star_pow, star_eff, start_dyn As Double
+                Dim dia_zuig As Double
+                Dim i As Integer
+
+
+
 
                 flow = G_Debiet_z_act_sec
                 star_flow = Round(flow * 3600, 0)
@@ -788,6 +828,18 @@ Public Class Form1
                 cond(1).Ps1 = P_zuig_Pa_static                      '[Pa abs] inlet flange waaier #1
                 cond(1).Power0 = Tschets(cond(1).Typ).werkp_opT(3)  '[Am3/s] Tschets
 
+                '---------- snelheden inlaat en uitlaat----------------
+                '---Note; Voor Q1 en Q2 speelt het sg geen rol !!!!!!!!!!
+                '------------------------------------------------------
+                dia_zuig = Round(Tschets(cond(1).Typ).Tdata(3) * cond(1).Dia1 / cond(1).Dia0, 0)        'Zuigmond diameter.
+                '--- Zoek de flensmaat in de flenzen array -----------
+                For i = 1 To (Std_flens_dia.Length - 1)
+                    If ((dia_zuig >= Std_flens_dia(i - 1)) And (dia_zuig < Std_flens_dia(i))) Then
+                        cond(1).zuig_dia = Std_flens_dia(i)
+                    End If
+                Next
+
+
                 Calc_stage(cond(1))                                 'Bereken de waaier #1  
                 calc_loop_loss(cond(1))                             'Bereken de omloop verliezen  
 
@@ -821,7 +873,7 @@ Public Class Form1
                 TextBox76.Text = Round(cond(1).Om_velos, 0).ToString                            'Omtrek snelheid [m/s]
                 TextBox218.Text = Round(cond(1).Om_velos / Vel_Mach(cond(1).T1), 2).ToString    'Omtrek snelheid [M]
                 TextBox77.Text = Round((cond(1).Reynolds * 10 ^ -6), 2).ToString
-                TextBox159.Text = Round(cond(1).zuig_dia / 10, 0) * 10.ToString                 'Zuigmond diameter rounded to 10[mm]
+                TextBox159.Text = Round(cond(1).zuig_dia, 0).ToString                           'Zuigmond diameter [mm]
                 TextBox160.Text = Round(cond(1).uitlaat_h, 0).ToString                          'Uitlaat hoogte inw.[mm]
                 TextBox161.Text = Round(cond(1).uitlaat_b, 0).ToString                          'Uitlaat breedte inw.[mm]
                 TextBox57.Text = Round(cond(1).in_velos, 1).ToString                            'Inlaat snelheid [m/s]
@@ -2088,11 +2140,6 @@ Public Class Form1
                         Calc_stage(cond(6))                     'Bereken de waaier #2  
                         calc_loop_loss(cond(6))                 'Bereken de omloop verliezen (niet echt nodig)
 
-
-                        'Label83.Text ="Waaier #1, Ro1=" & Round(cond(4).Ro1, 03).ToString &" [kg/m3], Ro2=" & Round(cond(4).Ro2, 3).ToString &" [kg/m3], Pt1=" & Round(cond(4).Pt1, 0).ToString &" [Pa], Pt2=" & Round(cond(4).Pt2, 0).ToString &" [Pa], dp_total=" & Round(cond(4).delta_pt, 0).ToString
-                        'Label84.Text ="Waaier #2, Ro1=" & Round(cond(5).Ro1, 03).ToString &" [kg/m3], Ro2=" & Round(cond(5).Ro2, 3).ToString &" [kg/m3], Pt1=" & Round(cond(5).Pt1, 0).ToString &" [Pa], Pt2=" & Round(cond(5).Pt2, 0).ToString &" [Pa], dp_total=" & Round(cond(5).delta_pt, 0).ToString
-                        'Label153.Text ="Waaier #3, Ro1=" & Round(cond(6).Ro1, 03).ToString &" [kg/m3], Ro2=" & Round(cond(6).Ro2, 3).ToString &" [kg/m3], Pt1=" & Round(cond(6).Pt1, 0).ToString &" [Pa], Pt2 =" & Round(cond(6).Pt2, 0).ToString &" [Pa], d_totalp=" & Round(cond(6).delta_pt, 0).ToString
-
                         Select Case True
                             Case RadioButton9.Checked      '1 traps
                                 Tschets(ty).TFlow_scaled(hh) = cond(4).Q1                                       '[Am3/hr]
@@ -2630,11 +2677,11 @@ Public Class Form1
         Double.TryParse(TextBox160.Text, uit_b)     'Uitlaat breedte
         Double.TryParse(TextBox161.Text, uit_h)     'Uitlaat hoogte
         Double.TryParse(TextBox347.Text, v_geluid)  'geluidsnelheid
+        uit_b /= 1000   '[m]
+        uit_h /= 1000   '[m]
 
-        uit_radius = (uit_b / 1000 + uit_h / 1000) / PI 'Hydraulische diameter [m]
-
+        uit_radius = 2 * (uit_b * uit_h) / (2 * uit_b + 2 * uit_h) 'Hydraulische radius [m]
         RKH = 2 * PI * freq * uit_radius / v_geluid
-        ' MessageBox.Show(RKH.ToString)
         dl = 10 * Log10(2.3 * RKH ^ 2 / (1 + 2.3 * RKH ^ 2))
         Return (dl)
     End Function
@@ -2645,9 +2692,9 @@ Public Class Form1
 
         Double.TryParse(TextBox347.Text, v_geluid)      'geluidsnelheid
         Double.TryParse(TextBox159.Text, in_radius)     'Inlet diameter
+        in_radius /= 1000   '[m]
 
-        RKH = 2 * PI * freq * (in_radius / 1000) / v_geluid
-        ' MessageBox.Show(RKH.ToString)
+        RKH = 2 * PI * freq * in_radius / v_geluid
         dl = 10 * Log10(2.3 * RKH ^ 2 / (1 + 2.3 * RKH ^ 2))
         Return (dl)
     End Function
@@ -2916,14 +2963,14 @@ Public Class Form1
             End If
 
             '--------------- Open Suction reduction-------------
-            Open_suction_red(0) = dL_open_discharge(63)
-            Open_suction_red(1) = dL_open_discharge(125)
-            Open_suction_red(2) = dL_open_discharge(250)
-            Open_suction_red(3) = dL_open_discharge(500)
-            Open_suction_red(4) = dL_open_discharge(1000)
-            Open_suction_red(5) = dL_open_discharge(2000)
-            Open_suction_red(6) = dL_open_discharge(4000)
-            Open_suction_red(7) = dL_open_discharge(8000)
+            Open_suction_red(0) = dL_open_suction(63)
+            Open_suction_red(1) = dL_open_suction(125)
+            Open_suction_red(2) = dL_open_suction(250)
+            Open_suction_red(3) = dL_open_suction(500)
+            Open_suction_red(4) = dL_open_suction(1000)
+            Open_suction_red(5) = dL_open_suction(2000)
+            Open_suction_red(6) = dL_open_suction(4000)
+            Open_suction_red(7) = dL_open_suction(8000)
 
             If CheckBox12.Checked Then  'Open suction 
                 Label356.Text = "Free Suction Power (SWL)"
@@ -3115,10 +3162,6 @@ Public Class Form1
     Private Sub Calc_stage(ByRef y As Stage)
         Dim area_uitlaat_flens As Double
 
-        '---------- snelheden inlaat en uitlaat----------------
-        '---Note; Voor Q1 en Q2 speelt het sg geen rol !!!!!!!!!!
-        '------------------------------------------------------
-        y.zuig_dia = Round(Tschets(y.Typ).Tdata(3) * y.Dia1 / y.Dia0, 0)        'Zuigmond diameter.
         y.in_velos = y.Q1 / (PI / 4 * (y.zuig_dia / 1000) ^ 2)                  'Zuigmond snelheid [m/s]
 
         y.uitlaat_h = Round(Tschets(y.Typ).Tdata(4) * y.Dia1 / y.Dia0, 0)       'Uitlaat hoogte inw.[mm]
@@ -3135,7 +3178,7 @@ Public Class Form1
         y.delta_pt = y.Pt2 - y.Pt1  'Drukverhoging waaier [Pa] total
         y.delta_ps = y.Ps2 - y.Ps1  'Drukverhoging waaier [Pa] static
 
-        y.Eff = y.Q1 * y.Pt2 / (y.Power * 1000)                                    'Eff =Press*Volume/Power
+        y.Eff = y.Q1 * y.Pt2 / (y.Power * 1000)                                     'Eff =Press*Volume/Power
 
 
         y.T2 = y.T1 + (y.Power * 3600 / (cp_air * y.Qkg))                           'Temperature outlet flange [celsius]
@@ -3152,8 +3195,6 @@ Public Class Form1
 
     Private Sub calc_loop_loss(ByRef x As Stage)
         Dim phi, area_omloop As Double
-
-        x.zuig_dia = Round(Tschets(x.Typ).Tdata(3) * x.Dia1 / x.Dia0, 0)         'Zuigmond diameter.
 
         '--------------------- gegevens omloop --------------------------
         x.uitlaat_h = Round(Tschets(x.Typ).Tdata(4) * x.Dia1 / x.Dia0, 0)       'Uitlaat hoogte inw.[mm]
