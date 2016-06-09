@@ -2671,34 +2671,15 @@ Public Class Form1
         Return (dl)
     End Function
     'VDI 3731 OPEN Suction-Discharge gleigung 20
-    Function dL_open_discharge(freq As Double)
-        Dim dl, RKH, uit_b, uit_h, uit_radius, v_geluid As Double
+    Function dL_open_pipe(freq As Double, diameter As Double)
+        Dim dl, RKH, v_geluid, radius As Double
 
-        Double.TryParse(TextBox160.Text, uit_b)     'Uitlaat breedte
-        Double.TryParse(TextBox161.Text, uit_h)     'Uitlaat hoogte
         Double.TryParse(TextBox347.Text, v_geluid)  'geluidsnelheid
-        uit_b /= 1000   '[m]
-        uit_h /= 1000   '[m]
-
-        uit_radius = 2 * (uit_b * uit_h) / (2 * uit_b + 2 * uit_h) 'Hydraulische radius [m]
-        RKH = 2 * PI * freq * uit_radius / v_geluid
+        radius = diameter / 2
+        RKH = 2 * PI * freq * radius / v_geluid
         dl = 10 * Log10(2.3 * RKH ^ 2 / (1 + 2.3 * RKH ^ 2))
         Return (dl)
     End Function
-
-    'VDI 3731 OPEN Suction-Discharge gleigung 20
-    Function dL_open_suction(freq As Double)
-        Dim dl, RKH, in_radius, v_geluid As Double
-
-        Double.TryParse(TextBox347.Text, v_geluid)      'geluidsnelheid
-        Double.TryParse(TextBox159.Text, in_radius)     'Inlet diameter
-        in_radius /= 1000   '[m]
-
-        RKH = 2 * PI * freq * in_radius / v_geluid
-        dl = 10 * Log10(2.3 * RKH ^ 2 / (1 + 2.3 * RKH ^ 2))
-        Return (dl)
-    End Function
-    'Add the octaves
     Private Function add_decibels(snd As Double())
         Dim Ltot As Double = 0
         Dim i As Integer
@@ -2941,15 +2922,23 @@ Public Class Form1
             '--------------- Open discharge reduction-------------
             Dim Open_disch_red(9) As Double
             Dim Open_suction_red(9) As Double
+            Dim uit_b, uit_h, dia_uit As Double
 
-            Open_disch_red(0) = dL_open_discharge(63)
-            Open_disch_red(1) = dL_open_discharge(125)
-            Open_disch_red(2) = dL_open_discharge(250)
-            Open_disch_red(3) = dL_open_discharge(500)
-            Open_disch_red(4) = dL_open_discharge(1000)
-            Open_disch_red(5) = dL_open_discharge(2000)
-            Open_disch_red(6) = dL_open_discharge(4000)
-            Open_disch_red(7) = dL_open_discharge(8000)
+
+            Double.TryParse(TextBox160.Text, uit_b)                 'Uitlaat breedte [mm]
+            Double.TryParse(TextBox161.Text, uit_h)                 'Uitlaat hoogte [mm]
+            uit_b /= 1000   '[m]
+            uit_h /= 1000   '[m]
+            dia_uit = 2 * uit_b * uit_h / (uit_b + uit_h)           'Hydraulische diameter [m]
+
+            Open_disch_red(0) = dL_open_pipe(63, dia_uit)
+            Open_disch_red(1) = dL_open_pipe(125, dia_uit)
+            Open_disch_red(2) = dL_open_pipe(250, dia_uit)
+            Open_disch_red(3) = dL_open_pipe(500, dia_uit)
+            Open_disch_red(4) = dL_open_pipe(1000, dia_uit)
+            Open_disch_red(5) = dL_open_pipe(2000, dia_uit)
+            Open_disch_red(6) = dL_open_pipe(4000, dia_uit)
+            Open_disch_red(7) = dL_open_pipe(8000, dia_uit)
 
             If CheckBox11.Checked Then  'Open discharge 
                 Label361.Text = "Free Discharge Power (SWL)"
@@ -2963,14 +2952,17 @@ Public Class Form1
             End If
 
             '--------------- Open Suction reduction-------------
-            Open_suction_red(0) = dL_open_suction(63)
-            Open_suction_red(1) = dL_open_suction(125)
-            Open_suction_red(2) = dL_open_suction(250)
-            Open_suction_red(3) = dL_open_suction(500)
-            Open_suction_red(4) = dL_open_suction(1000)
-            Open_suction_red(5) = dL_open_suction(2000)
-            Open_suction_red(6) = dL_open_suction(4000)
-            Open_suction_red(7) = dL_open_suction(8000)
+            Double.TryParse(TextBox159.Text, dia_uit)                   'Inlet diameter
+            dia_uit /= 1000 * 2                                         '[m]
+
+            Open_suction_red(0) = dL_open_pipe(63, dia_uit)
+            Open_suction_red(1) = dL_open_pipe(125, dia_uit)
+            Open_suction_red(2) = dL_open_pipe(250, dia_uit)
+            Open_suction_red(3) = dL_open_pipe(500, dia_uit)
+            Open_suction_red(4) = dL_open_pipe(1000, dia_uit)
+            Open_suction_red(5) = dL_open_pipe(2000, dia_uit)
+            Open_suction_red(6) = dL_open_pipe(4000, dia_uit)
+            Open_suction_red(7) = dL_open_pipe(8000, dia_uit)
 
             If CheckBox12.Checked Then  'Open suction 
                 Label356.Text = "Free Suction Power (SWL)"
