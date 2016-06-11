@@ -226,6 +226,24 @@ Public Class Form1
      "95; 2825; 43.5",
      "100; 2974; 42"}
 
+    'Vane Control 15;30;45;55;60;65;70;75;80;85% OPEN
+    Public Shared Vane_control() As String = {
+    "1.0;1.0;1.0;1.0;0.996;0.992;0.986;0.97;0.9421965;0.79075144",
+    "1.0;1.0;0.995;0.986;0.976;0.965;0.9477866;0.9006810;0.8427922;0.50227014",
+    "1.0;1.0;0.988;0.965;0.94;0.923588039;0.8881506;0.8056478;0.6555924;0.00553709",
+    "1.0;1.0;0.97189189;0.937;0.885405405;0.853513513;0.7913513;0.6616216;0.3702702;0.0",
+    "0.9898882;0.9850984;0.94784459;0.895156998;0.812666311;0.764768493;0.6599254;0.4693986;0.0510910;0.0",
+    "0.9800646;0.9585129;0.90140086;0.827047413;0.716594827;0.649784482;0.5118534;0.2359913;0.0;0.0",
+    "0.9731243;0.9283314;0.84546472;0.734042553;0.594624860;0.497200447;0.3202687;0.015;0.0;0.0",
+    "0.9650266;0.8998221;0.78541790;0.630112625;0.439834024;0.289863663;0.0960284;0.0;0.0;0.0",
+    "0.9571611;0.8631713;0.71867007;0.517902813;0.264705882;0.063938618;0.0;0.0;0.0;0.0",
+    "0.9444053;0.8198451;0.62350457;0.376495425;0.042223786;0.0;0.0;0.0;0.0;0.0",
+    "0.9124605;0.7586750;0.50315457;0.164826498;0.0;0.0;0.0;0.0;0.0;0.0",
+    "0.8828413;0.6826568;0.31365313;0.0;0.0;0.0;0.0;0.0;0.0;0.0",
+    "0.8403171;0.5571913;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0",
+    "0.7399103;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0"}
+    Dim IVC(10, 14) As Double 'IVC(% opening, meetpunten) 
+
     'Db loss voor ducting per meter
     Public Shared Duct_attenuation() As String = {
      "6x6 ;   0.30; 0.2; 0.1;  0.1;  0.1; 0.1; 0.1; 0.1",
@@ -406,7 +424,7 @@ Public Class Form1
     Dim Springstiff_1, Springstiff_2, Springstiff_3 As Double   'Torsional analyses
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Dim hh As Integer
+        Dim hh, jj As Integer
         Dim words() As String
 
         fill_array_T_schetsen()                     'Init T-schetsen info in de array plaatsen
@@ -455,6 +473,14 @@ Public Class Form1
             words = inlet_damper(hh).Split(";")
             ComboBox5.Items.Add(words(0))
             ComboBox10.Items.Add(words(0))
+        Next hh
+
+        '-------------- Vane Control Array (% opening, punten) -------------------
+        For hh = 0 To (Vane_control.Length - 1)     'Fill array Vane Control
+            words = Vane_control(hh).Split(";")
+            For jj = 0 To 9
+                Double.TryParse(words(jj), IVC(jj, hh))
+            Next jj
         Next hh
 
         '----------------- prevent out of bounds------------------
@@ -1605,14 +1631,13 @@ Public Class Form1
             Tschets(j).Tverm_scaled = Tschets(0).Tverm_scaled           'Rendement[%]
             Tschets(j).Teff_scaled = Tschets(0).Teff_scaled             'Vermogen[kW]
         Next
-
     End Sub
 
     Private Sub draw_chart1(Tschets_no As Integer)
         Dim hh As Integer
         Dim debiet As Double
         Dim Q_target, P_target As Double
-        Dim Weerstand_coefficient, p_loss_line As Double
+        Dim Weerstand_Coefficient_line, p_loss_line As Double
 
         If (Tschets_no < (ComboBox1.Items.Count)) And (Tschets_no >= 0) Then
             Try
@@ -1621,28 +1646,33 @@ Public Class Form1
                 Chart1.ChartAreas.Clear()
                 Chart1.Titles.Clear()
 
-
+                '----------- Line type-----------
                 Chart1.ChartAreas.Add("ChartArea0")
-                For hh = 0 To 5
+                For hh = 0 To 16
                     Chart1.Series.Add("Series" & hh.ToString)
                     Chart1.Series(hh).ChartArea = "ChartArea0"
-                    Chart1.Series(hh).ChartType = DataVisualization.Charting.SeriesChartType.Line
+                    Chart1.Series(hh).ChartType = SeriesChartType.Line
                 Next
-
 
                 Chart1.Titles.Add(Tschets(Tschets_no).Tname)
                 Chart1.Titles(0).Font = New Font("Arial", 16, System.Drawing.FontStyle.Bold)
 
+                '--------- Legend names ----------------
                 Chart1.Series(0).Name = "P totaal [mBar]"
                 Chart1.Series(1).Name = "Rendement [%]"
                 Chart1.Series(2).Name = "As vermogen [kW]"
                 Chart1.Series(3).Name = "Line resistance"
                 Chart1.Series(4).Name = "Marker"
                 Chart1.Series(5).Name = "P static [mBar]"
+                Chart1.Series(6).Name = "Vane-Control"
 
-                Chart1.Series(0).Color = Color.LightGreen        'Total pressure
+                '--------- Legend visible ----------------
+                Chart1.Series(4).IsVisibleInLegend = False
+                Chart1.Series(6).IsVisibleInLegend = False
+
+                Chart1.Series(0).Color = Color.LightGreen   'Total pressure
                 Chart1.Series(1).Color = Color.Red          'Efficiency
-                Chart1.Series(2).Color = Color.LightGreen        'Power
+                Chart1.Series(2).Color = Color.LightGreen   'Power
                 Chart1.Series(3).Color = Color.Blue         'marker
                 Chart1.Series(4).Color = Color.LightBlue    'Line resistance
                 Chart1.Series(5).Color = Color.Blue         'Static pressure
@@ -1655,17 +1685,22 @@ Public Class Form1
                     Chart1.Series(5).IsValueShownAsLabel = True
                 End If
 
-                Chart1.Series(0).BorderWidth = 1    'Total pressure
-                Chart1.Series(1).BorderWidth = 1
-                Chart1.Series(2).BorderWidth = 1
-                Chart1.Series(3).BorderWidth = 1
-                Chart1.Series(4).BorderWidth = 1
+                '------- line thickness-------------
+                For hh = 0 To 16
+                    Chart1.Series(hh).BorderWidth = 1
+                Next
                 Chart1.Series(5).BorderWidth = 3    'Static pressure
 
                 Chart1.ChartAreas("ChartArea0").AxisX.Minimum = 0
                 Chart1.ChartAreas("ChartArea0").AxisX.MinorTickMark.Enabled = True
                 Chart1.ChartAreas("ChartArea0").AxisY.MinorTickMark.Enabled = True
                 Chart1.ChartAreas("ChartArea0").AxisY2.MinorTickMark.Enabled = True
+
+                '------------- Grid --------------------------
+                'Chart1.ChartAreas("ChartArea0").AxisY.MajorGrid.Enabled = True
+                'Chart1.ChartAreas("ChartArea0").AxisX.MajorGrid.Enabled = True
+                'Chart1.ChartAreas("ChartArea0").AxisY.MinorGrid.Enabled = True
+                'Chart1.ChartAreas("ChartArea0").AxisX.MinorGrid.Enabled = True
 
                 '---------------- fan target info---------------------
                 TextBox149.Text = Round(G_Debiet_z_act_hr, 0).ToString  'Debiet [Am3/hr]
@@ -1683,6 +1718,7 @@ Public Class Form1
                 Chart1.Series(3).YAxisType = AxisType.Primary
                 Chart1.Series(4).YAxisType = AxisType.Primary
                 Chart1.Series(5).YAxisType = AxisType.Primary
+                Chart1.Series(6).YAxisType = AxisType.Primary
 
 
                 '------------------ Grafiek tekst en target ---------------------
@@ -1725,27 +1761,55 @@ Public Class Form1
                     Chart1.Series(3).Points.AddXY(Q_target, P_target)
                     Chart1.Series(3).Points(0).MarkerStyle = DataVisualization.Charting.MarkerStyle.Star10
                     Chart1.Series(3).Points(0).MarkerSize = 20
-                    '---------------- add the duct resistance line-----------------------
-                    Weerstand_coefficient = P_target * 2 / (NumericUpDown12.Value * Q_target ^ 2)
 
+                    '---------------- add the duct resistance line-----------------------
+                    Weerstand_Coefficient_line = P_target * 2 / (NumericUpDown12.Value * Q_target ^ 2)
                     For hh = 0 To 50
                         debiet = case_x_flow(hh, 0)
                         If CheckBox2.Checked Then debiet = Round(debiet * 3600, 1)      'Per uur
-                        p_loss_line = 0.5 * Weerstand_coefficient * NumericUpDown12.Value * debiet ^ 2
+
                         If CheckBox10.Checked Then
+                            p_loss_line = 0.5 * Weerstand_Coefficient_line * NumericUpDown12.Value * debiet ^ 2
                             Chart1.Series(4).Points.AddXY(debiet, p_loss_line)
                         End If
                     Next
                 End If
 
+                '-------------------Vane Control lines ---------------------
+                If CheckBox13.Checked Then
+                    Chart1.Series(6).YAxisType = AxisType.Primary
+                    'Chart1.Legends("Legend1").Position.Auto = False
+                    ' Chart1.Legends("Legend1").Position = New ElementPosition(30, 5, 100, 20)
+
+                    '---------------- add the Vane-Control lines-----------------------
+                    Dim phi_VC = New Double() {0.2, 0.5, 1.25, 3.125, 7.81, 19.5, 48.8}     'Pressure loss coeff (*= 2.5)
+                    For jj = 0 To 6
+                        For hh = 0 To 50
+                            debiet = case_x_flow(hh, 0)
+                            If CheckBox2.Checked Then debiet = Round(debiet * 3600, 1)      'Per uur
+                            P_loss_VC(jj + 6, phi_VC(jj), hh, debiet)                       'Calc and plot to chart
+                        Next
+                    Next
+                End If
                 Chart1.Refresh()
             Catch ex As Exception
                 'MessageBox.Show(ex.Message &"Line 1400")  ' Show the exception's message.
             End Try
         End If
     End Sub
+    'Pressure loss over the Vane control
+    Private Sub P_loss_VC(series As Integer, phi As Double, hh As Integer, debiet As Double)
+        Dim P_loss, fan_ptotal As Double
 
-    'Write to Word
+        Chart1.Series(series).Color = Color.Black           'Static pressure
+
+        P_loss = 0.5 * phi * NumericUpDown12.Value * debiet ^ 2
+        fan_ptotal = case_x_Pstat(hh, 0)
+        If P_loss < fan_ptotal * 0.8 Then
+            Chart1.Series(series).Points.AddXY(debiet, Round(fan_ptotal - P_loss, 1))
+        End If
+    End Sub
+    'Write to Word document
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
         write_to_word()
     End Sub
@@ -2953,7 +3017,7 @@ Public Class Form1
 
             '--------------- Open Suction reduction-------------
             Double.TryParse(TextBox159.Text, dia_uit)                   'Inlet diameter
-            dia_uit /= 1000 * 2                                         '[m]
+            dia_uit /= 1000                                             '[m]
 
             Open_suction_red(0) = dL_open_pipe(63, dia_uit)
             Open_suction_red(1) = dL_open_pipe(125, dia_uit)
@@ -3131,7 +3195,7 @@ Public Class Form1
         TextBox145.Text = Round(spalt_loss, 1).ToString     '[kg/hr]
     End Sub
 
-    Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click, CheckBox6.CheckedChanged, CheckBox3.CheckedChanged, CheckBox2.CheckedChanged, CheckBox1.CheckedChanged, TabPage3.Enter, NumericUpDown9.ValueChanged, NumericUpDown10.ValueChanged, RadioButton9.CheckedChanged, RadioButton11.CheckedChanged, RadioButton10.CheckedChanged, CheckBox7.CheckedChanged, CheckBox8.CheckedChanged, CheckBox10.CheckedChanged
+    Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click, CheckBox6.CheckedChanged, CheckBox3.CheckedChanged, CheckBox2.CheckedChanged, CheckBox1.CheckedChanged, TabPage3.Enter, NumericUpDown9.ValueChanged, NumericUpDown10.ValueChanged, RadioButton9.CheckedChanged, RadioButton11.CheckedChanged, RadioButton10.CheckedChanged, CheckBox7.CheckedChanged, CheckBox8.CheckedChanged, CheckBox10.CheckedChanged, CheckBox13.CheckedChanged
         NumericUpDown33.Value = NumericUpDown9.Value
         If NumericUpDown33.Value > 2300 Then
             NumericUpDown33.BackColor = Color.Red

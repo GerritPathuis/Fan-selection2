@@ -263,6 +263,7 @@ Partial Class Form1
         Me.NumericUpDown10 = New System.Windows.Forms.NumericUpDown()
         Me.Label98 = New System.Windows.Forms.Label()
         Me.GroupBox38 = New System.Windows.Forms.GroupBox()
+        Me.CheckBox13 = New System.Windows.Forms.CheckBox()
         Me.CheckBox10 = New System.Windows.Forms.CheckBox()
         Me.CheckBox8 = New System.Windows.Forms.CheckBox()
         Me.CheckBox7 = New System.Windows.Forms.CheckBox()
@@ -3776,6 +3777,7 @@ Partial Class Form1
         '
         'GroupBox38
         '
+        Me.GroupBox38.Controls.Add(Me.CheckBox13)
         Me.GroupBox38.Controls.Add(Me.CheckBox10)
         Me.GroupBox38.Controls.Add(Me.CheckBox8)
         Me.GroupBox38.Controls.Add(Me.CheckBox7)
@@ -3785,15 +3787,27 @@ Partial Class Form1
         Me.GroupBox38.Controls.Add(Me.CheckBox1)
         Me.GroupBox38.Location = New System.Drawing.Point(1148, 357)
         Me.GroupBox38.Name = "GroupBox38"
-        Me.GroupBox38.Size = New System.Drawing.Size(152, 152)
+        Me.GroupBox38.Size = New System.Drawing.Size(152, 166)
         Me.GroupBox38.TabIndex = 18
         Me.GroupBox38.TabStop = False
         Me.GroupBox38.Text = "Grafiek presentatie"
         '
+        'CheckBox13
+        '
+        Me.CheckBox13.AutoSize = True
+        Me.CheckBox13.Checked = True
+        Me.CheckBox13.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.CheckBox13.Location = New System.Drawing.Point(10, 138)
+        Me.CheckBox13.Name = "CheckBox13"
+        Me.CheckBox13.Size = New System.Drawing.Size(104, 17)
+        Me.CheckBox13.TabIndex = 20
+        Me.CheckBox13.Text = "Vane Control On"
+        Me.CheckBox13.UseVisualStyleBackColor = True
+        '
         'CheckBox10
         '
         Me.CheckBox10.AutoSize = True
-        Me.CheckBox10.Location = New System.Drawing.Point(10, 73)
+        Me.CheckBox10.Location = New System.Drawing.Point(10, 70)
         Me.CheckBox10.Name = "CheckBox10"
         Me.CheckBox10.Size = New System.Drawing.Size(93, 17)
         Me.CheckBox10.TabIndex = 19
@@ -3803,7 +3817,7 @@ Partial Class Form1
         'CheckBox8
         '
         Me.CheckBox8.AutoSize = True
-        Me.CheckBox8.Location = New System.Drawing.Point(10, 127)
+        Me.CheckBox8.Location = New System.Drawing.Point(10, 121)
         Me.CheckBox8.Name = "CheckBox8"
         Me.CheckBox8.Size = New System.Drawing.Size(73, 17)
         Me.CheckBox8.TabIndex = 18
@@ -3813,7 +3827,7 @@ Partial Class Form1
         'CheckBox7
         '
         Me.CheckBox7.AutoSize = True
-        Me.CheckBox7.Location = New System.Drawing.Point(10, 109)
+        Me.CheckBox7.Location = New System.Drawing.Point(10, 104)
         Me.CheckBox7.Name = "CheckBox7"
         Me.CheckBox7.Size = New System.Drawing.Size(89, 17)
         Me.CheckBox7.TabIndex = 17
@@ -3823,7 +3837,7 @@ Partial Class Form1
         'CheckBox6
         '
         Me.CheckBox6.AutoSize = True
-        Me.CheckBox6.Location = New System.Drawing.Point(10, 91)
+        Me.CheckBox6.Location = New System.Drawing.Point(10, 87)
         Me.CheckBox6.Name = "CheckBox6"
         Me.CheckBox6.Size = New System.Drawing.Size(74, 17)
         Me.CheckBox6.TabIndex = 16
@@ -3835,7 +3849,7 @@ Partial Class Form1
         Me.CheckBox3.AutoSize = True
         Me.CheckBox3.Checked = True
         Me.CheckBox3.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBox3.Location = New System.Drawing.Point(10, 55)
+        Me.CheckBox3.Location = New System.Drawing.Point(10, 53)
         Me.CheckBox3.Name = "CheckBox3"
         Me.CheckBox3.Size = New System.Drawing.Size(92, 17)
         Me.CheckBox3.TabIndex = 15
@@ -3845,7 +3859,7 @@ Partial Class Form1
         'CheckBox2
         '
         Me.CheckBox2.AutoSize = True
-        Me.CheckBox2.Location = New System.Drawing.Point(10, 37)
+        Me.CheckBox2.Location = New System.Drawing.Point(10, 36)
         Me.CheckBox2.Name = "CheckBox2"
         Me.CheckBox2.Size = New System.Drawing.Size(97, 17)
         Me.CheckBox2.TabIndex = 14
@@ -13501,4 +13515,5 @@ Partial Class Form1
     Friend WithEvents Panel4 As Panel
     Friend WithEvents Panel3 As Panel
     Friend WithEvents Label348 As Label
+    Friend WithEvents CheckBox13 As CheckBox
 End Class
