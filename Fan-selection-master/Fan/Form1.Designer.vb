@@ -1022,6 +1022,7 @@ Partial Class Form1
         Me.NumericUpDown78 = New System.Windows.Forms.NumericUpDown()
         Me.Button21 = New System.Windows.Forms.Button()
         Me.TextBox287 = New System.Windows.Forms.TextBox()
+        Me.CheckBox14 = New System.Windows.Forms.CheckBox()
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.GroupBox35.SuspendLayout()
@@ -3671,7 +3672,7 @@ Partial Class Form1
         Me.GroupBox42.Controls.Add(Me.RadioButton11)
         Me.GroupBox42.Controls.Add(Me.RadioButton10)
         Me.GroupBox42.Controls.Add(Me.RadioButton9)
-        Me.GroupBox42.Location = New System.Drawing.Point(1148, 529)
+        Me.GroupBox42.Location = New System.Drawing.Point(1148, 544)
         Me.GroupBox42.Name = "GroupBox42"
         Me.GroupBox42.Size = New System.Drawing.Size(152, 38)
         Me.GroupBox42.TabIndex = 21
@@ -3777,6 +3778,7 @@ Partial Class Form1
         '
         'GroupBox38
         '
+        Me.GroupBox38.Controls.Add(Me.CheckBox14)
         Me.GroupBox38.Controls.Add(Me.CheckBox13)
         Me.GroupBox38.Controls.Add(Me.CheckBox10)
         Me.GroupBox38.Controls.Add(Me.CheckBox8)
@@ -3787,7 +3789,7 @@ Partial Class Form1
         Me.GroupBox38.Controls.Add(Me.CheckBox1)
         Me.GroupBox38.Location = New System.Drawing.Point(1148, 357)
         Me.GroupBox38.Name = "GroupBox38"
-        Me.GroupBox38.Size = New System.Drawing.Size(152, 166)
+        Me.GroupBox38.Size = New System.Drawing.Size(152, 181)
         Me.GroupBox38.TabIndex = 18
         Me.GroupBox38.TabStop = False
         Me.GroupBox38.Text = "Grafiek presentatie"
@@ -3799,9 +3801,9 @@ Partial Class Form1
         Me.CheckBox13.CheckState = System.Windows.Forms.CheckState.Checked
         Me.CheckBox13.Location = New System.Drawing.Point(10, 138)
         Me.CheckBox13.Name = "CheckBox13"
-        Me.CheckBox13.Size = New System.Drawing.Size(104, 17)
+        Me.CheckBox13.Size = New System.Drawing.Size(127, 17)
         Me.CheckBox13.TabIndex = 20
-        Me.CheckBox13.Text = "Vane Control On"
+        Me.CheckBox13.Text = "Inlet Vane Control On"
         Me.CheckBox13.UseVisualStyleBackColor = True
         '
         'CheckBox10
@@ -3809,9 +3811,9 @@ Partial Class Form1
         Me.CheckBox10.AutoSize = True
         Me.CheckBox10.Location = New System.Drawing.Point(10, 70)
         Me.CheckBox10.Name = "CheckBox10"
-        Me.CheckBox10.Size = New System.Drawing.Size(93, 17)
+        Me.CheckBox10.Size = New System.Drawing.Size(141, 17)
         Me.CheckBox10.TabIndex = 19
-        Me.CheckBox10.Text = "Target line On"
+        Me.CheckBox10.Text = "Duct Resistance line On"
         Me.CheckBox10.UseVisualStyleBackColor = True
         '
         'CheckBox8
@@ -3978,7 +3980,7 @@ Partial Class Form1
         '
         'Button3
         '
-        Me.Button3.Location = New System.Drawing.Point(1148, 573)
+        Me.Button3.Location = New System.Drawing.Point(1148, 588)
         Me.Button3.Name = "Button3"
         Me.Button3.Size = New System.Drawing.Size(152, 30)
         Me.Button3.TabIndex = 4
@@ -12286,6 +12288,18 @@ Partial Class Form1
         Me.TextBox287.TabIndex = 107
         Me.TextBox287.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
+        'CheckBox14
+        '
+        Me.CheckBox14.AutoSize = True
+        Me.CheckBox14.Checked = True
+        Me.CheckBox14.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.CheckBox14.Location = New System.Drawing.Point(10, 157)
+        Me.CheckBox14.Name = "CheckBox14"
+        Me.CheckBox14.Size = New System.Drawing.Size(139, 17)
+        Me.CheckBox14.TabIndex = 21
+        Me.CheckBox14.Text = "Inlet Damper Control On"
+        Me.CheckBox14.UseVisualStyleBackColor = True
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -13516,4 +13530,5 @@ Partial Class Form1
     Friend WithEvents Panel3 As Panel
     Friend WithEvents Label348 As Label
     Friend WithEvents CheckBox13 As CheckBox
+    Friend WithEvents CheckBox14 As CheckBox
 End Class

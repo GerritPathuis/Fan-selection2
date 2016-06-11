@@ -1739,7 +1739,7 @@ Public Class Form1
                     Chart1.Series(3).Points(0).MarkerStyle = DataVisualization.Charting.MarkerStyle.Star10
                     Chart1.Series(3).Points(0).MarkerSize = 20
 
-                    '---------------- add the duct resistance line-----------------------
+                    '---------------- add the Duct resistance line-----------------------
                     Weerstand_Coefficient_line = P_target * 2 / (NumericUpDown12.Value * Q_target ^ 2)
                     For hh = 0 To 50
                         debiet = case_x_flow(hh, 0)
@@ -1747,18 +1747,18 @@ Public Class Form1
 
                         If CheckBox10.Checked Then
                             p_loss_line = 0.5 * Weerstand_Coefficient_line * NumericUpDown12.Value * debiet ^ 2
-                            Chart1.Series(4).Points.AddXY(debiet, p_loss_line)
+                            If p_loss_line < P_target * 1.1 Then Chart1.Series(4).Points.AddXY(debiet, p_loss_line)
                         End If
                     Next
                 End If
 
-                '-------------------Vane Control lines ---------------------
+                '-------------------Inlet Vane Control lines ---------------------
                 If CheckBox13.Checked Then
                     Chart1.Series(6).YAxisType = AxisType.Primary
 
-                    '---------------- add the Vane-Control lines-----------------------
+                    '---------------- add the Inlet Vane-Control lines-----------------------
                     Dim VC_phi = New Double() {0.2, 0.5, 1.25, 3.125, 7.81, 19.5, 48.8}     'Pressure loss coeff (*= 2.5)
-                    Dim VC_open = New String() {"10%", "20%", "30%", "40%", "50%", "60%", "70%"}
+                    Dim VC_open = New String() {"90%", "80%", "70%", "60%", "50%", "40%", "30%"}
 
                     Dim point_count As Integer
                     For jj = 0 To 6
@@ -1766,7 +1766,7 @@ Public Class Form1
                         For hh = 0 To 50
                             debiet = case_x_flow(hh, 0)
                             If CheckBox2.Checked Then debiet = Round(debiet * 3600, 1)      'Per uur
-                            P_loss_VC(jj + 6, VC_phi(jj), hh, debiet)                       'Calc and plot to chart
+                            P_loss_IVC(jj + 6, VC_phi(jj), hh, debiet)                       'Calc and plot to chart
                         Next
                         point_count = Chart1.Series(jj + 6).Points.Count - 1                'Last plotted point
                         Chart1.Series(jj + 6).Points(point_count).Label = VC_open(jj)       'Add the VC opening angle 
@@ -1778,8 +1778,8 @@ Public Class Form1
             End Try
         End If
     End Sub
-    'Pressure loss over the Vane control
-    Private Sub P_loss_VC(series As Integer, phi As Double, hh As Integer, debiet As Double)
+    'Pressure loss over the Inlet Vane control
+    Private Sub P_loss_IVC(series As Integer, phi As Double, hh As Integer, debiet As Double)
         Dim P_loss, fan_ptotal As Double
 
         Chart1.Series(series).Color = Color.Black           'Static pressure
