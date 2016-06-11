@@ -226,23 +226,6 @@ Public Class Form1
      "95; 2825; 43.5",
      "100; 2974; 42"}
 
-    'Vane Control 15;30;45;55;60;65;70;75;80;85% OPEN
-    Public Shared Vane_control() As String = {
-    "1.0;1.0;1.0;1.0;0.996;0.992;0.986;0.97;0.9421965;0.79075144",
-    "1.0;1.0;0.995;0.986;0.976;0.965;0.9477866;0.9006810;0.8427922;0.50227014",
-    "1.0;1.0;0.988;0.965;0.94;0.923588039;0.8881506;0.8056478;0.6555924;0.00553709",
-    "1.0;1.0;0.97189189;0.937;0.885405405;0.853513513;0.7913513;0.6616216;0.3702702;0.0",
-    "0.9898882;0.9850984;0.94784459;0.895156998;0.812666311;0.764768493;0.6599254;0.4693986;0.0510910;0.0",
-    "0.9800646;0.9585129;0.90140086;0.827047413;0.716594827;0.649784482;0.5118534;0.2359913;0.0;0.0",
-    "0.9731243;0.9283314;0.84546472;0.734042553;0.594624860;0.497200447;0.3202687;0.015;0.0;0.0",
-    "0.9650266;0.8998221;0.78541790;0.630112625;0.439834024;0.289863663;0.0960284;0.0;0.0;0.0",
-    "0.9571611;0.8631713;0.71867007;0.517902813;0.264705882;0.063938618;0.0;0.0;0.0;0.0",
-    "0.9444053;0.8198451;0.62350457;0.376495425;0.042223786;0.0;0.0;0.0;0.0;0.0",
-    "0.9124605;0.7586750;0.50315457;0.164826498;0.0;0.0;0.0;0.0;0.0;0.0",
-    "0.8828413;0.6826568;0.31365313;0.0;0.0;0.0;0.0;0.0;0.0;0.0",
-    "0.8403171;0.5571913;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0",
-    "0.7399103;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0"}
-    Dim IVC(10, 14) As Double 'IVC(% opening, meetpunten) 
 
     'Db loss voor ducting per meter
     Public Shared Duct_attenuation() As String = {
@@ -424,7 +407,7 @@ Public Class Form1
     Dim Springstiff_1, Springstiff_2, Springstiff_3 As Double   'Torsional analyses
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Dim hh, jj As Integer
+        Dim hh As Integer
         Dim words() As String
 
         fill_array_T_schetsen()                     'Init T-schetsen info in de array plaatsen
@@ -473,14 +456,6 @@ Public Class Form1
             words = inlet_damper(hh).Split(";")
             ComboBox5.Items.Add(words(0))
             ComboBox10.Items.Add(words(0))
-        Next hh
-
-        '-------------- Vane Control Array (% opening, punten) -------------------
-        For hh = 0 To (Vane_control.Length - 1)     'Fill array Vane Control
-            words = Vane_control(hh).Split(";")
-            For jj = 0 To 9
-                Double.TryParse(words(jj), IVC(jj, hh))
-            Next jj
         Next hh
 
         '----------------- prevent out of bounds------------------
@@ -1654,6 +1629,12 @@ Public Class Form1
                     Chart1.Series(hh).ChartType = SeriesChartType.Line
                 Next
 
+                '--------- Legend visible ----------------
+                Chart1.Series(4).IsVisibleInLegend = False          'Marker
+                For hh = 6 To 16
+                    Chart1.Series(hh).IsVisibleInLegend = False     'Vane control lines
+                Next
+
                 Chart1.Titles.Add(Tschets(Tschets_no).Tname)
                 Chart1.Titles(0).Font = New Font("Arial", 16, System.Drawing.FontStyle.Bold)
 
@@ -1665,10 +1646,6 @@ Public Class Form1
                 Chart1.Series(4).Name = "Marker"
                 Chart1.Series(5).Name = "P static [mBar]"
                 Chart1.Series(6).Name = "Vane-Control"
-
-                '--------- Legend visible ----------------
-                Chart1.Series(4).IsVisibleInLegend = False
-                Chart1.Series(6).IsVisibleInLegend = False
 
                 Chart1.Series(0).Color = Color.LightGreen   'Total pressure
                 Chart1.Series(1).Color = Color.Red          'Efficiency
@@ -1742,7 +1719,7 @@ Public Class Form1
                         Chart1.Series(5).Points.AddXY(debiet, Round(case_x_Pstat(hh, 0), 1))
 
                         If CheckBox7.Checked Then Chart1.Series(1).Points.AddXY(debiet, Round(case_x_Efficiency(hh), 1))    'efficiency
-                        If CheckBox8.Checked Then Chart1.Series(2).Points.AddXY(debiet, Round(case_x_Power(hh, 0), 1))         'Power
+                        If CheckBox8.Checked Then Chart1.Series(2).Points.AddXY(debiet, Round(case_x_Power(hh, 0), 1))      'Power
                     Next hh
                 Else                        'Fill chart with Tschets data
                     For hh = 0 To 10
@@ -1778,17 +1755,21 @@ Public Class Form1
                 '-------------------Vane Control lines ---------------------
                 If CheckBox13.Checked Then
                     Chart1.Series(6).YAxisType = AxisType.Primary
-                    'Chart1.Legends("Legend1").Position.Auto = False
-                    ' Chart1.Legends("Legend1").Position = New ElementPosition(30, 5, 100, 20)
 
                     '---------------- add the Vane-Control lines-----------------------
-                    Dim phi_VC = New Double() {0.2, 0.5, 1.25, 3.125, 7.81, 19.5, 48.8}     'Pressure loss coeff (*= 2.5)
+                    Dim VC_phi = New Double() {0.2, 0.5, 1.25, 3.125, 7.81, 19.5, 48.8}     'Pressure loss coeff (*= 2.5)
+                    Dim VC_open = New String() {"10%", "20%", "30%", "40%", "50%", "60%", "70%"}
+
+                    Dim point_count As Integer
                     For jj = 0 To 6
+                        Chart1.Series(jj + 6).SmartLabelStyle.Enabled = True
                         For hh = 0 To 50
                             debiet = case_x_flow(hh, 0)
                             If CheckBox2.Checked Then debiet = Round(debiet * 3600, 1)      'Per uur
-                            P_loss_VC(jj + 6, phi_VC(jj), hh, debiet)                       'Calc and plot to chart
+                            P_loss_VC(jj + 6, VC_phi(jj), hh, debiet)                       'Calc and plot to chart
                         Next
+                        point_count = Chart1.Series(jj + 6).Points.Count - 1                'Last plotted point
+                        Chart1.Series(jj + 6).Points(point_count).Label = VC_open(jj)       'Add the VC opening angle 
                     Next
                 End If
                 Chart1.Refresh()
