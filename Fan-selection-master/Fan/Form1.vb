@@ -1757,8 +1757,8 @@ Public Class Form1
                     Chart1.Series(6).YAxisType = AxisType.Primary
 
                     '---------------- add the Inlet Vane-Control lines-----------------------
-                    Dim VC_phi = New Double() {0.2, 0.5, 1.25, 3.125, 7.81, 19.5, 48.8}     'Pressure loss coeff (*= 2.5)
-                    Dim VC_open = New String() {"90%", "80%", "70%", "60%", "50%", "40%", "30%"}
+                    Dim VC_phi = New Double() {0.02, 0.04, 0.06, 0.08, 0.1, 0.12, 0.14}     'Pressure loss coeff (*= 2.5)
+                    Dim VC_open = New String() {"80", "70", "60", "50", "40", "30", "20"}
 
                     Dim point_count As Integer
                     For jj = 0 To 6
@@ -1766,10 +1766,10 @@ Public Class Form1
                         For hh = 0 To 50
                             debiet = case_x_flow(hh, 0)
                             If CheckBox2.Checked Then debiet = Round(debiet * 3600, 1)      'Per uur
-                            P_loss_IVC(jj + 6, VC_phi(jj), hh, debiet)                       'Calc and plot to chart
+                            P_loss_IVC(jj + 6, VC_phi(jj), hh, debiet, VC_open(jj))                       'Calc and plot to chart
                         Next
                         point_count = Chart1.Series(jj + 6).Points.Count - 1                'Last plotted point
-                        Chart1.Series(jj + 6).Points(point_count).Label = VC_open(jj)       'Add the VC opening angle 
+                        Chart1.Series(jj + 6).Points(point_count).Label = VC_open(jj) & " °" 'Add the VC opening angle 
                     Next
                 End If
                 Chart1.Refresh()
@@ -1779,12 +1779,16 @@ Public Class Form1
         End If
     End Sub
     'Pressure loss over the Inlet Vane control
-    Private Sub P_loss_IVC(series As Integer, phi As Double, hh As Integer, debiet As Double)
-        Dim P_loss, fan_ptotal As Double
+    Private Sub P_loss_IVC(series As Integer, phi As Double, hh As Integer, debiet As Double, alpha As Double)
+        Dim P_loss, fan_ptotal, ivc_area, ivc_speed, ivc_dia As Double
 
         Chart1.Series(series).Color = Color.Black           'Static pressure
 
-        P_loss = 0.5 * phi * NumericUpDown12.Value * debiet ^ 2
+        Double.TryParse(TextBox159.Text, ivc_dia)
+        ivc_dia /= 1000                                                     '[m] diameter
+        ivc_area = 3.14 / 4 * ivc_dia ^ 2 * Sin(alpha * PI / 180)           '[m2] open area
+        ivc_speed = debiet / ivc_area                                       '[m/s]
+        P_loss = 0.5 * phi * NumericUpDown12.Value * ivc_speed ^ 2          '[Pascal]
         fan_ptotal = case_x_Pstat(hh, 0)
         If P_loss < fan_ptotal * 0.8 Then
             Chart1.Series(series).Points.AddXY(debiet, Round(fan_ptotal - P_loss, 1))
