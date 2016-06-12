@@ -42,14 +42,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="VTK_fan_select.exe" size="553472">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="VTK_fan_select.exe" size="553984">
       <assemblyIdentity name="VTK_fan_select" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>sFAAD/D2KkyCdDwvs67R0uzCzi5l7F8gfclNMOib7Bw=</dsig:DigestValue>
+        <dsig:DigestValue>xdShHm/iQZbSqhREmFoeU5HCd4uiuIb5oqHT6tWmi60=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

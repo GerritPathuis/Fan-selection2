@@ -1627,6 +1627,7 @@ Public Class Form1
                     Chart1.Series.Add("Series" & hh.ToString)
                     Chart1.Series(hh).ChartArea = "ChartArea0"
                     Chart1.Series(hh).ChartType = SeriesChartType.Line
+                    Chart1.Series(hh).SmartLabelStyle.Enabled = True
                 Next
 
                 '--------- Legend visible ----------------
@@ -1721,6 +1722,11 @@ Public Class Form1
                         If CheckBox7.Checked Then Chart1.Series(1).Points.AddXY(debiet, Round(case_x_Efficiency(hh), 1))    'efficiency
                         If CheckBox8.Checked Then Chart1.Series(2).Points.AddXY(debiet, Round(case_x_Power(hh, 0), 1))      'Power
                     Next hh
+                    '----------- adding labels ----------------
+                    Chart1.Series(0).Points(45).Label = "P.total"
+                    Chart1.Series(5).Points(45).Label = "P.static"
+                    If CheckBox7.Checked Then Chart1.Series(1).Points(45).Label = "Efficiency"  'efficiency
+                    If CheckBox8.Checked Then Chart1.Series(2).Points(45).Label = "Power"       'Power
                 Else                        'Fill chart with Tschets data
                     For hh = 0 To 10
                         debiet = Tschets(Tschets_no).TFlow_scaled(hh)
@@ -1730,6 +1736,7 @@ Public Class Form1
                         If CheckBox7.Checked Then Chart1.Series(1).Points.AddXY(debiet, Round(Tschets(Tschets_no).Teff_scaled(hh), 1))
                         If CheckBox8.Checked Then Chart1.Series(2).Points.AddXY(debiet, Round(Tschets(Tschets_no).Tverm_scaled(hh), 1))
                     Next hh
+
                 End If
 
                 '-------------------Target dot ---------------------
@@ -1762,25 +1769,24 @@ Public Class Form1
 
                     Dim point_count As Integer
                     For jj = 0 To 6
-                        Chart1.Series(jj + 6).SmartLabelStyle.Enabled = True
                         For hh = 0 To 50
                             debiet = case_x_flow(hh, 0)
                             If CheckBox2.Checked Then debiet = Round(debiet * 3600, 1)      'Per uur
-                            P_loss_IVC(jj + 6, VC_phi(jj), hh, debiet, VC_open(jj))                       'Calc and plot to chart
+                            P_loss_IVC(jj + 6, VC_phi(jj), hh, debiet, VC_open(jj))         'Calc and plot to chart
                         Next
                         point_count = Chart1.Series(jj + 6).Points.Count - 1                'Last plotted point
-                        Chart1.Series(jj + 6).Points(point_count).Label = VC_open(jj) & " °" 'Add the VC opening angle 
+                        Chart1.Series(jj + 6).Points(point_count).Label = VC_open(jj) & "°" 'Add the VC opening angle 
                     Next
                 End If
                 Chart1.Refresh()
             Catch ex As Exception
-                'MessageBox.Show(ex.Message &"Line 1400")  ' Show the exception's message.
+                'MessageBox.Show(ex.Message & "Line 1780")  ' Show the exception's message.
             End Try
         End If
     End Sub
     'Pressure loss over the Inlet Vane control
     Private Sub P_loss_IVC(series As Integer, phi As Double, hh As Integer, debiet As Double, alpha As Double)
-        Dim P_loss, fan_ptotal, ivc_area, ivc_speed, ivc_dia As Double
+        Dim P_loss, fan_P_static, ivc_area, ivc_speed, ivc_dia As Double
 
         Chart1.Series(series).Color = Color.Black           'Static pressure
 
@@ -1789,11 +1795,18 @@ Public Class Form1
         ivc_area = 3.14 / 4 * ivc_dia ^ 2 * Sin(alpha * PI / 180)           '[m2] open area
         ivc_speed = debiet / ivc_area                                       '[m/s]
         P_loss = 0.5 * phi * NumericUpDown12.Value * ivc_speed ^ 2          '[Pascal]
-        fan_ptotal = case_x_Pstat(hh, 0)
-        If P_loss < fan_ptotal * 0.8 Then
-            Chart1.Series(series).Points.AddXY(debiet, Round(fan_ptotal - P_loss, 1))
+        fan_P_static = case_x_Pstat(hh, 0)
+        If P_loss < fan_P_static * 0.8 Then
+            Chart1.Series(series).Points.AddXY(debiet, Round(fan_P_static - P_loss, 1))
         End If
     End Sub
+    'Pressure loss over the Outlet Flow Damper
+    Private Sub P_loss_Oot_Flow_damper(series As Integer, phi As Double, hh As Integer, debiet As Double, alpha As Double)
+        'Future
+        'Future
+        'Future
+    End Sub
+
     'Write to Word document
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
         write_to_word()
@@ -4045,6 +4058,8 @@ Public Class Form1
         Chart5.ChartAreas.Clear()
         Chart5.ChartAreas.Add("ChartArea0")
 
+
+
         Try
             For hh = 1 To 9 'Determine how many cases there are
                 If Not String.IsNullOrEmpty(case_x_conditions(0, hh)) Then case_counter += 1
@@ -4054,6 +4069,7 @@ Public Class Form1
             For hh = 1 To (case_counter)
                 Chart5.Series.Add("Pressure " & case_x_conditions(0, hh))
                 Chart5.Series(hh - 1).ChartArea = "ChartArea0"
+                Chart5.Series(hh - 1).SmartLabelStyle.Enabled = True
                 If CheckBox9.Checked Then
                     Chart5.Series(hh - 1).IsVisibleInLegend = True
                 Else
@@ -4075,7 +4091,6 @@ Public Class Form1
                 Chart5.Series(hh - 1 + case_counter).BorderWidth = 1
             Next
 
-
             If CheckBox5.Checked Then
                 Chart5.Titles.Add("Static Pressure and power")
             Else
@@ -4083,19 +4098,16 @@ Public Class Form1
             End If
             Chart5.Titles(0).Font = New Font("Arial", 16, System.Drawing.FontStyle.Bold)
 
-
             Chart5.ChartAreas("ChartArea0").AxisX.Minimum = 0
             Chart5.ChartAreas("ChartArea0").AxisX.Title = "Suction Volume flow [Am3/hr]"
             Chart5.ChartAreas("ChartArea0").AxisX.MinorTickMark.Enabled = True
             Chart5.ChartAreas("ChartArea0").AxisY.MinorTickMark.Enabled = True
-
 
             Chart5.ChartAreas("ChartArea0").AxisY.Title = "Delta Static Pressure [mBar]"
             Chart5.ChartAreas("ChartArea0").AlignmentOrientation = DataVisualization.Charting.AreaAlignmentOrientations.Vertical
             Chart5.ChartAreas("ChartArea0").AxisY2.Enabled = AxisEnabled.True
             Chart5.ChartAreas("ChartArea0").AxisY2.Title = "Shaft power [kW]"
             Chart5.ChartAreas("ChartArea0").AxisY2.MinorTickMark.Enabled = True
-
 
             '----------------------------- pressure-----------------------
             For case_j = 1 To (case_counter)                  'Plot the cases 1...8
@@ -4104,6 +4116,7 @@ Public Class Form1
                     debiet = case_x_flow(hh, case_j) * 3600 '/hr
                     Chart5.Series(case_j - 1).Points.AddXY(debiet, Round(case_x_Pstat(hh, case_j), 1))
                 Next hh
+                Chart5.Series(case_j - 1).Points(45).Label = "Pstat " & case_x_conditions(0, case_j)       'Case name 
             Next case_j
 
             '----------------------------- power-----------------------
@@ -4114,6 +4127,7 @@ Public Class Form1
                         debiet = case_x_flow(hh, case_j) * 3600 '/hr
                         Chart5.Series(case_j - 1 + case_counter).Points.AddXY(debiet, Round(case_x_Power(hh, case_j), 1))
                     Next hh
+                    Chart5.Series(case_j - 1 + case_counter).Points(45).Label = "Power " & case_x_conditions(0, case_j)       'Case name 
                 Next case_j
             End If
 
