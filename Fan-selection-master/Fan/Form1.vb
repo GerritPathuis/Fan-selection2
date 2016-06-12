@@ -1623,7 +1623,7 @@ Public Class Form1
 
                 '----------- Line type-----------
                 Chart1.ChartAreas.Add("ChartArea0")
-                For hh = 0 To 16
+                For hh = 0 To 30
                     Chart1.Series.Add("Series" & hh.ToString)
                     Chart1.Series(hh).ChartArea = "ChartArea0"
                     Chart1.Series(hh).ChartType = SeriesChartType.Line
@@ -1632,7 +1632,7 @@ Public Class Form1
 
                 '--------- Legend visible ----------------
                 Chart1.Series(4).IsVisibleInLegend = False          'Marker
-                For hh = 6 To 16
+                For hh = 10 To 20
                     Chart1.Series(hh).IsVisibleInLegend = False     'Vane control lines
                 Next
 
@@ -1664,7 +1664,7 @@ Public Class Form1
                 End If
 
                 '------- line thickness-------------
-                For hh = 0 To 16
+                For hh = 0 To 30
                     Chart1.Series(hh).BorderWidth = 1
                 Next
                 Chart1.Series(5).BorderWidth = 3    'Static pressure
@@ -1690,14 +1690,18 @@ Public Class Form1
                 Chart1.ChartAreas("ChartArea0").AxisY2.Enabled = AxisEnabled.True
                 Chart1.ChartAreas("ChartArea0").AxisY2.Title = "Rendement [%] As-vermogen [kW]"
 
-                Chart1.Series(0).YAxisType = AxisType.Primary
+
+                '-------- Pressure on left hand Y axis------
+                For hh = 0 To 20
+                    Chart1.Series(hh).YAxisType = AxisType.Primary
+                Next
+
+                '-------- Power on right hand Y axis------
                 Chart1.Series(1).YAxisType = AxisType.Secondary
                 Chart1.Series(2).YAxisType = AxisType.Secondary
-                Chart1.Series(3).YAxisType = AxisType.Primary
-                Chart1.Series(4).YAxisType = AxisType.Primary
-                Chart1.Series(5).YAxisType = AxisType.Primary
-                Chart1.Series(6).YAxisType = AxisType.Primary
-
+                For hh = 20 To 30
+                    Chart1.Series(hh).YAxisType = AxisType.Secondary
+                Next
 
                 '------------------ Grafiek tekst en target ---------------------
                 If CheckBox2.Checked Then               '========Per uur=========
@@ -1711,33 +1715,20 @@ Public Class Form1
                 End If
 
                 '---------------- add the fan lines-----------------------
-                If CheckBox1.Checked Then      'Fil chart with Poly lines
-                    For hh = 0 To 50
-                        debiet = case_x_flow(hh, 0)
-                        If CheckBox2.Checked Then debiet = Round(debiet * 3600, 1)      'Per uur
+                For hh = 0 To 50
+                    debiet = case_x_flow(hh, 0)
+                    If CheckBox2.Checked Then debiet = Round(debiet * 3600, 1)      'Per uur
+                    Chart1.Series(0).Points.AddXY(debiet, Round(case_x_Ptot(hh), 1))
+                    Chart1.Series(5).Points.AddXY(debiet, Round(case_x_Pstat(hh, 0), 1))
+                    If CheckBox7.Checked Then Chart1.Series(1).Points.AddXY(debiet, Round(case_x_Efficiency(hh), 1))    'efficiency
+                    If CheckBox8.Checked Then Chart1.Series(2).Points.AddXY(debiet, Round(case_x_Power(hh, 0), 1))      'Power
+                Next hh
 
-                        Chart1.Series(0).Points.AddXY(debiet, Round(case_x_Ptot(hh), 1))
-                        Chart1.Series(5).Points.AddXY(debiet, Round(case_x_Pstat(hh, 0), 1))
-
-                        If CheckBox7.Checked Then Chart1.Series(1).Points.AddXY(debiet, Round(case_x_Efficiency(hh), 1))    'efficiency
-                        If CheckBox8.Checked Then Chart1.Series(2).Points.AddXY(debiet, Round(case_x_Power(hh, 0), 1))      'Power
-                    Next hh
-                    '----------- adding labels ----------------
-                    Chart1.Series(0).Points(45).Label = "P.total"
-                    Chart1.Series(5).Points(45).Label = "P.static"
-                    If CheckBox7.Checked Then Chart1.Series(1).Points(45).Label = "Efficiency"  'efficiency
-                    If CheckBox8.Checked Then Chart1.Series(2).Points(45).Label = "Power"       'Power
-                Else                        'Fill chart with Tschets data
-                    For hh = 0 To 10
-                        debiet = Tschets(Tschets_no).TFlow_scaled(hh)
-                        If CheckBox2.Checked Then debiet = Round(debiet * 3600, 1)      'Per uur
-                        Chart1.Series(0).Points.AddXY(debiet, Round(Tschets(Tschets_no).TPtot_scaled(hh), 2))
-                        Chart1.Series(5).Points.AddXY(debiet, Round(Tschets(Tschets_no).TPstat_scaled(hh), 2))
-                        If CheckBox7.Checked Then Chart1.Series(1).Points.AddXY(debiet, Round(Tschets(Tschets_no).Teff_scaled(hh), 1))
-                        If CheckBox8.Checked Then Chart1.Series(2).Points.AddXY(debiet, Round(Tschets(Tschets_no).Tverm_scaled(hh), 1))
-                    Next hh
-
-                End If
+                '----------- adding labels ----------------
+                Chart1.Series(0).Points(45).Label = "P.total"
+                Chart1.Series(5).Points(45).Label = "P.static"
+                If CheckBox7.Checked Then Chart1.Series(1).Points(45).Label = "Efficiency"  'efficiency
+                If CheckBox8.Checked Then Chart1.Series(2).Points(45).Label = "Power"       'Power
 
                 '-------------------Target dot ---------------------
                 If CheckBox3.Checked Then
@@ -1761,23 +1752,25 @@ Public Class Form1
 
                 '-------------------Inlet Vane Control lines ---------------------
                 If CheckBox13.Checked Then
-                    Chart1.Series(6).YAxisType = AxisType.Primary
-
-                    '---------------- add the Inlet Vane-Control lines-----------------------
-                    Dim VC_phi = New Double() {0.02, 0.04, 0.06, 0.08, 0.1, 0.12, 0.14}     'Pressure loss coeff (*= 2.5)
-                    Dim VC_open = New String() {"80", "70", "60", "50", "40", "30", "20"}
-
+                    Dim VC_phi = New Double() {0.02, 0.04, 0.06, 0.08, 0.1, 0.12}     'Pressure loss coeff (*= 2.5)
+                    Dim VC_open = New String() {"80", "70", "60", "50", "40", "30"}
                     Dim point_count As Integer
-                    For jj = 0 To 6
+                    For jj = 0 To 5
                         For hh = 0 To 50
                             debiet = case_x_flow(hh, 0)
                             If CheckBox2.Checked Then debiet = Round(debiet * 3600, 1)      'Per uur
-                            P_loss_IVC(jj + 6, VC_phi(jj), hh, debiet, VC_open(jj))         'Calc and plot to chart
+                            P_loss_IVC(jj + 10, VC_phi(jj), hh, debiet, VC_open(jj))         'Calc and plot to chart
                         Next
-                        point_count = Chart1.Series(jj + 6).Points.Count - 1                'Last plotted point
-                        Chart1.Series(jj + 6).Points(point_count).Label = VC_open(jj) & "°" 'Add the VC opening angle 
+                        point_count = Chart1.Series(jj + 10).Points.Count - 1                'Last plotted point
+                        Chart1.Series(jj + 10).Points(point_count).Label = VC_open(jj) & "°" 'Add the VC opening angle 
                     Next
                 End If
+
+                '---------------Outlet damper-----------------
+                If CheckBox14.Checked Then
+                    ' P_loss_Out_Flow_damper(Series As Integer, phi As Double, hh As Integer, debiet As Double, alpha As Double)
+                End If
+
                 Chart1.Refresh()
             Catch ex As Exception
                 'MessageBox.Show(ex.Message & "Line 1780")  ' Show the exception's message.
@@ -1786,22 +1779,32 @@ Public Class Form1
     End Sub
     'Pressure loss over the Inlet Vane control
     Private Sub P_loss_IVC(series As Integer, phi As Double, hh As Integer, debiet As Double, alpha As Double)
-        Dim P_loss, fan_P_static, ivc_area, ivc_speed, ivc_dia As Double
+        Dim ivc_area, ivc_speed, ivc_dia, ivc_Power, ivc_loss As Double
+        Dim fan_P_static, Pstatic_w_ivc, debiet_sec As Double
 
-        Chart1.Series(series).Color = Color.Black           'Static pressure
+        Chart1.Series(series).Color = Color.Black                           'Static pressure
 
         Double.TryParse(TextBox159.Text, ivc_dia)
         ivc_dia /= 1000                                                     '[m] diameter
         ivc_area = 3.14 / 4 * ivc_dia ^ 2 * Sin(alpha * PI / 180)           '[m2] open area
-        ivc_speed = debiet / ivc_area                                       '[m/s]
-        P_loss = 0.5 * phi * NumericUpDown12.Value * ivc_speed ^ 2          '[Pascal]
+
+        debiet_sec = debiet                                                 'debiet in [m3/sec]
+        If CheckBox2.Checked Then debiet_sec = debiet / 3600                'debiet in [m3/hr]
+        ivc_speed = debiet_sec / ivc_area                                   '[m/s]
+        ivc_loss = 0.5 * phi * NumericUpDown12.Value * ivc_speed ^ 2        '[mbar]
         fan_P_static = case_x_Pstat(hh, 0)
-        If P_loss < fan_P_static * 0.8 Then
-            Chart1.Series(series).Points.AddXY(debiet, Round(fan_P_static - P_loss, 1))
+        Pstatic_w_ivc = fan_P_static - ivc_loss                             '[mbar] Pstatic with IVC
+        If Pstatic_w_ivc < 0 Then Pstatic_w_ivc = 0
+        If ivc_loss < fan_P_static * 0.8 Then Chart1.Series(series).Points.AddXY(debiet, Round(Pstatic_w_ivc, 1))
+
+        '----------- Power lines IVC ------------
+        If CheckBox14.Checked Then
+            ivc_Power = 15 * Pstatic_w_ivc * debiet / case_x_Efficiency(hh)  '[kW]
+            If hh > 10 And ivc_Power > 1 Then Chart1.Series(series + 10).Points.AddXY(debiet, Round(ivc_Power, 1))
         End If
     End Sub
     'Pressure loss over the Outlet Flow Damper
-    Private Sub P_loss_Oot_Flow_damper(series As Integer, phi As Double, hh As Integer, debiet As Double, alpha As Double)
+    Private Sub P_loss_Out_Flow_damper(series As Integer, phi As Double, hh As Integer, debiet As Double, alpha As Double)
         'Future
         'Future
         'Future
@@ -2241,81 +2244,77 @@ Public Class Form1
 
                 ReDim PZ(aantal_Tschets_punten)          'PZ() too big gives wrong results !!!
                 max_flow = Tschets(ty).TFlow_scaled(aantal_Tschets_punten)
-                If CheckBox1.Checked Then
+
+                '=============== calculate the polynoom for Ptotal ====================
+                For j = 0 To aantal_Tschets_punten       'Get data into PZ()
+                    PZ(j).x = Tschets(ty).TFlow_scaled(j)
+                    PZ(j).y = Tschets(ty).TPtot_scaled(j)
+                Next
+                t = Trend(PZ, 5)            'calculate the polynoom
+
+                For j = 0 To 5      'Store the variable for later use
+                    ABCDE_Ptot(j) = BZ(j, 0)
+                Next
 
 
-                    '=============== calculate the polynoom for Ptotal ====================
-                    For j = 0 To aantal_Tschets_punten       'Get data into PZ()
-                        PZ(j).x = Tschets(ty).TFlow_scaled(j)
-                        PZ(j).y = Tschets(ty).TPtot_scaled(j)
-                    Next
-                    t = Trend(PZ, 5)            'calculate the polynoom
+                For j = 0 To aantal_Grafiek_punten      'Calculate chart data points
+                    flow = j / aantal_Grafiek_punten * max_flow
+                    case_x_flow(j, 0) = flow
+                    case_x_Ptot(j) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3 + BZ(4, 0) * flow ^ 4 + BZ(5, 0) * flow ^ 5
+                Next
 
-                    For j = 0 To 5      'Store the variable for later use
-                        ABCDE_Ptot(j) = BZ(j, 0)
-                    Next
+                '=============== calculate the polynoom for Pstatic ====================
+                For j = 0 To aantal_Tschets_punten       'Get data into PZ()
+                    PZ(j).x = Tschets(ty).TFlow_scaled(j)
+                    PZ(j).y = Tschets(ty).TPstat_scaled(j)
+                Next
+                t = Trend(PZ, 5)        'calculate the polynoom
 
-
-                    For j = 0 To aantal_Grafiek_punten      'Calculate chart data points
-                        flow = j / aantal_Grafiek_punten * max_flow
-                        case_x_flow(j, 0) = flow
-                        case_x_Ptot(j) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3 + BZ(4, 0) * flow ^ 4 + BZ(5, 0) * flow ^ 5
-                    Next
-
-                    '=============== calculate the polynoom for Pstatic ====================
-                    For j = 0 To aantal_Tschets_punten       'Get data into PZ()
-                        PZ(j).x = Tschets(ty).TFlow_scaled(j)
-                        PZ(j).y = Tschets(ty).TPstat_scaled(j)
-                    Next
-                    t = Trend(PZ, 5)        'calculate the polynoom
-
-                    For j = 0 To 5      'Store the variable for later use
-                        ABCDE_Psta(j) = BZ(j, 0)
-                    Next
+                For j = 0 To 5      'Store the variable for later use
+                    ABCDE_Psta(j) = BZ(j, 0)
+                Next
 
 
-                    For j = 0 To aantal_Grafiek_punten      'Calculate chart data points
-                        flow = j / aantal_Grafiek_punten * max_flow
-                        case_x_flow(j, 0) = flow
-                        case_x_Pstat(j, 0) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3 + BZ(4, 0) * flow ^ 4 + BZ(5, 0) * flow ^ 5
-                    Next
+                For j = 0 To aantal_Grafiek_punten      'Calculate chart data points
+                    flow = j / aantal_Grafiek_punten * max_flow
+                    case_x_flow(j, 0) = flow
+                    case_x_Pstat(j, 0) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3 + BZ(4, 0) * flow ^ 4 + BZ(5, 0) * flow ^ 5
+                Next
 
-                    ''=============== calculate the polynoom for Power ====================
-                    For j = 0 To aantal_Tschets_punten       'Get data into PZ()
-                        PZ(j).x = Tschets(ty).TFlow_scaled(j)
-                        PZ(j).y = Tschets(ty).Tverm_scaled(j)
-                    Next
-                    t = Trend(PZ, 5)        'calculate the polynoom
+                ''=============== calculate the polynoom for Power ====================
+                For j = 0 To aantal_Tschets_punten       'Get data into PZ()
+                    PZ(j).x = Tschets(ty).TFlow_scaled(j)
+                    PZ(j).y = Tschets(ty).Tverm_scaled(j)
+                Next
+                t = Trend(PZ, 5)        'calculate the polynoom
 
-                    For j = 0 To 5      'Store the variable for later use
-                        ABCDE_Pow(j) = BZ(j, 0)
-                    Next
+                For j = 0 To 5      'Store the variable for later use
+                    ABCDE_Pow(j) = BZ(j, 0)
+                Next
 
-                    For j = 0 To aantal_Grafiek_punten      'Calculate chart data points
-                        flow = j / aantal_Grafiek_punten * max_flow
-                        case_x_flow(j, 0) = flow
-                        case_x_Power(j, 0) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3 + BZ(4, 0) * flow ^ 4 + BZ(5, 0) * flow ^ 5
-                    Next
+                For j = 0 To aantal_Grafiek_punten      'Calculate chart data points
+                    flow = j / aantal_Grafiek_punten * max_flow
+                    case_x_flow(j, 0) = flow
+                    case_x_Power(j, 0) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3 + BZ(4, 0) * flow ^ 4 + BZ(5, 0) * flow ^ 5
+                Next
 
-                    '=============== convert to polynoom, Efficiency ====================
-                    TextBox158.AppendText(Environment.NewLine)
-                    For j = 0 To aantal_Tschets_punten       'Get data into PZ()
-                        PZ(j).x = Tschets(ty).TFlow_scaled(j)
-                        PZ(j).y = Tschets(ty).Teff_scaled(j)
-                    Next
-                    t = Trend(PZ, 5)        'calculate the polynoom
+                '=============== convert to polynoom, Efficiency ====================
+                TextBox158.AppendText(Environment.NewLine)
+                For j = 0 To aantal_Tschets_punten       'Get data into PZ()
+                    PZ(j).x = Tschets(ty).TFlow_scaled(j)
+                    PZ(j).y = Tschets(ty).Teff_scaled(j)
+                Next
+                t = Trend(PZ, 5)        'calculate the polynoom
 
-                    For j = 0 To 5      'Store the variable for later use
-                        ABCDE_Eff(j) = BZ(j, 0)
-                    Next
+                For j = 0 To 5      'Store the variable for later use
+                    ABCDE_Eff(j) = BZ(j, 0)
+                Next
 
-
-                    For j = 0 To aantal_Grafiek_punten      'Calculate chart data points
-                        flow = j / aantal_Grafiek_punten * max_flow
-                        case_x_flow(j, 0) = flow
-                        case_x_Efficiency(j) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3 + BZ(4, 0) * flow ^ 4 + BZ(5, 0) * flow ^ 5
-                    Next
-                End If
+                For j = 0 To aantal_Grafiek_punten      'Calculate chart data points
+                    flow = j / aantal_Grafiek_punten * max_flow
+                    case_x_flow(j, 0) = flow
+                    case_x_Efficiency(j) = BZ(0, 0) + BZ(1, 0) * flow ^ 1 + BZ(2, 0) * flow ^ 2 + BZ(3, 0) * flow ^ 3 + BZ(4, 0) * flow ^ 4 + BZ(5, 0) * flow ^ 5
+                Next
 
                 draw_chart1(ty)
             Catch ex As Exception
@@ -3193,7 +3192,7 @@ Public Class Form1
         TextBox145.Text = Round(spalt_loss, 1).ToString     '[kg/hr]
     End Sub
 
-    Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click, CheckBox6.CheckedChanged, CheckBox3.CheckedChanged, CheckBox2.CheckedChanged, CheckBox1.CheckedChanged, TabPage3.Enter, NumericUpDown9.ValueChanged, NumericUpDown10.ValueChanged, RadioButton9.CheckedChanged, RadioButton11.CheckedChanged, RadioButton10.CheckedChanged, CheckBox7.CheckedChanged, CheckBox8.CheckedChanged, CheckBox10.CheckedChanged, CheckBox13.CheckedChanged
+    Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click, CheckBox6.CheckedChanged, CheckBox3.CheckedChanged, CheckBox2.CheckedChanged, TabPage3.Enter, NumericUpDown9.ValueChanged, NumericUpDown10.ValueChanged, RadioButton9.CheckedChanged, RadioButton11.CheckedChanged, RadioButton10.CheckedChanged, CheckBox7.CheckedChanged, CheckBox8.CheckedChanged, CheckBox10.CheckedChanged, CheckBox13.CheckedChanged, CheckBox14.CheckedChanged
         NumericUpDown33.Value = NumericUpDown9.Value
         If NumericUpDown33.Value > 2300 Then
             NumericUpDown33.BackColor = Color.Red
