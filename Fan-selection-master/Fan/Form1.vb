@@ -332,8 +332,10 @@ Public Class Form1
 
 
     Dim Std_flens_dia() As Double = {71, 80, 90, 100, 112, 125, 140, 160, 180, 200, 224, 250, 280, 315,
-        355, 400, 450, 500, 560, 630, 710, 800, 900, 1000, 1120, 1250, 1400, 1600, 1800, 2000, 2100, 2200, 2400, 2500}
-    Dim R20() As Double
+        355, 400, 450, 500, 560, 630, 710, 800, 900, 1000, 1120, 1250, 1400, 1600, 1800, 2000, 2100,
+        2200, 2400, 2600, 2800, 3000, 3100, 3200, 3300, 99999}
+
+    'Dim R20() As Double
 
     'T-model, Alle gegevens bij het hoogste rendement
     Public T_eff As Double              'Efficiency max [-]
@@ -505,7 +507,7 @@ Public Class Form1
 
         Dim Ttype As Int16                  'Waaier type
         Dim diam1, diam2, nn1, nn2, roo1, roo2 As Double
-        Dim Power_total, flow As Double
+        Dim Power_total, flow, temp As Double
 
         '0-Diameter,1-Toerental,2-Dichtheid,3-Zuigmond diameter,4-Persmond lengte,5-Breedte huis,6-Lengte spiraal,7 breedte pers,8 lengte pers,9-c,10-d,11-e,
         '12-Schoeplengte,13-Aantal schoepen,14-Breedte inwendig,15-Breedte uitwendig,16-Keeldiameter,17-Inw. dia. schoepen,18-Intrede hoek,19-Uittrede hoek
@@ -532,7 +534,8 @@ Public Class Form1
         nrq = ComboBox7.SelectedIndex   'Prevent out of bounds error
         If nrq >= 0 And nrq <= 30 Then
             Try
-                Label1.Text += TextBox159.Text & "/" & NumericUpDown33.Value.ToString & "/" & Tschets(ComboBox1.SelectedIndex).Tname
+                temp = Round(NumericUpDown33.Value / 5) * 5     'Diameter waaier afronden op 5 mm
+                Label1.Text += TextBox159.Text & "/" & temp.ToString & "/" & Tschets(ComboBox1.SelectedIndex).Tname
 
                 '---------------- Debiet in [kgs/hr]------------------
                 If RadioButton6.Checked Then
@@ -1632,7 +1635,7 @@ Public Class Form1
 
                 '--------- Legend visible ----------------
                 Chart1.Series(4).IsVisibleInLegend = False          'Marker
-                For hh = 10 To 20
+                For hh = 7 To 30
                     Chart1.Series(hh).IsVisibleInLegend = False     'Vane control lines
                 Next
 
@@ -1640,13 +1643,13 @@ Public Class Form1
                 Chart1.Titles(0).Font = New Font("Arial", 16, System.Drawing.FontStyle.Bold)
 
                 '--------- Legend names ----------------
-                Chart1.Series(0).Name = "P totaal [mBar]"
-                Chart1.Series(1).Name = "Rendement [%]"
-                Chart1.Series(2).Name = "As vermogen [kW]"
-                Chart1.Series(3).Name = "Line resistance"
-                Chart1.Series(4).Name = "Marker"
-                Chart1.Series(5).Name = "P static [mBar]"
-                Chart1.Series(6).Name = "Vane-Control"
+                Chart1.Series(0).Name = "P totaal [mBar] "
+                Chart1.Series(1).Name = "Rendement [%] "
+                Chart1.Series(2).Name = "As vermogen [kW] "
+                Chart1.Series(3).Name = "Line resistance "
+                Chart1.Series(4).Name = "Marker "
+                Chart1.Series(5).Name = "P static [mBar] "
+                Chart1.Series(6).Name = "Vane-Control "
 
                 Chart1.Series(0).Color = Color.LightGreen   'Total pressure
                 Chart1.Series(1).Color = Color.Red          'Efficiency
