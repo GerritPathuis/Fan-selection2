@@ -978,7 +978,7 @@ Public Class Form1
         Dim maxrpm As Double
         Dim maxV As Double
         Dim sigma_allowed As Double
-        Dim Waaier_dia, Waaier_dik, Waaier_gewicht, las_gewicht As Double   'Zonder naaf
+        Dim Waaier_dia, Waaier_dik, Waaier_as_gewicht, las_gewicht As Double   'Zonder naaf
         Dim labyrinth_gewicht As Double
         Dim Sch_breed As Double                                             'Schoep breed
         Dim Sch_dik, Sch_hoek, Sch_lengte, Sch_gewicht As Double            'Schoep_dik, Schoep_lang
@@ -996,8 +996,9 @@ Public Class Form1
         Dim dia_naaf, gewicht_as As Double
         Dim length_naaf, gewicht_pulley As Double
         Dim sg_staal As Double
-        Dim n_krit As Double
-        Dim back_plate_steel, back_plate_alu As Double
+        Dim n_krit, Waaier_gewicht As Double
+        Dim Back_plate_steel_1, Back_plate_steel_2, Back_plate_steel_3 As Double
+        Dim Front_plate_steel_1, Front_plate_steel_2, Front_plate_steel_3 As Double
 
         If Sch_hoek > 90 Then TextBox37.Text = "90"
 
@@ -1044,7 +1045,9 @@ Public Class Form1
         gewicht_naaf = PI / 4 * dia_naaf ^ 2 * length_naaf * sg_staal
         TextBox93.Text = Round(gewicht_naaf, 1).ToString
 
-        Waaier_gewicht = Bodem_gewicht + schoepen_gewicht + labyrinth_gewicht + Voorplaat_gewicht + gewicht_as + gewicht_naaf + gewicht_pulley + las_gewicht     'totaal gewicht
+        Waaier_as_gewicht = Bodem_gewicht + schoepen_gewicht + labyrinth_gewicht + Voorplaat_gewicht + gewicht_as + gewicht_naaf + gewicht_pulley + las_gewicht     'totaal gewicht
+        Waaier_gewicht = Bodem_gewicht + schoepen_gewicht + labyrinth_gewicht + Voorplaat_gewicht      'Gewicht tbv N_krit
+
 
         '--------max toerental (beide zijden ingeklemd)-----------
         maxrpm = 0.32 * Sqrt(sigma_allowed * Sch_dik / (sg_staal * Waaier_dia * Sch_breed ^ 2 * Cos(Sch_hoek * PI / 180)))
@@ -1079,13 +1082,33 @@ Public Class Form1
 
 
         '------------ Eigen frequenties bodemplaat ---------------------------
-        '------------ Roarks, 8 edition, pagina 793 ----------------------------
-        back_plate_steel = 4.4 * (NumericUpDown17.Value / 25.4) / (inw_schoep_dia * 1000 / (2 * 25.4)) ^ 2 * 10 ^ 4
-        back_plate_alu = back_plate_steel * 1.04
-        TextBox209.Text = Round(back_plate_steel, 1).ToString           'Bodemplaat eigenfrequentie staal [Hz]
-        TextBox210.Text = Round(back_plate_alu, 1).ToString             'Bodemplaat eigenfrequentie aluminium [Hz]
-        TextBox211.Text = Round(back_plate_steel * 60, 0).ToString      'Bodemplaat eigenfrequentie staal [rpm]
-        TextBox212.Text = Round(back_plate_alu * 60, 0).ToString        'Bodemplaat eigenfrequentie aluminium [rpm]
+        '------------ Roarks, 8 edition, pagina 793 --------------------------
+        Back_plate_steel_1 = 10000 * 4.4 * (NumericUpDown17.Value / 25.4) / (NumericUpDown21.Value * 0.5 / 25.4) ^ 2
+        Back_plate_steel_2 = 10000 * 20.33 * (NumericUpDown17.Value / 25.4) / (NumericUpDown21.Value * 0.5 / 25.4) ^ 2
+        Back_plate_steel_3 = 10000 * 59.49 * (NumericUpDown17.Value / 25.4) / (NumericUpDown21.Value * 0.5 / 25.4) ^ 2
+
+        TextBox209.Text = Round(Back_plate_steel_1, 1).ToString             'Bodemplaat 1ste eigenfrequentie staal [Hz]
+        TextBox210.Text = Round(Back_plate_steel_2, 0).ToString             'Bodemplaat 2de  eigenfrequentie staal [Hz]
+        TextBox204.Text = Round(Back_plate_steel_3, 0).ToString             'Bodemplaat 3de  eigenfrequentie staal [Hz]
+
+        TextBox211.Text = Round(Back_plate_steel_1 * 60, 0).ToString        'Bodemplaat 1st eigenfrequentie staal [rpm]
+        TextBox212.Text = Round(Back_plate_steel_2 * 60, 0).ToString        'Bodemplaat 2de eigenfrequentie staal [rpm]
+        TextBox358.Text = Round(Back_plate_steel_3 * 60, 0).ToString        'Bodemplaat 3de eigenfrequentie staal [rpm]
+
+        '------------ Eigen frequenties Voorplaat ---------------------------
+        '------------ Roarks, 8 edition, pagina 793 --------------------------
+        Front_plate_steel_1 = 10000 * 4.4 * (NumericUpDown31.Value / 25.4) / (NumericUpDown21.Value * 0.5 / 25.4) ^ 2
+        Front_plate_steel_2 = 10000 * 20.33 * (NumericUpDown31.Value / 25.4) / (NumericUpDown21.Value * 0.5 / 25.4) ^ 2
+        Front_plate_steel_3 = 10000 * 59.49 * (NumericUpDown31.Value / 25.4) / (NumericUpDown21.Value * 0.5 / 25.4) ^ 2
+
+        TextBox373.Text = Round(Front_plate_steel_1, 1).ToString             'Frontplaat 1ste eigenfrequentie staal [Hz]
+        TextBox372.Text = Round(Front_plate_steel_2, 0).ToString             'Frontplaat 2de  eigenfrequentie staal [Hz]
+        TextBox360.Text = Round(Front_plate_steel_3, 0).ToString             'Frontplaat 2de  eigenfrequentie staal [Hz]
+
+        TextBox371.Text = Round(Front_plate_steel_1 * 60, 0).ToString        'Frontplaat 1st eigenfrequentie staal [rpm]
+        TextBox370.Text = Round(Front_plate_steel_2 * 60, 0).ToString        'Frontplaat 2de eigenfrequentie staal [rpm]
+        TextBox359.Text = Round(Front_plate_steel_3 * 60, 0).ToString        'Frontplaat 3de eigenfrequentie staal [rpm]
+
 
         '------------------------------------ airfoil------------------------------------
         '--------------------------------------------------------------------------------
@@ -1165,12 +1188,14 @@ Public Class Form1
         TextBox38.Text = Round(maxrpm * 60, 0).ToString
         TextBox45.Text = Round(Bodem_gewicht, 1).ToString
         TextBox94.Text = Round(Voorplaat_gewicht, 1).ToString
+
+        TextBox374.Text = Round(Waaier_gewicht, 1).ToString
+
         TextBox95.Text = Round(schoepen_gewicht, 1).ToString
-        TextBox192.Text = Round(Waaier_gewicht, 0).ToString
-        TextBox96.Text = Round(Waaier_gewicht, 1).ToString
+        TextBox192.Text = Round(Waaier_as_gewicht, 0).ToString
+        TextBox96.Text = Round(Waaier_as_gewicht, 1).ToString
         TextBox103.Text = Round(Voorplaat_keel * 1000, 0).ToString
         TextBox104.Text = Round(Sch_lengte * 1000, 0).ToString
-        TextBox204.Text = Round(inw_schoep_dia * 1000, 0).ToString          'inwendige schpeo diameter
 
         TextBox105.Text = Round(J1, 1).ToString
         TextBox106.Text = Round(J2, 1).ToString
@@ -1218,19 +1243,19 @@ Public Class Form1
         '-------------- kritisch toerental---------------
         Double.TryParse(TextBox47.Text, n_krit)
 
-        If n_krit < n_actual * 60 * 1.2 Then
+        If n_krit < n_actual * 60 * 1.15 Then
             TextBox47.BackColor = Color.Red
         Else
             TextBox47.BackColor = Color.LightGreen
         End If
 
         '-------------- kritisch toerental bodemschijf-----------
-        If back_plate_steel < n_actual * 1.05 Then
+        If Back_plate_steel_1 < n_actual * 1.05 Then
             TextBox211.BackColor = Color.Red
-            TextBox212.BackColor = Color.Red
+            TextBox209.BackColor = Color.Red
         Else
             TextBox211.BackColor = Color.LightGreen
-            TextBox212.BackColor = Color.LightGreen
+            TextBox209.BackColor = Color.LightGreen
         End If
     End Sub
 
@@ -2569,7 +2594,7 @@ Public Class Form1
         Dim I_shaft_a, I_shaft_b, I_shaft_c As Double
         Dim gewicht_as, gewicht_waaier, gewicht_pulley, gewicht_naaf As Double
         Dim Force_combi1, Force_combi2, Force_combi3 As Double
-        Dim N_kritisch_as As Double
+        Dim N_kritisch_as, N_max_tussen As Double
         Dim N_max_doorbuiging As Double
         Dim n_actual As Double
         Dim Elasticiteitsm As Double
@@ -2601,7 +2626,7 @@ Public Class Form1
         g_shaft_c = PI / 4 * dia_c ^ 2 * length_c * sg_staal
         gewicht_as = g_shaft_a + g_shaft_b + g_shaft_c
 
-        Double.TryParse(TextBox192.Text, gewicht_waaier)
+        Double.TryParse(TextBox374.Text, gewicht_waaier)
         gewicht_pulley = NumericUpDown30.Value
         gewicht_naaf = PI / 4 * dia_naaf ^ 2 * length_naaf * sg_staal
 
@@ -2614,11 +2639,17 @@ Public Class Form1
         J_shaft_c = 0.5 * g_shaft_c * (dia_c / 2) ^ 2       'MassaTraagheid [kg.m2]
         J_shaft_total = J_shaft_a + J_shaft_b + J_shaft_c   'MassaTraagheid As
 
+
         '--Willi Bohl, Ventilatoren, Kritisch toerental formule 6.41 pagina 213--------------
+        '----- waaier buiten de lagers ----------------------
         Elasticiteitsm = 210 * 1000 ^ 3                                             'in Pascal [N/m2]
         N_max_doorbuiging = ((length_a ^ 3 / I_shaft_a) + (length_a ^ 2 * length_b / I_shaft_b)) / (3 * Elasticiteitsm)
-        N_max_doorbuiging *= (gewicht_waaier + gewicht_naaf + g_shaft_a) * 9.81
+        N_max_doorbuiging *= (gewicht_waaier) * 9.81
         N_kritisch_as = Sqrt(9.81 / N_max_doorbuiging) * 60 / (2 * PI)
+
+        '----- waaier tussen de lagers ----------------------
+        N_max_tussen = Sqrt(48 * Elasticiteitsm * I_shaft_b / (gewicht_waaier * length_b)) * 60 / (2 * PI)
+
 
         '--------- Kracht door onbalans----------
         V_onbalans = NumericUpDown15.Value / 1000          '[m/s]
@@ -2689,9 +2720,7 @@ Public Class Form1
         TextBox191.Text = TextBox48.Text
         TextBox193.Text = TextBox52.Text
         TextBox190.Text = Round(gewicht_as, 0).ToString
-
         TextBox102.Text = Round(g_shaft_a + g_shaft_b + g_shaft_c + gewicht_naaf + gewicht_pulley, 1).ToString 'Totaal gewicht impellar
-        TextBox47.Text = Round(N_kritisch_as, 0).ToString   '[RPM]
 
         '--------------- krachten---------------
         TextBox97.Text = Round(F_onbalans, 0).ToString      'Force inbalans
@@ -2702,7 +2731,10 @@ Public Class Form1
         TextBox19.Text = Round(F_axial, 0).ToString         'Force axial
 
         '----------- eigen frequentie ---------------------
+        TextBox47.Text = Round(N_kritisch_as, 0).ToString               '[RPM] overhung
         TextBox111.Text = Round(N_max_doorbuiging * 1000, 3).ToString   'Max doorbuiging in [mm]
+        TextBox377.Text = Round(N_max_tussen, 0).ToString               '[rpm] Tussen de lagers
+
     End Sub
 
     Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click, NumericUpDown8.ValueChanged, NumericUpDown5.ValueChanged, NumericUpDown4.ValueChanged, NumericUpDown3.ValueChanged, NumericUpDown13.ValueChanged, NumericUpDown12.ValueChanged, ComboBox1.SelectedIndexChanged, RadioButton4.CheckedChanged, RadioButton3.CheckedChanged, CheckBox4.CheckedChanged, NumericUpDown33.ValueChanged, ComboBox7.SelectedIndexChanged, RadioButton14.CheckedChanged, RadioButton13.CheckedChanged, RadioButton12.CheckedChanged, NumericUpDown58.ValueChanged, NumericUpDown37.ValueChanged, NumericUpDown76.ValueChanged, RadioButton6.CheckedChanged
@@ -3427,12 +3459,12 @@ Public Class Form1
         oPara1.Range.Font.Name = "Arial"
         oPara1.Range.Font.Size = 16
         oPara1.Range.Font.Bold = True
-        oPara1.Format.SpaceAfter = 4                '24 pt spacing after paragraph. 
+        oPara1.Format.SpaceAfter = 2                '24 pt spacing after paragraph. 
         oPara1.Range.InsertParagraphAfter()
 
         oPara2 = oDoc.Content.Paragraphs.Add(oDoc.Bookmarks.Item("\endofdoc").Range)
         oPara2.Range.Font.Size = 11
-        oPara2.Format.SpaceAfter = 2
+        oPara2.Format.SpaceAfter = 1
         oPara2.Range.Font.Bold = False
         oPara2.Range.Text = "This torsional analyses is (API-673) based on the Holzer method" & vbCrLf
         oPara2.Range.InsertParagraphAfter()
@@ -3441,12 +3473,12 @@ Public Class Form1
         'Insert a table, fill it with data and change the column widths.
         oTable = oDoc.Tables.Add(oDoc.Bookmarks.Item("\endofdoc").Range, 4, 2)
         oTable.Range.ParagraphFormat.SpaceAfter = 1
-        oTable.Range.Font.Size = 11
+        oTable.Range.Font.Size = 9
         oTable.Range.Font.Bold = False
         oTable.Rows.Item(1).Range.Font.Bold = True
 
         oTable.Cell(1, 1).Range.Text = "Project Name"
-        oTable.Cell(1, 2).Range.Text = "."
+        oTable.Cell(1, 2).Range.Text = TextBox283.Text
         oTable.Cell(2, 1).Range.Text = "Project number "
         oTable.Cell(2, 2).Range.Text = "."
         oTable.Cell(3, 1).Range.Text = "Auther "
@@ -3461,9 +3493,9 @@ Public Class Form1
 
         '----------------------------------------------
         'Insert a 14 x 5 table, fill it with data and change the column widths.
-        oTable = oDoc.Tables.Add(oDoc.Bookmarks.Item("\endofdoc").Range, 14, 5)
+        oTable = oDoc.Tables.Add(oDoc.Bookmarks.Item("\endofdoc").Range, 18, 5)
         oTable.Range.ParagraphFormat.SpaceAfter = 1
-        oTable.Range.Font.Size = 10
+        oTable.Range.Font.Size = 9
         oTable.Range.Font.Bold = False
         oTable.Rows.Item(1).Range.Font.Bold = True
 
@@ -3521,12 +3553,41 @@ Public Class Form1
         oTable.Cell(12, 2).Range.Text = NumericUpDown27.Value
         oTable.Cell(12, 3).Range.Text = "[mm]"
 
-        '---- results---------
-        oTable.Cell(14, 1).Range.Text = "First natural speed"
+        oTable.Cell(13, 1).Range.Text = "Weight impeller"
+        oTable.Cell(13, 2).Range.Text = TextBox374.Text
+        oTable.Cell(13, 3).Range.Text = "[kg]"
+
+
+        '---- results torsie analyse---------
+        oTable.Cell(14, 1).Range.Text = "Drive string 1st natural speed"
         oTable.Cell(14, 2).Range.Text = TextBox84.Text
         oTable.Cell(14, 3).Range.Text = "[rpm]"
 
-        oTable.Columns.Item(1).Width = oWord.InchesToPoints(2.0)   'Change width of columns 1 & 2.
+        '---- results bending analyse---------
+        oTable.Cell(15, 1).Range.Text = "Overhung Shaft 1st natural speed"
+        oTable.Cell(15, 2).Range.Text = TextBox47.Text
+        oTable.Cell(15, 3).Range.Text = "[rpm]"
+
+        '---- results bending analyse---------
+        oTable.Cell(16, 1).Range.Text = "Shaft between bearings 1st natural speed"
+        oTable.Cell(16, 2).Range.Text = TextBox377.Text
+        oTable.Cell(16, 3).Range.Text = "[rpm]"
+
+        '---- results Impeller analyse---------
+        oTable.Cell(17, 1).Range.Text = "Impeller back disk 1st natural speed"
+        oTable.Cell(17, 2).Range.Text = TextBox211.Text
+        oTable.Cell(17, 3).Range.Text = "[rpm]"
+        oTable.Cell(17, 4).Range.Text = NumericUpDown17.Value
+        oTable.Cell(17, 5).Range.Text = "[mm]"
+
+        '---- results Impeller analyse---------
+        oTable.Cell(18, 1).Range.Text = "Impeller front disk 1st natural speed"
+        oTable.Cell(18, 2).Range.Text = TextBox371.Text
+        oTable.Cell(18, 3).Range.Text = "[rpm]"
+        oTable.Cell(18, 4).Range.Text = NumericUpDown31.Value
+        oTable.Cell(18, 5).Range.Text = "[mm]"
+
+        oTable.Columns.Item(1).Width = oWord.InchesToPoints(2.7)   'Change width of columns 1 & 2.
         oTable.Columns.Item(2).Width = oWord.InchesToPoints(0.8)
         oTable.Columns.Item(3).Width = oWord.InchesToPoints(0.9)
         oTable.Columns.Item(4).Width = oWord.InchesToPoints(0.6)
@@ -3544,6 +3605,7 @@ Public Class Form1
         oPara4.Range.InsertParagraphAfter()
 
     End Sub
+
 
     'Bearing calculation
     Private Sub Button13_Click(sender As Object, e As EventArgs) Handles Button13.Click, RadioButton24.CheckedChanged, RadioButton22.CheckedChanged, RadioButton19.CheckedChanged, RadioButton17.Click, NumericUpDown69.ValueChanged, TabPage13.Enter, NumericUpDown62.ValueChanged, NumericUpDown61.ValueChanged, ComboBox8.SelectedIndexChanged, NumericUpDown63.ValueChanged, NumericUpDown59.ValueChanged, RadioButton23.CheckedChanged, RadioButton18.CheckedChanged, NumericUpDown57.ValueChanged, RadioButton25.Click, RadioButton26.CheckedChanged, RadioButton27.CheckedChanged, RadioButton28.CheckedChanged
