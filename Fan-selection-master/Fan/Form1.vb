@@ -2997,12 +2997,12 @@ Public Class Form1
 
             '----------- calc discharge clean-----------
             For i = 0 To (Discharge_clean.Length - 1)
-                Discharge_clean(i) = Discharge_raw(i) + Discharge_damper(i)
+                Discharge_clean(i) = Discharge_raw(i) - Discharge_damper(i)
             Next
 
             '----------- calc suction clean-----------
             For i = 0 To (Suction_clean.Length - 1)
-                Suction_clean(i) = Suction_raw(i) + Suction_damper(i)
+                Suction_clean(i) = Suction_raw(i) - Suction_damper(i)
             Next
 
             '----------- Casing RAW-----------
@@ -3204,10 +3204,12 @@ Public Class Form1
     Private Function calc_Actual_density(density1 As Double, pressure As Double, temperature As Double)
         Return (density1 * (pressure / 101325) * (273.15 / (temperature + 273.15)))
     End Function
+
     'Calculate the labyrinth loss
-    Private Sub Button10_Click(sender As Object, e As EventArgs) Handles Button10.Click, NumericUpDown55.ValueChanged, NumericUpDown54.ValueChanged, NumericUpDown53.ValueChanged, NumericUpDown52.ValueChanged, NumericUpDown51.ValueChanged, NumericUpDown50.ValueChanged, TabPage9.Enter
+    Private Sub Button10_Click(sender As Object, e As EventArgs) Handles Button10.Click, NumericUpDown55.ValueChanged, NumericUpDown54.ValueChanged, NumericUpDown53.ValueChanged, NumericUpDown52.ValueChanged, NumericUpDown51.ValueChanged, NumericUpDown50.ValueChanged, TabPage9.Enter, NumericUpDown84.ValueChanged, NumericUpDown83.ValueChanged, NumericUpDown82.ValueChanged
         Dim as_diam, spalt_breed, spalt_opp, rho, dpres, spalt_velos, no_rings, spalt_loss, contractie As Double
 
+        '---------- as afdichting loss ------------------
         as_diam = NumericUpDown51.Value                     '[mm]
         spalt_breed = NumericUpDown50.Value                 '[mm]
         rho = NumericUpDown53.Value                         '[kg/m3]
@@ -3215,7 +3217,7 @@ Public Class Form1
         contractie = NumericUpDown54.Value                  '[-]
         dpres = NumericUpDown52.Value * 100 / no_rings      '[Pa] pressure loss per ring
 
-        spalt_opp = PI / 4 * as_diam * spalt_breed          '[mm2]
+        spalt_opp = PI * as_diam * spalt_breed              '[mm2]
 
         'Principle pressure is transferred into speed
         spalt_velos = contractie * Sqrt(dpres * 2 / rho)
@@ -3225,7 +3227,26 @@ Public Class Form1
         TextBox143.Text = Round(spalt_opp, 0).ToString      '[mm2]
         TextBox144.Text = Round(spalt_velos, 1).ToString    '[m/s]
         TextBox145.Text = Round(spalt_loss, 1).ToString     '[kg/hr]
+
+        '------------ Labyrinth loss -----------------
+        Dim Laby_diam, Laby_promille, Laby_contr, Laby_opp, Laby_velos, Laby_loss As Double
+
+        Laby_diam = NumericUpDown84.Value                   '[mm]
+        Laby_promille = NumericUpDown82.Value               '[0/000]
+        Laby_contr = NumericUpDown83.Value                  '[-]
+
+        Laby_opp = PI * Laby_diam ^ 2 * Laby_promille / 1000    '[mm2]
+
+        'Principle pressure is transferred into speed
+        Laby_velos = contractie * Sqrt(dpres * 2 / rho)
+
+        Laby_loss = Laby_velos * Laby_opp / 1000 ^ 2 * 36000 * rho   '[kg/hr]
+
+        TextBox379.Text = Round(Laby_opp, 0).ToString       '[mm2]
+        TextBox378.Text = Round(Laby_velos, 1).ToString     '[m/s]
+        TextBox375.Text = Round(Laby_loss, 1).ToString      '[kg/hr]
     End Sub
+
 
     Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click, CheckBox6.CheckedChanged, CheckBox3.CheckedChanged, CheckBox2.CheckedChanged, TabPage3.Enter, NumericUpDown9.ValueChanged, NumericUpDown10.ValueChanged, RadioButton9.CheckedChanged, RadioButton11.CheckedChanged, RadioButton10.CheckedChanged, CheckBox7.CheckedChanged, CheckBox8.CheckedChanged, CheckBox10.CheckedChanged, CheckBox13.CheckedChanged, CheckBox14.CheckedChanged
         NumericUpDown33.Value = NumericUpDown9.Value
